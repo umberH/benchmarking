@@ -16,6 +16,18 @@ except ImportError:
 
 
 class IterationManager:
+    def get_all_iterations(self) -> List[Dict[str, Any]]:
+        """
+        Return all loaded iteration dicts (with filename info) for pretty-printing and analysis.
+        """
+        iteration_files = self.get_iteration_files()
+        iterations = []
+        for iteration_file in iteration_files:
+            iteration_data = self.load_iteration(iteration_file)
+            if iteration_data:
+                iteration_data['filename'] = str(iteration_file.name)
+            iterations.append(iteration_data)
+        return iterations
     """
     Manager for handling separate iteration result files
     """

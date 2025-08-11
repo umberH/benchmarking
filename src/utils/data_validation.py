@@ -162,68 +162,87 @@ class DataValidator:
             results['errors'].append(f"Missing classes in test set: {missing_classes}")
     
     def _check_data_quality(self, X_train, X_test, results: Dict[str, Any]):
-        """Check for data quality issues like missing values"""
-        # Handle different data types
-        if isinstance(X_train, np.ndarray):
-            # For image/text data, check for NaN/Inf values
-            train_has_nan = np.isnan(X_train).any()
-            train_has_inf = np.isinf(X_train).any()
-            test_has_nan = np.isnan(X_test).any()
-            test_has_inf = np.isinf(X_test).any()
-            
+        """Check for data quality issues like missing values, with robust error handling."""
+        try:
+            # Handle different data types
+            if isinstance(X_train, np.ndarray):
+                # For image/text data, check for NaN/Inf values
+                train_has_nan = np.isnan(X_train).any()
+                train_has_inf = np.isinf(X_train).any()
+                test_has_nan = np.isnan(X_test).any()
+                test_has_inf = np.isinf(X_test).any()
+                results['validation_details']['data_quality'] = {
+                    'train_has_nan': bool(train_has_nan),
+                    'train_has_inf': bool(train_has_inf),
+                    'test_has_nan': bool(test_has_nan),
+                    'test_has_inf': bool(test_has_inf),
+                    'data_type': 'array',
+                    'train_missing_ratio': None,
+                    'test_missing_ratio': None
+                }
+                if train_has_nan or test_has_nan:
+                    results['warnings'].append("NaN values detected in data")
+                if train_has_inf or test_has_inf:
+                    results['warnings'].append("Infinite values detected in data")
+            else:
+                # For tabular data, convert to DataFrame and check missing values
+                if not isinstance(X_train, pd.DataFrame):
+                    X_train = pd.DataFrame(X_train)
+                if not isinstance(X_test, pd.DataFrame):
+                    X_test = pd.DataFrame(X_test)
+                # Check missing values
+                train_missing = X_train.isnull().sum()
+                test_missing = X_test.isnull().sum()
+                # Defensive: avoid division by zero
+                if X_train.shape[0] == 0 or X_train.shape[1] == 0:
+                    raise ValueError("Training data is empty or malformed (zero rows or columns).")
+                if X_test.shape[0] == 0 or X_test.shape[1] == 0:
+                    raise ValueError("Test data is empty or malformed (zero rows or columns).")
+                train_missing_ratio = train_missing.sum() / (X_train.shape[0] * X_train.shape[1])
+                test_missing_ratio = test_missing.sum() / (X_test.shape[0] * X_test.shape[1])
+                results['validation_details']['data_quality'] = {
+                    'train_missing_ratio': float(train_missing_ratio),
+                    'test_missing_ratio': float(test_missing_ratio),
+                    'train_missing_by_feature': train_missing.to_dict(),
+                    'test_missing_by_feature': test_missing.to_dict(),
+                    'data_type': 'tabular',
+                    'train_has_nan': None,
+                    'train_has_inf': None,
+                    'test_has_nan': None,
+                    'test_has_inf': None
+                }
+                if train_missing_ratio is not None:
+                    if train_missing_ratio > self.thresholds['max_missing_ratio']:
+                        results['errors'].append(
+                            f"Too many missing values in training set: {train_missing_ratio:.3f} > {self.thresholds['max_missing_ratio']}"
+                        )
+                if test_missing_ratio is not None:
+                    if test_missing_ratio > self.thresholds['max_missing_ratio']:
+                        results['errors'].append(
+                            f"Too many missing values in test set: {test_missing_ratio:.3f} > {self.thresholds['max_missing_ratio']}"
+                        )
+                # Check for infinite values
+                train_infinite = np.isinf(X_train.select_dtypes(include=[np.number])).sum().sum()
+                test_infinite = np.isinf(X_test.select_dtypes(include=[np.number])).sum().sum()
+                if train_infinite > 0:
+                    results['warnings'].append(f"Found {train_infinite} infinite values in training set")
+                if test_infinite > 0:
+                    results['warnings'].append(f"Found {test_infinite} infinite values in test set")
+        except Exception as e:
+            # Always set a data_quality entry, even on error
             results['validation_details']['data_quality'] = {
-                'train_has_nan': bool(train_has_nan),
-                'train_has_inf': bool(train_has_inf),
-                'test_has_nan': bool(test_has_nan),
-                'test_has_inf': bool(test_has_inf),
-                'data_type': 'array'
+                'train_missing_ratio': None,
+                'test_missing_ratio': None,
+                'train_missing_by_feature': None,
+                'test_missing_by_feature': None,
+                'data_type': 'error',
+                'train_has_nan': None,
+                'train_has_inf': None,
+                'test_has_nan': None,
+                'test_has_inf': None
             }
-            
-            if train_has_nan or test_has_nan:
-                results['warnings'].append("NaN values detected in data")
-            if train_has_inf or test_has_inf:
-                results['warnings'].append("Infinite values detected in data")
-        else:
-            # For tabular data, convert to DataFrame and check missing values
-            if not isinstance(X_train, pd.DataFrame):
-                X_train = pd.DataFrame(X_train)
-            if not isinstance(X_test, pd.DataFrame):
-                X_test = pd.DataFrame(X_test)
-            
-            # Check missing values
-            train_missing = X_train.isnull().sum()
-            test_missing = X_test.isnull().sum()
-            
-            train_missing_ratio = train_missing.sum() / (X_train.shape[0] * X_train.shape[1])
-            test_missing_ratio = test_missing.sum() / (X_test.shape[0] * X_test.shape[1])
-            
-            results['validation_details']['data_quality'] = {
-                'train_missing_ratio': float(train_missing_ratio),
-                'test_missing_ratio': float(test_missing_ratio),
-                'train_missing_by_feature': train_missing.to_dict(),
-                'test_missing_by_feature': test_missing.to_dict(),
-                'data_type': 'tabular'
-            }
-            
-            if train_missing_ratio > self.thresholds['max_missing_ratio']:
-                results['errors'].append(
-                    f"Too many missing values in training set: {train_missing_ratio:.3f} > {self.thresholds['max_missing_ratio']}"
-                )
-            
-            if test_missing_ratio > self.thresholds['max_missing_ratio']:
-                results['errors'].append(
-                    f"Too many missing values in test set: {test_missing_ratio:.3f} > {self.thresholds['max_missing_ratio']}"
-                )
-            
-            # Check for infinite values
-            train_infinite = np.isinf(X_train.select_dtypes(include=[np.number])).sum().sum()
-            test_infinite = np.isinf(X_test.select_dtypes(include=[np.number])).sum().sum()
-            
-            if train_infinite > 0:
-                results['warnings'].append(f"Found {train_infinite} infinite values in training set")
-            
-            if test_infinite > 0:
-                results['warnings'].append(f"Found {test_infinite} infinite values in test set")
+            results['errors'].append(f"Validation failed: {str(e)}")
+            self.logger.error(f"Error during data quality check: {e}")
     
     def _check_feature_distributions(self, X_train, results: Dict[str, Any]):
         """Check feature distributions for potential issues"""

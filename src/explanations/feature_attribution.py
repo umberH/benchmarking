@@ -224,48 +224,51 @@ class IntegratedGradientsExplainer(BaseExplainer):
     supported_model_types = ['mlp', 'cnn', 'vit']
     
     def explain(self, dataset) -> Dict[str, Any]:
-        """Generate Integrated Gradients explanations"""
+        """Generate Integrated Gradients explanations (only for differentiable models)."""
+        import warnings
+        import time
         start_time = time.time()
-        
-        # Get test data
         X_train, X_test, y_train, y_test = dataset.get_data()
-        
-        # Handle different data types
-        if isinstance(X_test, list):
-            # Text data - Integrated Gradients not supported for text
-            self.logger.warning("Integrated Gradients not supported for text data, skipping...")
+        model = self.model
+        # Check for scikit-learn MLP or non-differentiable model
+        sklearn_mlp = False
+        try:
+            from sklearn.neural_network import MLPClassifier, MLPRegressor
+            if isinstance(model, (MLPClassifier, MLPRegressor)):
+                sklearn_mlp = True
+        except ImportError:
+            pass
+        if sklearn_mlp:
+            warnings.warn("Integrated Gradients is not supported for scikit-learn MLP. Skipping explanation.")
+            self.logger.warning("Integrated Gradients is not supported for scikit-learn MLP. Skipping explanation.")
             return {
                 'explanations': [],
                 'generation_time': 0.0,
                 'method': 'integrated_gradients',
                 'info': {
                     'n_explanations': 0,
-                    'feature_names': []
+                    'feature_names': dataset.feature_names if hasattr(dataset, 'feature_names') else []
                 }
             }
-        
+        # Optionally: check for PyTorch or TensorFlow model here and implement real IG
+        # For now, warn if not implemented
+        # If you want a real implementation, use Captum (PyTorch) or tf-explain (TensorFlow)
         explanations = []
         feature_names = dataset.feature_names if hasattr(dataset, 'feature_names') else [f'feature_{i}' for i in range(X_test.shape[1])]
-        
-        # Generate explanations for a subset of test instances
-        n_explanations = min(30, len(X_test))  # Limit for performance
+        n_explanations = min(30, len(X_test))
         test_subset = X_test[:n_explanations]
-        
         for i, instance in enumerate(test_subset):
-            # Calculate integrated gradients
+            # Calculate integrated gradients (finite-diff fallback, not recommended)
             importance = self._calculate_integrated_gradients(instance, X_train)
-            
             explanation = {
                 'instance_id': i,
                 'feature_importance': importance,
                 'feature_names': feature_names,
-                'prediction': self.model.predict([instance])[0],
+                'prediction': model.predict([instance])[0],
                 'true_label': y_test[i] if i < len(y_test) else None
             }
             explanations.append(explanation)
-        
         self.generation_time = time.time() - start_time
-        
         return {
             'explanations': explanations,
             'generation_time': self.generation_time,

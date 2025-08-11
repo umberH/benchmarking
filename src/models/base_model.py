@@ -122,8 +122,8 @@ class BaseModel(ABC):
         """Get model information"""
         return {
             'name': self.config['name'],
-            'type': self.config['type'],
+            'type': self.config['name'],
             'is_trained': self.is_trained,
             'training_time': self.training_time,
             'config': self.config
-        } 
+        }

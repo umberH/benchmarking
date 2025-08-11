@@ -115,6 +115,11 @@ hyperparameter_tuning:
 
 # Model configuration
 models:
+  models_to_train:
+    - decision_tree
+    - random_forest
+    - gradient_boosting
+    - mlp
   # Tabular models
   tabular:
     - name: "decision_tree"

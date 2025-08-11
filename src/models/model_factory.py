@@ -65,28 +65,23 @@ class ModelFactory:
                 })
         return flattened
     
-    def create_model(self, model_config: Dict[str, Any], dataset) -> BaseModel:
+    def create_model(self, model_config: Dict[str, Any], dataset, model_type: str) -> BaseModel:
         """
         Create a model instance
         
         Args:
             model_config: Model configuration
             dataset: Dataset instance
-            
+            model_type: Type of the model (tabular, image, text)
         Returns:
             Model instance
         """
-        model_type = model_config['type']
         model_name = model_config['name']
-        
         if model_type not in self.model_registry:
             raise ValueError(f"Unknown model type: {model_type}")
-        
         self.logger.info(f"Creating model: {model_name} (type: {model_type})")
-        
         model_class = self.model_registry[model_type]
         model = model_class(model_config, dataset)
-        
         return model
     
     def get_model_info(self, model_type: str) -> Dict[str, Any]:

@@ -56,11 +56,24 @@ st.markdown("""
 def load_benchmark_results(file_path: str = "results/benchmark_results.json") -> Dict[str, Any]:
     """Load benchmark results from JSON file"""
     try:
-        with open(file_path, 'r') as f:
+        with open(file_path, "r") as f:
             return json.load(f)
-    except FileNotFoundError:
-        st.error(f"Results file not found: {file_path}")
-        return {}
+    except Exception as e:
+        st.warning(f"Results file not found: {file_path}")
+        # Try to find a file in results/iterations/ as fallback
+        iteration_dir = Path("results/iterations")
+        if not iteration_dir.exists():
+            st.error("No results/iterations/ directory found.")
+            return {}
+        iteration_files = sorted(iteration_dir.glob("*.json"))
+        if not iteration_files:
+            st.error("No iteration files found in results/iterations/.")
+            return {}
+        # Try to extract dataset name from user selection or just pick the first file
+        # (main() will filter by dataset if needed)
+        st.info(f"Loading fallback iteration file: {iteration_files[0].name}")
+        with open(iteration_files[0], "r") as f:
+            return json.load(f)
     except json.JSONDecodeError:
         st.error(f"Invalid JSON in results file: {file_path}")
         return {}
@@ -123,9 +136,17 @@ def main():
     
     # Load results
     results = load_benchmark_results()
-    
     if not results:
         st.warning("No benchmark results found. Please run the benchmark first.")
+        # Try to load from iterations folder for selected dataset
+        iteration_dir = Path("results/iterations")
+        if iteration_dir.exists():
+            iteration_files = sorted(iteration_dir.glob("*.json"))
+            if iteration_files:
+                st.info(f"Loading fallback iteration file: {iteration_files[0].name}")
+                with open(iteration_files[0], "r") as f:
+                    results = json.load(f)
+    if not results:
         return
     
     # Sidebar for filters
@@ -156,14 +177,86 @@ def main():
         filtered_df = pd.DataFrame()
     
     # Main content with tabs
-    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
         "📈 Overview", 
         "🎯 Model Performance", 
         "🔍 Explanation Metrics",
         "⏱️ Performance Analysis",
         "📊 Comparative Analysis",
-        "📋 Raw Data"
+        "📋 Raw Data",
+        "🧩 Explanation Visualizations"
     ])
+    # --- New Tab: Explanation Visualizations ---
+    with tab7:
+        st.header("🧩 Explanation Visualizations")
+        # Load all iteration files
+        iteration_dir = Path("results/iterations")
+        iteration_files = sorted(iteration_dir.glob("*.json"))
+        if not iteration_files:
+            st.warning("No iteration files found in results/iterations/.")
+        else:
+            file_names = [f.name for f in iteration_files]
+            selected_file = st.selectbox("Select Iteration File", file_names)
+            st.info(f"Fetching file: {selected_file}")
+            with open(iteration_dir / selected_file, "r") as f:
+                iteration_data = json.load(f)
+            st.subheader("Iteration File Content (truncated)")
+            st.json({k: v if k != 'explanation_results' else '...omitted...' for k, v in iteration_data.items()})
+            explanation_results = iteration_data.get("explanation_results", {})
+            available_methods = list(explanation_results.keys())
+            if not available_methods:
+                st.warning("No explanation results in this iteration file.")
+            else:
+                selected_methods = st.multiselect("Select Explanation Methods", available_methods, default=available_methods)
+                # For each selected method, show all explanations (or allow multi-instance selection)
+                for selected_method in selected_methods:
+                    st.markdown(f"---\n### Method: `{selected_method}`")
+                    method_data = explanation_results[selected_method]
+                    explanations = method_data.get("explanations", [])
+                    if not explanations:
+                        st.warning(f"No explanations found for method {selected_method}.")
+                        continue
+                    instance_ids = [e.get("instance_id", i) for i, e in enumerate(explanations)]
+                    selected_instances = st.multiselect(f"Select Instances for {selected_method}", instance_ids, default=instance_ids[:5], key=f"{selected_method}_instances")
+                    for sid in selected_instances:
+                        explanation = explanations[instance_ids.index(sid)]
+                        st.markdown(f"#### Instance: {sid}")
+                        # Feature importance (SHAP, LIME, IG, Ablation)
+                        if "feature_importance" in explanation:
+                            st.subheader("Feature Importance (Bar Plot)")
+                            feature_names = explanation.get("feature_names")
+                            importances = explanation["feature_importance"]
+                            if hasattr(importances, 'tolist'):
+                                importances = importances.tolist()
+                            df = pd.DataFrame({"Feature": feature_names, "Importance": importances})
+                            fig = px.bar(df, x="Feature", y="Importance", title=f"Feature Importances for Instance {sid}")
+                            st.plotly_chart(fig, use_container_width=True)
+                        # Counterfactual
+                        if "counterfactual" in explanation:
+                            st.subheader("Counterfactual (Table)")
+                            orig = explanation.get("original")
+                            cf = explanation.get("counterfactual")
+                            if orig is not None and cf is not None:
+                                diff = [o != c for o, c in zip(orig, cf)]
+                                df = pd.DataFrame({"Original": orig, "Counterfactual": cf, "Changed": diff})
+                                st.dataframe(df)
+                        # Prototype
+                        if "prototype" in explanation:
+                            st.subheader("Prototype (Table)")
+                            orig = explanation.get("original")
+                            proto = explanation.get("prototype")
+                            if orig is not None and proto is not None:
+                                diff = [o != p for o, p in zip(orig, proto)]
+                                df = pd.DataFrame({"Original": orig, "Prototype": proto, "Changed": diff})
+                                st.dataframe(df)
+                        # Importance map (image)
+                        if "importance_map" in explanation:
+                            st.subheader("Importance Map (Heatmap)")
+                            imp_map = np.array(explanation["importance_map"])
+                            fig = px.imshow(imp_map, color_continuous_scale='RdBu', title=f"Importance Map for Instance {sid}")
+                            st.plotly_chart(fig, use_container_width=True)
+                        st.subheader("Raw Explanation Data")
+                        st.json(explanation)
     
     with tab1:
         st.header("📈 Experiment Overview")

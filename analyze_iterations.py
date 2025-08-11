@@ -60,30 +60,69 @@ def main():
             print(f"  Earliest: {summary['date_range']['earliest']}")
             print(f"  Latest: {summary['date_range']['latest']}")
     
-    elif args.action == "report":
-        print("📋 GENERATING COMPARISON REPORT")
+    if args.action == "summary":
+        def pretty_float(val):
+            try:
+                import numpy as np
+                if isinstance(val, float) or (hasattr(np, 'floating') and isinstance(val, np.floating)):
+                    return f"{float(val):.4f}"
+            except Exception:
+                pass
+            return str(val)
+
+        def print_section(title):
+            print(f"\n{'='*10} {title} {'='*10}")
+
+        print("� ITERATION SUMMARY")
         print("=" * 50)
-        
-        output_file = Path(args.output) if args.output else None
-        report = manager.create_comparison_report(output_file)
-        print(report)
-    
-    elif args.action == "csv":
-        if not args.output:
-            print("Error: --output is required for CSV export")
-            return
-        
-        print(f"📊 EXPORTING TO CSV: {args.output}")
+        summary = manager.get_iteration_summary()
+        print(f"Total iterations: {summary['total_iterations']}")
+        print(f"Datasets: {', '.join(summary['datasets'])}")
+        print(f"Models: {', '.join(summary['models'])}")
+        print(f"Methods: {', '.join(summary['methods'])}")
+        val_stats = summary['validation_stats']
+        print(f"\nValidation Statistics:")
+        print(f"  Valid: {val_stats['valid_count']}")
+        print(f"  Invalid: {val_stats['invalid_count']}")
+        print(f"  Success rate: {val_stats['valid_ratio']:.2%}")
+        if 'date_range' in summary:
+            print(f"\nDate Range:")
+            print(f"  Earliest: {summary['date_range']['earliest']}")
+            print(f"  Latest:   {summary['date_range']['latest']}")
+        print("\nSample Iteration Details:")
+        for it in summary.get('sample_iterations', [])[:3]:
+            print(f"- {it['filename']}: {it['dataset']} | {it['model']} | {it['explanation_method']} | Valid: {it['validation_status']}")
+
+        # Pretty-print all iterations' model and explanation evaluation stats
+        print("\n\n� ALL ITERATION EVALUATION STATS")
         print("=" * 50)
-        export_iterations_to_csv(results_dir, Path(args.output))
-        print(f"Data exported to {args.output}")
-    
-    elif args.action == "best":
-        print(f"🏆 TOP {args.top_k} PERFORMING COMBINATIONS (by {args.metric})")
-        print("=" * 50)
-        
-        best_combinations = manager.get_best_performing_combinations(args.metric, args.top_k)
-        
+        all_iterations = manager.get_all_iterations()
+        for idx, it in enumerate(all_iterations, 1):
+            print_section(f"Iteration {idx}: {it.get('filename', '')}")
+            rd = it.get('result_data', {})
+            print(f"Dataset: {rd.get('dataset', '')}")
+            print(f"Model: {rd.get('model', '')}")
+            print(f"Explanation: {rd.get('explanation_method', '')}")
+            print(f"Valid: {rd.get('validation_status', '')}")
+            # Model performance
+            if 'model_performance' in rd:
+                print_section("Model Performance")
+                perf = rd['model_performance']
+                if isinstance(perf, dict):
+                    for k, v in perf.items():
+                        print(f"{k:20}: {pretty_float(v)}")
+                else:
+                    print(perf)
+            # Explanation evaluation
+            if 'evaluation_results' in rd:
+                print_section("Explanation Evaluation Results")
+                evals = rd['evaluation_results']
+                if isinstance(evals, dict):
+                    for k, v in evals.items():
+                        print(f"{k:20}: {pretty_float(v)}")
+                else:
+                    print(evals)
+            print("\n" + "-"*40)
         if not best_combinations:
             print("No results found!")
             return

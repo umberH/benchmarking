@@ -83,33 +83,26 @@ class ExplanationFactory:
             explanation_config: Explanation method configuration
             model: Trained model instance
             dataset: Dataset instance
-            
         Returns:
             Explainer instance
         """
-        method_type = explanation_config['type']
         method_name = explanation_config['name']
-        
-        if method_type not in self.explainer_registry:
-            raise ValueError(f"Unknown explanation method type: {method_type}")
-        
-        self.logger.info(f"Creating explainer: {method_name} (type: {method_type})")
-        
-        explainer_class = self.explainer_registry[method_type]
+        if method_name not in self.explainer_registry:
+            raise ValueError(f"Unknown explanation method name: {method_name}")
+        self.logger.info(f"Creating explainer: {method_name}")
+        explainer_class = self.explainer_registry[method_name]
         explainer = explainer_class(explanation_config, model, dataset)
-        
         return explainer
     
-    def get_method_info(self, method_type: str) -> Dict[str, Any]:
-        """Get information about an explanation method type"""
-        if method_type not in self.explainer_registry:
-            raise ValueError(f"Unknown explanation method type: {method_type}")
-        
-        explainer_class = self.explainer_registry[method_type]
+    def get_method_info(self, method_name: str) -> Dict[str, Any]:
+        """Get information about an explanation method by name"""
+        if method_name not in self.explainer_registry:
+            raise ValueError(f"Unknown explanation method name: {method_name}")
+        explainer_class = self.explainer_registry[method_name]
         return {
-            'type': method_type,
-            'name': explainer_class.__name__,
+            'name': method_name,
+            'class_name': explainer_class.__name__,
             'description': explainer_class.__doc__ or '',
             'supported_data_types': getattr(explainer_class, 'supported_data_types', []),
             'supported_model_types': getattr(explainer_class, 'supported_model_types', [])
-        } 
+        }
