@@ -1,0 +1,337 @@
+# XAI Benchmarking Framework Configuration
+
+# Data configuration
+data:
+  # Available datasets for each data type
+  tabular_datasets:
+    # Mandatory datasets
+    - name: "adult_income"
+      source: "uci"
+      description: "Adult Income (UCI) - Binary classification, well-known interpretable baseline dataset"
+      mandatory: true
+    - name: "compas"
+      source: "custom"
+      description: "COMPAS - Binary classification, real-world socially sensitive dataset"
+      mandatory: true
+    # Complementary datasets
+    - name: "iris"
+      source: "sklearn"
+      description: "Iris flower classification dataset"
+      mandatory: false
+    - name: "breast_cancer"
+      source: "sklearn"
+      description: "Breast cancer diagnosis dataset"
+      mandatory: false
+    - name: "diabetes"
+      source: "sklearn"
+      description: "Diabetes prediction dataset"
+      mandatory: false
+  
+  image_datasets:
+    # Mandatory datasets
+    - name: "mnist"
+      source: "torchvision"
+      description: "MNIST - Multiclass classification, standard for image classification and attributions"
+      mandatory: true
+    # Complementary datasets
+    - name: "cifar10"
+      source: "torchvision"
+      description: "Color image classification dataset"
+      mandatory: false
+  
+  text_datasets:
+    # Mandatory datasets
+    - name: "imdb"
+      source: "huggingface"
+      description: "IMDB Movie Reviews - Binary sentiment classification, common NLP task for text explanation methods"
+      mandatory: true
+    # Complementary datasets
+    - name: "20newsgroups"
+      source: "sklearn"
+      description: "News article classification dataset"
+      mandatory: false
+
+# Data validation configuration
+validation:
+  # Class balance thresholds
+  class_imbalance_ratio: 0.2  # Minimum ratio of minority to majority class
+  
+  # Dataset size thresholds
+  min_dataset_size: 100  # Minimum samples for reliable evaluation
+  min_test_size: 10  # Minimum test samples
+  
+  # Data quality thresholds
+  max_missing_ratio: 0.3  # Maximum allowed missing values ratio
+  outlier_threshold: 3.0  # Z-score threshold for outlier detection
+  
+  # Feature thresholds
+  feature_correlation_threshold: 0.95  # Maximum correlation between features
+  min_features: 2  # Minimum number of features
+  max_features: 1000  # Maximum number of features (for performance)
+  
+  # Distribution thresholds
+  max_skewness: 3.0  # Maximum absolute skewness for features
+  max_outlier_ratio: 0.1  # Maximum outlier ratio per feature
+
+# Hyperparameter tuning configuration
+hyperparameter_tuning:
+  # General tuning settings
+  cv_folds: 5  # Number of cross-validation folds
+  scoring: "accuracy"  # Scoring metric for optimization
+  n_jobs: -1  # Number of parallel jobs (-1 for all cores)
+  verbose: 1  # Verbosity level
+  
+  # Optimization method
+  optimization_method: "grid_search"  # 'grid_search' or 'optuna'
+  n_trials: 100  # Number of trials for optuna
+  timeout: 3600  # Timeout in seconds (1 hour)
+  
+  # Result saving
+  save_best_params: true  # Save best parameters for each model-dataset combination
+  save_all_results: true  # Save all tuning results
+  
+  # Parameter grids (can be overridden per model)
+  parameter_grids:
+    decision_tree:
+      max_depth: [3, 5, 7, 10, None]
+      min_samples_split: [2, 5, 10]
+      min_samples_leaf: [1, 2, 4]
+      criterion: ['gini', 'entropy']
+    random_forest:
+      n_estimators: [50, 100, 200]
+      max_depth: [5, 10, 15, None]
+      min_samples_split: [2, 5, 10]
+      max_features: ['sqrt', 'log2', None]
+    gradient_boosting:
+      n_estimators: [50, 100, 200]
+      learning_rate: [0.01, 0.1, 0.2]
+      max_depth: [3, 5, 7]
+      subsample: [0.8, 0.9, 1.0]
+    mlp:
+      hidden_layer_sizes: [(50,), (100,), (50, 50)]
+      activation: ['relu', 'tanh']
+      alpha: [0.0001, 0.001, 0.01]
+      max_iter: [500, 1000]
+
+# Model configuration
+models:
+  # Tabular models
+  tabular:
+    - name: "decision_tree"
+      description: "Decision Tree Classifier"
+      library: "sklearn"
+    - name: "random_forest"
+      description: "Random Forest Classifier"
+      library: "sklearn"
+    - name: "gradient_boosting"
+      description: "Gradient Boosting Classifier"
+      library: "sklearn"
+    - name: "mlp"
+      description: "Multi-layer Perceptron"
+      library: "sklearn"
+  
+  # Image models
+  image:
+    - name: "cnn"
+      description: "Convolutional Neural Network"
+      library: "pytorch"
+    - name: "vit"
+      description: "Vision Transformer"
+      library: "pytorch"
+  
+  # Text models
+  text:
+    - name: "bert"
+      description: "BERT-based classifier (simplified)"
+      library: "sklearn"
+    - name: "lstm"
+      description: "LSTM-based classifier (simplified)"
+      library: "sklearn"
+
+# Explanation methods configuration
+explanations:
+  # Feature attribution methods
+  feature_attribution:
+    - name: "shap"
+      description: "SHAP (SHapley Additive exPlanations)"
+      library: "shap"
+    - name: "lime"
+      description: "LIME (Local Interpretable Model-agnostic Explanations)"
+      library: "lime"
+    - name: "integrated_gradients"
+      description: "Integrated Gradients"
+      library: "captum"
+  
+  # Example-based methods
+  example_based:
+    - name: "prototype"
+      description: "Prototype-based explanations"
+      library: "custom"
+    - name: "counterfactual"
+      description: "Counterfactual explanations"
+      library: "alibi"
+  
+  # Concept-based methods
+  concept_based:
+    - name: "tcav"
+      description: "TCAV (Testing with Concept Activation Vectors)"
+      library: "custom"
+    - name: "concept_bottleneck"
+      description: "Concept Bottleneck Models"
+      library: "custom"
+  
+  # Perturbation methods
+  perturbation:
+    - name: "occlusion"
+      description: "Occlusion-based explanations"
+      library: "captum"
+    - name: "feature_ablation"
+      description: "Feature ablation explanations"
+      library: "captum"
+
+# Evaluation metrics configuration
+evaluation:
+  # Fidelity metrics
+  fidelity:
+    - name: "faithfulness"
+      description: "How well explanations reflect model behavior"
+    - name: "monotonicity"
+      description: "Consistency of explanation with model predictions"
+    - name: "completeness"
+      description: "Coverage of explanation across features"
+  
+  # Time complexity
+  time_complexity:
+    - name: "explanation_time"
+      description: "Time taken to generate explanations"
+    - name: "training_time"
+      description: "Time taken to train the model"
+  
+  # Stability metrics
+  stability:
+    - name: "consistency"
+      description: "Consistency of explanations across similar inputs"
+    - name: "robustness"
+      description: "Robustness to small input perturbations"
+  
+  # Comprehensibility metrics
+  comprehensibility:
+    - name: "sparsity"
+      description: "Sparsity of explanations"
+    - name: "simplicity"
+      description: "Simplicity of explanation structure"
+
+# Experiment configuration
+experiment:
+  # Data preprocessing
+  preprocessing:
+    test_size: 0.2
+    random_state: 42
+    scale_features: true
+    handle_missing: true
+  
+  # Enhanced data splitting configuration
+  data_splitting:
+    # Default splitting strategy
+    default_strategy: "stratified"
+    
+    # Split sizes
+    test_size: 0.2
+    validation_size: 0.1
+    
+    # General settings
+    random_state: 42
+    stratify: true
+    shuffle: true
+    
+    # Cross-validation settings
+    n_splits: 5
+    n_repeats: 3
+    
+    # Time-based splitting
+    time_column: null
+    gap: 0
+    
+    # Group-based splitting
+    group_column: null
+    
+    # Validation thresholds
+    min_samples_per_class: 2
+    max_imbalance_ratio: 0.3
+    
+    # Available strategies
+    strategies:
+      stratified:
+        description: "Maintains class distribution across splits"
+        supports_validation: true
+        supports_cv: true
+      time_based:
+        description: "Time-based splits for temporal data"
+        supports_validation: false
+        supports_cv: false
+        requires_time_column: true
+      cross_validation:
+        description: "K-fold cross-validation"
+        supports_validation: false
+        supports_cv: true
+        cv_types:
+          - "stratified_kfold"
+          - "kfold"
+          - "leave_one_out"
+          - "stratified_shuffle_split"
+      group_based:
+        description: "Group-based splits (e.g., by patient, subject)"
+        supports_validation: false
+        supports_cv: false
+        requires_group_column: true
+      custom:
+        description: "Custom split strategies"
+        supports_validation: true
+        supports_cv: true
+      holdout:
+        description: "Simple holdout split"
+        supports_validation: true
+        supports_cv: false
+  
+  # Model training
+  training:
+    max_iter: 1000
+    early_stopping: true
+    validation_split: 0.1
+  
+  # Explanation generation
+  explanation:
+    num_samples: 100
+    max_features: 10
+    random_state: 42
+  
+  # Evaluation
+  evaluation:
+    num_runs: 5
+    confidence_level: 0.95
+    significance_level: 0.05
+    multiple_comparison_correction: "bonferroni"
+    statistical_tests:
+      - "t_test"
+      - "mann_whitney"
+      - "wilcoxon"
+      - "anova"
+      - "kruskal_wallis"
+      - "friedman"
+    effect_size_calculation: true
+    power_analysis: true
+    correlation_analysis: true
+
+# Output configuration
+output:
+  results_dir: "results"
+  save_models: true
+  save_explanations: true
+  generate_plots: true
+  save_reports: true
+
+# Logging configuration
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "benchmark.log" 
