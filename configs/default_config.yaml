@@ -120,6 +120,10 @@ models:
     - random_forest
     - gradient_boosting
     - mlp
+    - cnn
+    - vit
+    - bert
+    - lstm
   # Tabular models
   tabular:
     - name: "decision_tree"
@@ -166,6 +170,18 @@ explanations:
     - name: "integrated_gradients"
       description: "Integrated Gradients"
       library: "captum"
+    - name: "causal_shap"
+      description: "Causal SHAP - SHAP values with causal structure consideration"
+      library: "custom"
+      data_types: ["tabular"]
+    - name: "shapley_flow"
+      description: "Shapley Flow - tracks value propagation through model layers"
+      library: "custom"
+      data_types: ["tabular", "image"]
+    - name: "shap_interactive"
+      description: "SHAP Interactive - includes main effects and pairwise interactions"
+      library: "custom"
+      data_types: ["tabular"]
   
   # Example-based methods
   example_based:
@@ -175,6 +191,10 @@ explanations:
     - name: "counterfactual"
       description: "Counterfactual explanations"
       library: "alibi"
+    - name: "influence_functions"
+      description: "Influence Functions - identifies training examples affecting predictions"
+      library: "custom"
+      data_types: ["tabular", "image", "text"]
   
   # Concept-based methods
   concept_based:
@@ -184,6 +204,14 @@ explanations:
     - name: "concept_bottleneck"
       description: "Concept Bottleneck Models"
       library: "custom"
+    - name: "bayesian_rule_list"
+      description: "Bayesian Rule Lists - interpretable if-then rules with posteriors"
+      library: "custom"
+      data_types: ["tabular"]
+    - name: "corels"
+      description: "CORELS - certifiably optimal rule lists"
+      library: "custom"
+      data_types: ["tabular"]
   
   # Perturbation methods
   perturbation:

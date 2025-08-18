@@ -76,4 +76,18 @@ class BaseExplainer(ABC):
             'config': self.config,
             'supported_data_types': getattr(self, 'supported_data_types', []),
             'supported_model_types': getattr(self, 'supported_model_types', [])
+        }
+    
+    def _empty_result(self) -> Dict[str, Any]:
+        """Return empty result structure when explanation cannot be generated"""
+        return {
+            'explanations': [],
+            'generation_time': 0.0,
+            'method': self.config.get('type', 'unknown'),
+            'info': {
+                'n_explanations': 0,
+                'error': 'Explanation method not compatible with this data type',
+                'supported_data_types': getattr(self, 'supported_data_types', []),
+                'supported_model_types': getattr(self, 'supported_model_types', [])
+            }
         } 

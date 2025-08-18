@@ -13,11 +13,28 @@ class TCAVExplainer(BaseExplainer):
     
     def explain(self, dataset) -> dict:
         """Generate TCAV explanations"""
+        # Placeholder: check for concepts in config or dataset
+        concepts = getattr(dataset, 'concepts', None)
+        if not concepts or len(concepts) == 0:
+            return {
+                'explanations': [],
+                'generation_time': 0.0,
+                'method': 'tcav',
+                'info': {
+                    'n_explanations': 0,
+                    'debug': 'No concepts provided for TCAV. Please specify concept sets for this dataset/model.'
+                }
+            }
+        # If concepts exist, implement TCAV logic here (placeholder)
+        # For now, just return a debug message
         return {
             'explanations': [],
             'generation_time': 0.0,
             'method': 'tcav',
-            'info': {'n_explanations': 0}
+            'info': {
+                'n_explanations': 0,
+                'debug': f'TCAV not implemented. Concepts provided: {concepts}'
+            }
         }
 
 

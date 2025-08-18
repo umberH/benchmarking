@@ -434,8 +434,20 @@ class StatisticalTester:
                     continue
                 
                 # Calculate correlations
-                values1 = [np.mean(metrics_data[metric1][method]) for method in common_methods]
-                values2 = [np.mean(metrics_data[metric2][method]) for method in common_methods]
+                values1 = []
+                values2 = []
+                
+                for method in common_methods:
+                    try:
+                        val1 = np.mean(metrics_data[metric1][method]) if isinstance(metrics_data[metric1][method], list) else metrics_data[metric1][method]
+                        val2 = np.mean(metrics_data[metric2][method]) if isinstance(metrics_data[metric2][method], list) else metrics_data[metric2][method]
+                        values1.append(val1)
+                        values2.append(val2)
+                    except Exception:
+                        continue
+                
+                if len(values1) != len(values2) or len(values1) < 2:
+                    continue
                 
                 try:
                     # Pearson correlation

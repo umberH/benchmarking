@@ -28,6 +28,8 @@ def parse_args():
                        help="Run in interactive mode")
     parser.add_argument("--run-all", action="store_true",
                        help="Run all combinations of datasets, models, and explanations")
+    parser.add_argument("--comprehensive", action="store_true",
+                       help="Run comprehensive benchmarking across all models, explanations, and evaluations with markdown report generation")
     
     # Hyperparameter tuning options
     parser.add_argument("--tune-hyperparameters", action="store_true",
@@ -112,7 +114,10 @@ def main():
             return
         
         # Run benchmark modes
-        if args.run_all:
+        if args.comprehensive:
+            logger.info("Running comprehensive benchmarking with markdown report generation")
+            benchmark.run_comprehensive(use_tuned_params=args.use_tuned_params)
+        elif args.run_all:
             logger.info("Running all combinations with incremental saving")
             benchmark.run_all(use_tuned_params=args.use_tuned_params)
         elif args.interactive:
@@ -127,6 +132,9 @@ def main():
         # Print summary
         print(f"\n🎉 Benchmarking completed!")
         print(f"📁 Results saved to: {args.output_dir}")
+        
+        if args.comprehensive:
+            print(f"📄 Comprehensive markdown report: {args.output_dir}/comprehensive_report.md")
         
         if args.use_tuned_params:
             print(f"🔧 Used tuned hyperparameters for model training")

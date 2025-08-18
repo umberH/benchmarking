@@ -12,6 +12,7 @@ from .base_model import BaseModel
 
 
 class BERTModel(BaseModel):
+    supported_data_types = ['text']
     """BERT model for text data (simplified implementation)"""
     
     supported_data_types = ['text']
@@ -48,6 +49,7 @@ class BERTModel(BaseModel):
 
 
 class LSTMModel(BaseModel):
+    supported_data_types = ['text']
     """LSTM model for text data (simplified implementation)"""
     
     supported_data_types = ['text']

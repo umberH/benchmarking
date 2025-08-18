@@ -9,7 +9,12 @@ from .base_explainer import BaseExplainer
 from .feature_attribution import SHAPExplainer, LIMEExplainer, IntegratedGradientsExplainer
 from .example_based import PrototypeExplainer, CounterfactualExplainer
 from .concept_based import TCAVExplainer, ConceptBottleneckExplainer
-from .perturbation import OcclusionExplainer, FeatureAblationExplainer
+from .perturbation import OcclusionExplainer, FeatureAblationExplainer, TextOcclusionExplainer
+from .attention_based import AttentionVisualizationExplainer
+from .advanced_methods import (
+    CausalSHAPExplainer, ShapleyFlowExplainer, BayesianRuleListExplainer,
+    InfluenceFunctionExplainer, SHAPInteractivePlotsExplainer, CORELSExplainer
+)
 
 
 class ExplanationFactory:
@@ -45,6 +50,18 @@ class ExplanationFactory:
             # Perturbation methods
             'occlusion': OcclusionExplainer,
             'feature_ablation': FeatureAblationExplainer,
+            'text_occlusion': TextOcclusionExplainer,
+            
+            # Attention-based methods
+            'attention_visualization': AttentionVisualizationExplainer,
+            
+            # Advanced methods
+            'causal_shap': CausalSHAPExplainer,
+            'shapley_flow': ShapleyFlowExplainer,
+            'bayesian_rule_list': BayesianRuleListExplainer,
+            'influence_functions': InfluenceFunctionExplainer,
+            'shap_interactive': SHAPInteractivePlotsExplainer,
+            'corels': CORELSExplainer,
         }
     
     def get_available_methods(self) -> List[Dict[str, Any]]:
@@ -73,7 +90,35 @@ class ExplanationFactory:
                     'description': item.get('description', ''),
                     'params': item.get('params', {})
                 })
+        # Also add methods from registry that aren't in config
+        for method_name, explainer_class in self.explainer_registry.items():
+            # Check if method is already in flattened list
+            if not any(method['name'] == method_name for method in flattened):
+                # Add method from registry
+                method_info = self.get_method_info(method_name)
+                flattened.append({
+                    'name': method_name,
+                    'type': method_name,
+                    'category': self._infer_category_from_registry(method_name),
+                    'description': method_info.get('description', ''),
+                    'params': {}
+                })
+        
         return flattened
+    
+    def _infer_category_from_registry(self, method_name: str) -> str:
+        """Infer category for registry methods"""
+        if method_name in ['shap', 'lime', 'integrated_gradients', 'attention_visualization', 
+                          'causal_shap', 'shapley_flow', 'shap_interactive']:
+            return 'feature_attribution'
+        elif method_name in ['prototype', 'counterfactual', 'influence_functions']:
+            return 'example_based'
+        elif method_name in ['tcav', 'concept_bottleneck', 'bayesian_rule_list', 'corels']:
+            return 'concept_based'
+        elif method_name in ['occlusion', 'feature_ablation', 'text_occlusion']:
+            return 'perturbation'
+        else:
+            return 'advanced'
     
     def create_explainer(self, explanation_config: Dict[str, Any], model, dataset) -> BaseExplainer:
         """

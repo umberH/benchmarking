@@ -138,7 +138,26 @@ dmypy.json
 .DS_Store
 Thumbs.db
 
-# Project specific
+# Project specific - Exclude large result files for cloud deployment
+results/
+!results/.gitkeep
 results/iterations/
 *.json
-!configs/*.yaml 
+*.md
+!README.md
+!*.md
+!configs/*.yaml
+!configs/*.json
+
+# Large data files
+*.csv
+*.pkl
+*.pickle
+*.h5
+*.hdf5
+*.npz
+
+# Temporary files
+temp/
+tmp/
+*.tmp 

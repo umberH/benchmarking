@@ -46,17 +46,9 @@ class DataValidator:
     
     def validate_dataset(self, dataset, dataset_name: str) -> Dict[str, Any]:
         """
-        Comprehensive dataset validation
-        
-        Args:
-            dataset: Dataset object with get_data() method
-            dataset_name: Name of the dataset
-            
-        Returns:
-            Dictionary containing validation results and recommendations
+        Comprehensive dataset validation with robust type conversion
         """
         self.logger.info(f"Validating dataset: {dataset_name}")
-        
         validation_results = {
             'dataset_name': dataset_name,
             'is_valid': True,
@@ -65,34 +57,62 @@ class DataValidator:
             'recommendations': [],
             'validation_details': {}
         }
-        
         try:
             # Get dataset info
             dataset_info = dataset.get_info()
             validation_results['dataset_info'] = dataset_info
-            
             # Get data
             X_train, X_test, y_train, y_test = dataset.get_data()
-            
-            # Run all validation checks
+            # Defensive: ensure correct types for validation
+            dtype = dataset_info.get('type', '').lower()
+            import numpy as np
+            import pandas as pd
+            if dtype == 'image':
+                # Ensure np.ndarray, never convert to DataFrame
+                if not isinstance(X_train, np.ndarray):
+                    X_train = np.array(X_train)
+                if not isinstance(X_test, np.ndarray):
+                    X_test = np.array(X_test)
+                # Defensive: if 4D, keep as is; if 3D, add channel dim
+                if X_train.ndim == 3:
+                    X_train = X_train[:, None, :, :]
+                if X_test.ndim == 3:
+                    X_test = X_test[:, None, :, :]
+                # Robust check: image data should be 4D (N, C, H, W)
+                if X_train.ndim != 4:
+                    validation_results['errors'].append(f"Image data must be 4D (N, C, H, W), got shape {X_train.shape}")
+                if X_test.ndim != 4:
+                    validation_results['errors'].append(f"Image test data must be 4D (N, C, H, W), got shape {X_test.shape}")
+                # Do NOT convert image data to DataFrame or enforce 2D
+            elif dtype == 'text':
+                # Ensure list of str
+                if not isinstance(X_train, list):
+                    X_train = list(X_train)
+                if not isinstance(X_test, list):
+                    X_test = list(X_test)
+            elif dtype == 'tabular':
+                # Ensure DataFrame or np.ndarray, but only if 2D
+                if not (isinstance(X_train, pd.DataFrame) or (isinstance(X_train, np.ndarray) and X_train.ndim == 2)):
+                    X_train = pd.DataFrame(X_train)
+                if not (isinstance(X_test, pd.DataFrame) or (isinstance(X_test, np.ndarray) and X_test.ndim == 2)):
+                    X_test = pd.DataFrame(X_test)
+            # Run general validation checks
             self._check_dataset_size(X_train, X_test, y_train, y_test, validation_results)
             self._check_class_balance(y_train, y_test, validation_results)
             self._check_data_quality(X_train, X_test, validation_results)
-            self._check_feature_distributions(X_train, validation_results)
-            self._check_feature_correlations(X_train, validation_results)
-            self._check_outliers(X_train, validation_results)
-            
+            # Only run tabular-specific checks for tabular data
+            if dtype == 'tabular':
+                self._check_feature_distributions(X_train, validation_results)
+                self._check_feature_correlations(X_train, validation_results)
+                self._check_outliers(X_train, validation_results)
             # Overall validation status
             validation_results['is_valid'] = len(validation_results['errors']) == 0
-            
             # Generate recommendations
             self._generate_recommendations(validation_results)
-            
         except Exception as e:
             self.logger.error(f"Error validating dataset {dataset_name}: {e}")
             validation_results['errors'].append(f"Validation failed: {str(e)}")
             validation_results['is_valid'] = False
-        
         return validation_results
     
     def _check_dataset_size(self, X_train, X_test, y_train, y_test, results: Dict[str, Any]):
@@ -166,11 +186,25 @@ class DataValidator:
         try:
             # Handle different data types
             if isinstance(X_train, np.ndarray):
-                # For image/text data, check for NaN/Inf values
-                train_has_nan = np.isnan(X_train).any()
-                train_has_inf = np.isinf(X_train).any()
-                test_has_nan = np.isnan(X_test).any()
-                test_has_inf = np.isinf(X_test).any()
+                # For image/text data, check for NaN/Inf values, handle None safely
+                train_has_nan = False
+                train_has_inf = False
+                test_has_nan = False
+                test_has_inf = False
+                if X_train is not None:
+                    try:
+                        train_has_nan = np.isnan(X_train).any()
+                        train_has_inf = np.isinf(X_train).any()
+                    except Exception:
+                        train_has_nan = False
+                        train_has_inf = False
+                if X_test is not None:
+                    try:
+                        test_has_nan = np.isnan(X_test).any()
+                        test_has_inf = np.isinf(X_test).any()
+                    except Exception:
+                        test_has_nan = False
+                        test_has_inf = False
                 results['validation_details']['data_quality'] = {
                     'train_has_nan': bool(train_has_nan),
                     'train_has_inf': bool(train_has_inf),
@@ -201,8 +235,8 @@ class DataValidator:
                 train_missing_ratio = train_missing.sum() / (X_train.shape[0] * X_train.shape[1])
                 test_missing_ratio = test_missing.sum() / (X_test.shape[0] * X_test.shape[1])
                 results['validation_details']['data_quality'] = {
-                    'train_missing_ratio': float(train_missing_ratio),
-                    'test_missing_ratio': float(test_missing_ratio),
+                    'train_missing_ratio': float(train_missing_ratio) if train_missing_ratio is not None else 0.0,
+                    'test_missing_ratio': float(test_missing_ratio) if test_missing_ratio is not None else 0.0,
                     'train_missing_by_feature': train_missing.to_dict(),
                     'test_missing_by_feature': test_missing.to_dict(),
                     'data_type': 'tabular',
@@ -211,16 +245,14 @@ class DataValidator:
                     'test_has_nan': None,
                     'test_has_inf': None
                 }
-                if train_missing_ratio is not None:
-                    if train_missing_ratio > self.thresholds['max_missing_ratio']:
-                        results['errors'].append(
-                            f"Too many missing values in training set: {train_missing_ratio:.3f} > {self.thresholds['max_missing_ratio']}"
-                        )
-                if test_missing_ratio is not None:
-                    if test_missing_ratio > self.thresholds['max_missing_ratio']:
-                        results['errors'].append(
-                            f"Too many missing values in test set: {test_missing_ratio:.3f} > {self.thresholds['max_missing_ratio']}"
-                        )
+                if train_missing_ratio is not None and train_missing_ratio > self.thresholds['max_missing_ratio']:
+                    results['errors'].append(
+                        f"Too many missing values in training set: {train_missing_ratio:.3f} > {self.thresholds['max_missing_ratio']}"
+                    )
+                if test_missing_ratio is not None and test_missing_ratio > self.thresholds['max_missing_ratio']:
+                    results['errors'].append(
+                        f"Too many missing values in test set: {test_missing_ratio:.3f} > {self.thresholds['max_missing_ratio']}"
+                    )
                 # Check for infinite values
                 train_infinite = np.isinf(X_train.select_dtypes(include=[np.number])).sum().sum()
                 test_infinite = np.isinf(X_test.select_dtypes(include=[np.number])).sum().sum()
@@ -396,44 +428,54 @@ class DataValidator:
         """Generate recommendations based on validation results"""
         recommendations = []
         
-        # Dataset size recommendations
-        if 'dataset_size' in results['validation_details']:
-            size_info = results['validation_details']['dataset_size']
-            if size_info['n_total'] < self.thresholds['min_dataset_size'] * 2:
-                recommendations.append("Consider collecting more data or using data augmentation techniques")
+        try:
+            # Dataset size recommendations
+            if 'dataset_size' in results['validation_details']:
+                size_info = results['validation_details']['dataset_size']
+                if size_info.get('n_total', 0) < self.thresholds['min_dataset_size'] * 2:
+                    recommendations.append("Consider collecting more data or using data augmentation techniques")
+            
+            # Class balance recommendations
+            if 'class_balance' in results['validation_details']:
+                balance_info = results['validation_details']['class_balance']
+                train_imbalance = balance_info.get('train_imbalance_ratio')
+                if train_imbalance is not None and train_imbalance < 0.3:
+                    recommendations.append("Consider using class balancing techniques (SMOTE, undersampling, etc.)")
+                    recommendations.append("Use metrics like F1-score instead of accuracy for imbalanced datasets")
+            
+            # Data quality recommendations (only for tabular data)
+            if 'data_quality' in results['validation_details']:
+                quality_info = results['validation_details']['data_quality']
+                if quality_info.get('data_type') == 'tabular':
+                    train_missing_ratio = quality_info.get('train_missing_ratio')
+                    if train_missing_ratio is not None and train_missing_ratio > 0.1:
+                        recommendations.append("Implement proper missing value imputation strategies")
+                    if train_missing_ratio is not None and train_missing_ratio > 0.3:
+                        recommendations.append("Consider removing features with too many missing values")
+            
+            # Feature recommendations (only for tabular data)
+            if 'feature_distributions' in results['validation_details']:
+                dist_info = results['validation_details']['feature_distributions']
+                if isinstance(dist_info, dict) and dist_info.get('data_type') != 'array':
+                    constant_features = [col for col, info in dist_info.items() 
+                                       if isinstance(info, dict) and info.get('is_constant', False)]
+                    if constant_features:
+                        recommendations.append(f"Remove constant features: {constant_features}")
+            
+            if 'feature_correlations' in results['validation_details']:
+                corr_info = results['validation_details']['feature_correlations']
+                if isinstance(corr_info, dict) and corr_info.get('high_corr_pairs'):
+                    recommendations.append("Consider feature selection to remove highly correlated features")
+            
+            # Outlier recommendations (only for tabular data)
+            if 'outliers' in results['validation_details']:
+                outlier_info = results['validation_details']['outliers']
+                if isinstance(outlier_info, dict) and outlier_info.get('total_outliers', 0) > 0:
+                    recommendations.append("Consider outlier detection and treatment strategies")
         
-        # Class balance recommendations
-        if 'class_balance' in results['validation_details']:
-            balance_info = results['validation_details']['class_balance']
-            if balance_info['train_imbalance_ratio'] < 0.3:
-                recommendations.append("Consider using class balancing techniques (SMOTE, undersampling, etc.)")
-                recommendations.append("Use metrics like F1-score instead of accuracy for imbalanced datasets")
-        
-        # Data quality recommendations
-        if 'data_quality' in results['validation_details']:
-            quality_info = results['validation_details']['data_quality']
-            if quality_info['train_missing_ratio'] > 0.1:
-                recommendations.append("Implement proper missing value imputation strategies")
-            if quality_info['train_missing_ratio'] > 0.3:
-                recommendations.append("Consider removing features with too many missing values")
-        
-        # Feature recommendations
-        if 'feature_distributions' in results['validation_details']:
-            dist_info = results['validation_details']['feature_distributions']
-            constant_features = [col for col, info in dist_info.items() if info['is_constant']]
-            if constant_features:
-                recommendations.append(f"Remove constant features: {constant_features}")
-        
-        if 'feature_correlations' in results['validation_details']:
-            corr_info = results['validation_details']['feature_correlations']
-            if corr_info['high_corr_pairs']:
-                recommendations.append("Consider feature selection to remove highly correlated features")
-        
-        # Outlier recommendations
-        if 'outliers' in results['validation_details']:
-            outlier_info = results['validation_details']['outliers']
-            if outlier_info['total_outliers'] > 0:
-                recommendations.append("Consider outlier detection and treatment strategies")
+        except Exception as e:
+            self.logger.warning(f"Error generating recommendations: {e}")
+            recommendations.append("Unable to generate specific recommendations due to validation errors")
         
         results['recommendations'] = recommendations
     
@@ -493,8 +535,12 @@ class DataValidator:
         if 'data_quality' in details:
             quality_info = details['data_quality']
             report_lines.append("Data Quality:")
-            report_lines.append(f"  - Training missing ratio: {quality_info['train_missing_ratio']:.3f}")
-            report_lines.append(f"  - Test missing ratio: {quality_info['test_missing_ratio']:.3f}")
+            train_ratio = quality_info.get('train_missing_ratio', 0.0)
+            test_ratio = quality_info.get('test_missing_ratio', 0.0)
+            train_ratio = train_ratio if train_ratio is not None else 0.0
+            test_ratio = test_ratio if test_ratio is not None else 0.0
+            report_lines.append(f"  - Training missing ratio: {train_ratio:.3f}")
+            report_lines.append(f"  - Test missing ratio: {test_ratio:.3f}")
             report_lines.append("")
         
         # Warnings and errors
