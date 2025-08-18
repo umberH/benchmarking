@@ -1,0 +1,1319 @@
+{
+  "organized_structure": {
+    "adult": {
+      "income": {
+        "decision_tree_bayesian_rule_list": {
+          "file_count": 10,
+          "files": [
+            "iteration_0008_20250814_211914.json",
+            "iteration_0008_20250814_213612.json",
+            "iteration_0008_20250815_092800.json",
+            "iteration_0008_20250815_094009.json",
+            "iteration_0008_20250815_120232.json",
+            "iteration_0008_20250815_121746.json",
+            "iteration_0008_20250815_135323.json",
+            "iteration_0008_20250815_140130.json",
+            "iteration_0008_20250815_144534.json",
+            "iteration_0008_20250816_063647.json"
+          ]
+        },
+        "decision_tree_causal_shap": {
+          "file_count": 11,
+          "files": [
+            "iteration_0003_20250814_213108.json",
+            "iteration_0003_20250815_092759.json",
+            "iteration_0003_20250815_094007.json",
+            "iteration_0003_20250815_120146.json",
+            "iteration_0003_20250815_121717.json",
+            "iteration_0003_20250815_132625.json",
+            "iteration_0003_20250815_135300.json",
+            "iteration_0003_20250815_140103.json",
+            "iteration_0003_20250815_144504.json",
+            "iteration_0003_20250816_063626.json",
+            "iteration_0006_20250814_211911.json"
+          ]
+        },
+        "decision_tree_corels": {
+          "file_count": 10,
+          "files": [
+            "iteration_0009_20250814_213625.json",
+            "iteration_0009_20250815_092800.json",
+            "iteration_0009_20250815_094009.json",
+            "iteration_0009_20250815_120237.json",
+            "iteration_0009_20250815_121751.json",
+            "iteration_0009_20250815_135327.json",
+            "iteration_0009_20250815_140133.json",
+            "iteration_0009_20250815_144543.json",
+            "iteration_0009_20250816_063650.json",
+            "iteration_0010_20250814_211916.json"
+          ]
+        },
+        "decision_tree_counterfactual": {
+          "file_count": 19,
+          "files": [
+            "iteration_0003_20250811_194239.json",
+            "iteration_0004_20250811_195808.json",
+            "iteration_0004_20250811_201410.json",
+            "iteration_0004_20250811_202142.json",
+            "iteration_0004_20250811_203215.json",
+            "iteration_0004_20250811_205544.json",
+            "iteration_0004_20250812_193005.json",
+            "iteration_0004_20250814_063740.json",
+            "iteration_0004_20250814_121514.json",
+            "iteration_0004_20250814_211532.json",
+            "iteration_0007_20250814_213542.json",
+            "iteration_0007_20250815_092800.json",
+            "iteration_0007_20250815_094009.json",
+            "iteration_0007_20250815_120226.json",
+            "iteration_0007_20250815_121741.json",
+            "iteration_0007_20250815_135321.json",
+            "iteration_0007_20250815_140126.json",
+            "iteration_0007_20250815_144529.json",
+            "iteration_0007_20250816_063644.json"
+          ]
+        },
+        "decision_tree_feature_ablation": {
+          "file_count": 18,
+          "files": [
+            "iteration_0005_20250811_195808.json",
+            "iteration_0005_20250811_201410.json",
+            "iteration_0005_20250811_202142.json",
+            "iteration_0005_20250811_203215.json",
+            "iteration_0005_20250811_205544.json",
+            "iteration_0005_20250812_193005.json",
+            "iteration_0005_20250814_063741.json",
+            "iteration_0005_20250814_121516.json",
+            "iteration_0005_20250814_211744.json",
+            "iteration_0010_20250814_213632.json",
+            "iteration_0010_20250815_092800.json",
+            "iteration_0010_20250815_094009.json",
+            "iteration_0010_20250815_120247.json",
+            "iteration_0010_20250815_121801.json",
+            "iteration_0010_20250815_135336.json",
+            "iteration_0010_20250815_140142.json",
+            "iteration_0010_20250815_144606.json",
+            "iteration_0010_20250816_063659.json"
+          ]
+        },
+        "decision_tree_lime": {
+          "file_count": 20,
+          "files": [
+            "iteration_0002_20250811_194239.json",
+            "iteration_0002_20250811_195808.json",
+            "iteration_0002_20250811_201410.json",
+            "iteration_0002_20250811_202142.json",
+            "iteration_0002_20250811_203215.json",
+            "iteration_0002_20250811_205543.json",
+            "iteration_0002_20250812_193005.json",
+            "iteration_0002_20250814_063736.json",
+            "iteration_0002_20250814_121511.json",
+            "iteration_0002_20250814_211339.json",
+            "iteration_0002_20250814_213048.json",
+            "iteration_0002_20250815_092758.json",
+            "iteration_0002_20250815_094006.json",
+            "iteration_0002_20250815_120137.json",
+            "iteration_0002_20250815_121712.json",
+            "iteration_0002_20250815_132619.json",
+            "iteration_0002_20250815_135255.json",
+            "iteration_0002_20250815_140057.json",
+            "iteration_0002_20250815_144459.json",
+            "iteration_0002_20250816_063621.json"
+          ]
+        },
+        "decision_tree_prototype": {
+          "file_count": 18,
+          "files": [
+            "iteration_0003_20250811_195808.json",
+            "iteration_0003_20250811_201410.json",
+            "iteration_0003_20250811_202142.json",
+            "iteration_0003_20250811_203215.json",
+            "iteration_0003_20250811_205544.json",
+            "iteration_0003_20250812_193005.json",
+            "iteration_0003_20250814_063738.json",
+            "iteration_0003_20250814_121513.json",
+            "iteration_0003_20250814_211343.json",
+            "iteration_0006_20250814_213156.json",
+            "iteration_0006_20250815_092800.json",
+            "iteration_0006_20250815_094009.json",
+            "iteration_0006_20250815_120209.json",
+            "iteration_0006_20250815_121734.json",
+            "iteration_0006_20250815_135314.json",
+            "iteration_0006_20250815_140119.json",
+            "iteration_0006_20250815_144524.json",
+            "iteration_0006_20250816_063641.json"
+          ]
+        },
+        "decision_tree_shap": {
+          "file_count": 23,
+          "files": [
+            "iteration_0001_20250811_193258.json",
+            "iteration_0001_20250811_194239.json",
+            "iteration_0001_20250811_195808.json",
+            "iteration_0001_20250811_201409.json",
+            "iteration_0001_20250811_202142.json",
+            "iteration_0001_20250811_203214.json",
+            "iteration_0001_20250811_205543.json",
+            "iteration_0001_20250812_193004.json",
+            "iteration_0001_20250813_080101.json",
+            "iteration_0001_20250814_063730.json",
+            "iteration_0001_20250814_121507.json",
+            "iteration_0001_20250814_204415.json",
+            "iteration_0001_20250814_210329.json",
+            "iteration_0001_20250814_212957.json",
+            "iteration_0001_20250815_092757.json",
+            "iteration_0001_20250815_094006.json",
+            "iteration_0001_20250815_120011.json",
+            "iteration_0001_20250815_121556.json",
+            "iteration_0001_20250815_132501.json",
+            "iteration_0001_20250815_135207.json",
+            "iteration_0001_20250815_135952.json",
+            "iteration_0001_20250815_144400.json",
+            "iteration_0001_20250816_063511.json"
+          ]
+        },
+        "decision_tree_shapley_flow": {
+          "file_count": 11,
+          "files": [
+            "iteration_0004_20250814_213128.json",
+            "iteration_0004_20250815_092759.json",
+            "iteration_0004_20250815_094008.json",
+            "iteration_0004_20250815_120151.json",
+            "iteration_0004_20250815_121722.json",
+            "iteration_0004_20250815_132632.json",
+            "iteration_0004_20250815_135304.json",
+            "iteration_0004_20250815_140106.json",
+            "iteration_0004_20250815_144509.json",
+            "iteration_0004_20250816_063630.json",
+            "iteration_0007_20250814_211913.json"
+          ]
+        },
+        "decision_tree_shap_interactive": {
+          "file_count": 10,
+          "files": [
+            "iteration_0005_20250814_213135.json",
+            "iteration_0005_20250815_092800.json",
+            "iteration_0005_20250815_094009.json",
+            "iteration_0005_20250815_120157.json",
+            "iteration_0005_20250815_121727.json",
+            "iteration_0005_20250815_135308.json",
+            "iteration_0005_20250815_140111.json",
+            "iteration_0005_20250815_144513.json",
+            "iteration_0005_20250816_063634.json",
+            "iteration_0009_20250814_211916.json"
+          ]
+        },
+        "gradient_boosting_bayesian_rule_list": {
+          "file_count": 5,
+          "files": [
+            "iteration_0027_20250815_092935.json",
+            "iteration_0027_20250815_094148.json",
+            "iteration_0027_20250815_142132.json",
+            "iteration_0027_20250815_150317.json",
+            "iteration_0027_20250816_065322.json"
+          ]
+        },
+        "gradient_boosting_causal_shap": {
+          "file_count": 5,
+          "files": [
+            "iteration_0023_20250815_092933.json",
+            "iteration_0023_20250815_094145.json",
+            "iteration_0023_20250815_142051.json",
+            "iteration_0023_20250815_150244.json",
+            "iteration_0023_20250816_065254.json"
+          ]
+        },
+        "gradient_boosting_corels": {
+          "file_count": 5,
+          "files": [
+            "iteration_0028_20250815_092935.json",
+            "iteration_0028_20250815_094148.json",
+            "iteration_0028_20250815_142141.json",
+            "iteration_0028_20250815_150323.json",
+            "iteration_0028_20250816_065327.json"
+          ]
+        },
+        "gradient_boosting_counterfactual": {
+          "file_count": 12,
+          "files": [
+            "iteration_0014_20250811_201425.json",
+            "iteration_0014_20250811_202208.json",
+            "iteration_0014_20250811_203300.json",
+            "iteration_0014_20250811_205635.json",
+            "iteration_0014_20250812_201849.json",
+            "iteration_0014_20250814_063813.json",
+            "iteration_0014_20250814_121545.json",
+            "iteration_0026_20250815_092935.json",
+            "iteration_0026_20250815_094147.json",
+            "iteration_0026_20250815_142125.json",
+            "iteration_0026_20250815_150311.json",
+            "iteration_0026_20250816_065317.json"
+          ]
+        },
+        "gradient_boosting_feature_ablation": {
+          "file_count": 12,
+          "files": [
+            "iteration_0015_20250811_201425.json",
+            "iteration_0015_20250811_202208.json",
+            "iteration_0015_20250811_203300.json",
+            "iteration_0015_20250811_205636.json",
+            "iteration_0015_20250812_201849.json",
+            "iteration_0015_20250814_063815.json",
+            "iteration_0015_20250814_121546.json",
+            "iteration_0029_20250815_092935.json",
+            "iteration_0029_20250815_094148.json",
+            "iteration_0029_20250815_142202.json",
+            "iteration_0029_20250815_150339.json",
+            "iteration_0029_20250816_065342.json"
+          ]
+        },
+        "gradient_boosting_lime": {
+          "file_count": 12,
+          "files": [
+            "iteration_0012_20250811_201425.json",
+            "iteration_0012_20250811_202208.json",
+            "iteration_0012_20250811_203300.json",
+            "iteration_0012_20250811_205635.json",
+            "iteration_0012_20250812_201849.json",
+            "iteration_0012_20250814_063810.json",
+            "iteration_0012_20250814_121542.json",
+            "iteration_0022_20250815_092931.json",
+            "iteration_0022_20250815_094143.json",
+            "iteration_0022_20250815_142043.json",
+            "iteration_0022_20250815_150236.json",
+            "iteration_0022_20250816_065246.json"
+          ]
+        },
+        "gradient_boosting_prototype": {
+          "file_count": 12,
+          "files": [
+            "iteration_0013_20250811_201425.json",
+            "iteration_0013_20250811_202208.json",
+            "iteration_0013_20250811_203300.json",
+            "iteration_0013_20250811_205635.json",
+            "iteration_0013_20250812_201849.json",
+            "iteration_0013_20250814_063812.json",
+            "iteration_0013_20250814_121544.json",
+            "iteration_0025_20250815_092935.json",
+            "iteration_0025_20250815_094147.json",
+            "iteration_0025_20250815_142112.json",
+            "iteration_0025_20250815_150305.json",
+            "iteration_0025_20250816_065312.json"
+          ]
+        },
+        "gradient_boosting_shap": {
+          "file_count": 14,
+          "files": [
+            "iteration_0005_20250811_194259.json",
+            "iteration_0007_20250811_195834.json",
+            "iteration_0011_20250811_201424.json",
+            "iteration_0011_20250811_202207.json",
+            "iteration_0011_20250811_203259.json",
+            "iteration_0011_20250811_205634.json",
+            "iteration_0011_20250812_201848.json",
+            "iteration_0011_20250814_063807.json",
+            "iteration_0011_20250814_121540.json",
+            "iteration_0021_20250815_092930.json",
+            "iteration_0021_20250815_094142.json",
+            "iteration_0021_20250815_142020.json",
+            "iteration_0021_20250815_150214.json",
+            "iteration_0021_20250816_065227.json"
+          ]
+        },
+        "gradient_boosting_shap_interactive": {
+          "file_count": 5,
+          "files": [
+            "iteration_0024_20250815_092935.json",
+            "iteration_0024_20250815_094147.json",
+            "iteration_0024_20250815_142059.json",
+            "iteration_0024_20250815_150252.json",
+            "iteration_0024_20250816_065301.json"
+          ]
+        },
+        "mlp_bayesian_rule_list": {
+          "file_count": 5,
+          "files": [
+            "iteration_0039_20250815_092950.json",
+            "iteration_0039_20250815_094201.json",
+            "iteration_0039_20250815_142337.json",
+            "iteration_0039_20250815_151819.json",
+            "iteration_0039_20250816_065442.json"
+          ]
+        },
+        "mlp_causal_shap": {
+          "file_count": 5,
+          "files": [
+            "iteration_0033_20250815_092947.json",
+            "iteration_0033_20250815_094159.json",
+            "iteration_0033_20250815_142301.json",
+            "iteration_0033_20250815_150421.json",
+            "iteration_0033_20250816_065418.json"
+          ]
+        },
+        "mlp_corels": {
+          "file_count": 5,
+          "files": [
+            "iteration_0040_20250815_092950.json",
+            "iteration_0040_20250815_094201.json",
+            "iteration_0040_20250815_142341.json",
+            "iteration_0040_20250815_151826.json",
+            "iteration_0040_20250816_065446.json"
+          ]
+        },
+        "mlp_counterfactual": {
+          "file_count": 12,
+          "files": [
+            "iteration_0020_20250811_201449.json",
+            "iteration_0020_20250811_202222.json",
+            "iteration_0020_20250811_204524.json",
+            "iteration_0020_20250812_183027.json",
+            "iteration_0020_20250812_201907.json",
+            "iteration_0020_20250814_063835.json",
+            "iteration_0020_20250814_121612.json",
+            "iteration_0037_20250815_092949.json",
+            "iteration_0037_20250815_094201.json",
+            "iteration_0037_20250815_142330.json",
+            "iteration_0037_20250815_151804.json",
+            "iteration_0037_20250816_065436.json"
+          ]
+        },
+        "mlp_feature_ablation": {
+          "file_count": 12,
+          "files": [
+            "iteration_0021_20250811_201449.json",
+            "iteration_0021_20250811_202222.json",
+            "iteration_0021_20250811_204524.json",
+            "iteration_0021_20250812_183027.json",
+            "iteration_0021_20250812_201907.json",
+            "iteration_0021_20250814_063837.json",
+            "iteration_0021_20250814_121613.json",
+            "iteration_0041_20250815_092950.json",
+            "iteration_0041_20250815_094201.json",
+            "iteration_0041_20250815_142353.json",
+            "iteration_0041_20250815_151845.json",
+            "iteration_0041_20250816_065455.json"
+          ]
+        },
+        "mlp_influence_functions": {
+          "file_count": 5,
+          "files": [
+            "iteration_0038_20250815_092950.json",
+            "iteration_0038_20250815_094201.json",
+            "iteration_0038_20250815_142333.json",
+            "iteration_0038_20250815_151810.json",
+            "iteration_0038_20250816_065439.json"
+          ]
+        },
+        "mlp_integrated_gradients": {
+          "file_count": 12,
+          "files": [
+            "iteration_0018_20250811_201448.json",
+            "iteration_0018_20250811_202221.json",
+            "iteration_0018_20250811_204524.json",
+            "iteration_0018_20250812_183026.json",
+            "iteration_0018_20250812_201907.json",
+            "iteration_0018_20250814_063833.json",
+            "iteration_0018_20250814_121604.json",
+            "iteration_0032_20250815_092946.json",
+            "iteration_0032_20250815_094158.json",
+            "iteration_0032_20250815_142247.json",
+            "iteration_0032_20250815_150416.json",
+            "iteration_0032_20250816_065413.json"
+          ]
+        },
+        "mlp_lime": {
+          "file_count": 12,
+          "files": [
+            "iteration_0017_20250811_201447.json",
+            "iteration_0017_20250811_202220.json",
+            "iteration_0017_20250811_204522.json",
+            "iteration_0017_20250812_183025.json",
+            "iteration_0017_20250812_201905.json",
+            "iteration_0017_20250814_063831.json",
+            "iteration_0017_20250814_121602.json",
+            "iteration_0031_20250815_092944.json",
+            "iteration_0031_20250815_094156.json",
+            "iteration_0031_20250815_142240.json",
+            "iteration_0031_20250815_150410.json",
+            "iteration_0031_20250816_065408.json"
+          ]
+        },
+        "mlp_prototype": {
+          "file_count": 12,
+          "files": [
+            "iteration_0019_20250811_201449.json",
+            "iteration_0019_20250811_202221.json",
+            "iteration_0019_20250811_204524.json",
+            "iteration_0019_20250812_183026.json",
+            "iteration_0019_20250812_201907.json",
+            "iteration_0019_20250814_063834.json",
+            "iteration_0019_20250814_121610.json",
+            "iteration_0036_20250815_092949.json",
+            "iteration_0036_20250815_094201.json",
+            "iteration_0036_20250815_142322.json",
+            "iteration_0036_20250815_150439.json",
+            "iteration_0036_20250816_065432.json"
+          ]
+        },
+        "mlp_shap": {
+          "file_count": 14,
+          "files": [
+            "iteration_0006_20250811_194312.json",
+            "iteration_0008_20250811_195844.json",
+            "iteration_0016_20250811_201446.json",
+            "iteration_0016_20250811_202219.json",
+            "iteration_0016_20250811_204521.json",
+            "iteration_0016_20250812_183024.json",
+            "iteration_0016_20250812_201905.json",
+            "iteration_0016_20250814_063829.json",
+            "iteration_0016_20250814_121600.json",
+            "iteration_0030_20250815_092944.json",
+            "iteration_0030_20250815_094156.json",
+            "iteration_0030_20250815_142217.json",
+            "iteration_0030_20250815_150352.json",
+            "iteration_0030_20250816_065353.json"
+          ]
+        },
+        "mlp_shapley_flow": {
+          "file_count": 5,
+          "files": [
+            "iteration_0034_20250815_092948.json",
+            "iteration_0034_20250815_094159.json",
+            "iteration_0034_20250815_142308.json",
+            "iteration_0034_20250815_150425.json",
+            "iteration_0034_20250816_065421.json"
+          ]
+        },
+        "mlp_shap_interactive": {
+          "file_count": 5,
+          "files": [
+            "iteration_0035_20250815_092949.json",
+            "iteration_0035_20250815_094200.json",
+            "iteration_0035_20250815_142313.json",
+            "iteration_0035_20250815_150430.json",
+            "iteration_0035_20250816_065425.json"
+          ]
+        },
+        "random_forest_bayesian_rule_list": {
+          "file_count": 5,
+          "files": [
+            "iteration_0018_20250815_092927.json",
+            "iteration_0018_20250815_094139.json",
+            "iteration_0018_20250815_141425.json",
+            "iteration_0018_20250815_145744.json",
+            "iteration_0018_20250816_064814.json"
+          ]
+        },
+        "random_forest_causal_shap": {
+          "file_count": 6,
+          "files": [
+            "iteration_0013_20250815_092847.json",
+            "iteration_0013_20250815_094056.json",
+            "iteration_0013_20250815_135836.json",
+            "iteration_0013_20250815_140647.json",
+            "iteration_0013_20250815_145120.json",
+            "iteration_0013_20250816_064150.json"
+          ]
+        },
+        "random_forest_corels": {
+          "file_count": 5,
+          "files": [
+            "iteration_0019_20250815_092927.json",
+            "iteration_0019_20250815_094140.json",
+            "iteration_0019_20250815_141522.json",
+            "iteration_0019_20250815_145843.json",
+            "iteration_0019_20250816_064909.json"
+          ]
+        },
+        "random_forest_counterfactual": {
+          "file_count": 12,
+          "files": [
+            "iteration_0009_20250811_201419.json",
+            "iteration_0009_20250811_202202.json",
+            "iteration_0009_20250811_203226.json",
+            "iteration_0009_20250811_205552.json",
+            "iteration_0009_20250812_193151.json",
+            "iteration_0009_20250814_063800.json",
+            "iteration_0009_20250814_121531.json",
+            "iteration_0017_20250815_092926.json",
+            "iteration_0017_20250815_094139.json",
+            "iteration_0017_20250815_141320.json",
+            "iteration_0017_20250815_145641.json",
+            "iteration_0017_20250816_064719.json"
+          ]
+        },
+        "random_forest_feature_ablation": {
+          "file_count": 12,
+          "files": [
+            "iteration_0010_20250811_201419.json",
+            "iteration_0010_20250811_202202.json",
+            "iteration_0010_20250811_203226.json",
+            "iteration_0010_20250811_205554.json",
+            "iteration_0010_20250812_193153.json",
+            "iteration_0010_20250814_063802.json",
+            "iteration_0010_20250814_121534.json",
+            "iteration_0020_20250815_092929.json",
+            "iteration_0020_20250815_094141.json",
+            "iteration_0020_20250815_142009.json",
+            "iteration_0020_20250815_150206.json",
+            "iteration_0020_20250816_065220.json"
+          ]
+        },
+        "random_forest_lime": {
+          "file_count": 14,
+          "files": [
+            "iteration_0007_20250811_201419.json",
+            "iteration_0007_20250811_202202.json",
+            "iteration_0007_20250811_203225.json",
+            "iteration_0007_20250811_205552.json",
+            "iteration_0007_20250812_193151.json",
+            "iteration_0007_20250814_063756.json",
+            "iteration_0007_20250814_121526.json",
+            "iteration_0012_20250814_211934.json",
+            "iteration_0012_20250815_092808.json",
+            "iteration_0012_20250815_094015.json",
+            "iteration_0012_20250815_135653.json",
+            "iteration_0012_20250815_140505.json",
+            "iteration_0012_20250815_144954.json",
+            "iteration_0012_20250816_064022.json"
+          ]
+        },
+        "random_forest_prototype": {
+          "file_count": 13,
+          "files": [
+            "iteration_0008_20250811_201419.json",
+            "iteration_0008_20250811_202202.json",
+            "iteration_0008_20250811_203225.json",
+            "iteration_0008_20250811_205552.json",
+            "iteration_0008_20250812_193151.json",
+            "iteration_0008_20250814_063758.json",
+            "iteration_0008_20250814_121529.json",
+            "iteration_0013_20250814_211937.json",
+            "iteration_0016_20250815_092925.json",
+            "iteration_0016_20250815_094138.json",
+            "iteration_0016_20250815_141109.json",
+            "iteration_0016_20250815_145550.json",
+            "iteration_0016_20250816_064616.json"
+          ]
+        },
+        "random_forest_shap": {
+          "file_count": 18,
+          "files": [
+            "iteration_0004_20250811_194255.json",
+            "iteration_0006_20250811_195830.json",
+            "iteration_0006_20250811_201418.json",
+            "iteration_0006_20250811_202201.json",
+            "iteration_0006_20250811_203223.json",
+            "iteration_0006_20250811_205550.json",
+            "iteration_0006_20250812_193150.json",
+            "iteration_0006_20250814_063751.json",
+            "iteration_0006_20250814_121524.json",
+            "iteration_0011_20250814_211931.json",
+            "iteration_0011_20250815_092806.json",
+            "iteration_0011_20250815_094014.json",
+            "iteration_0011_20250815_120405.json",
+            "iteration_0011_20250815_121905.json",
+            "iteration_0011_20250815_135450.json",
+            "iteration_0011_20250815_140246.json",
+            "iteration_0011_20250815_144751.json",
+            "iteration_0011_20250816_063755.json"
+          ]
+        },
+        "random_forest_shapley_flow": {
+          "file_count": 5,
+          "files": [
+            "iteration_0014_20250815_092857.json",
+            "iteration_0014_20250815_094109.json",
+            "iteration_0014_20250815_140753.json",
+            "iteration_0014_20250815_145226.json",
+            "iteration_0014_20250816_064253.json"
+          ]
+        },
+        "random_forest_shap_interactive": {
+          "file_count": 5,
+          "files": [
+            "iteration_0015_20250815_092924.json",
+            "iteration_0015_20250815_094137.json",
+            "iteration_0015_20250815_140912.json",
+            "iteration_0015_20250815_145345.json",
+            "iteration_0015_20250816_064404.json"
+          ]
+        }
+      }
+    },
+    "compas": {
+      "decision": {
+        "tree_bayesian_rule_list": {
+          "file_count": 5,
+          "files": [
+            "iteration_0049_20250815_092957.json",
+            "iteration_0049_20250815_094208.json",
+            "iteration_0049_20250815_142423.json",
+            "iteration_0049_20250815_151922.json",
+            "iteration_0049_20250816_065521.json"
+          ]
+        },
+        "tree_causal_shap": {
+          "file_count": 5,
+          "files": [
+            "iteration_0044_20250815_092956.json",
+            "iteration_0044_20250815_094207.json",
+            "iteration_0044_20250815_142415.json",
+            "iteration_0044_20250815_151916.json",
+            "iteration_0044_20250816_065515.json"
+          ]
+        },
+        "tree_corels": {
+          "file_count": 5,
+          "files": [
+            "iteration_0050_20250815_092957.json",
+            "iteration_0050_20250815_094208.json",
+            "iteration_0050_20250815_142424.json",
+            "iteration_0050_20250815_151923.json",
+            "iteration_0050_20250816_065522.json"
+          ]
+        },
+        "tree_counterfactual": {
+          "file_count": 7,
+          "files": [
+            "iteration_0025_20250811_201453.json",
+            "iteration_0025_20250814_121627.json",
+            "iteration_0048_20250815_092957.json",
+            "iteration_0048_20250815_094208.json",
+            "iteration_0048_20250815_142422.json",
+            "iteration_0048_20250815_151921.json",
+            "iteration_0048_20250816_065519.json"
+          ]
+        },
+        "tree_feature_ablation": {
+          "file_count": 7,
+          "files": [
+            "iteration_0026_20250811_201453.json",
+            "iteration_0026_20250814_121628.json",
+            "iteration_0051_20250815_092957.json",
+            "iteration_0051_20250815_094208.json",
+            "iteration_0051_20250815_142426.json",
+            "iteration_0051_20250815_151924.json",
+            "iteration_0051_20250816_065524.json"
+          ]
+        },
+        "tree_lime": {
+          "file_count": 7,
+          "files": [
+            "iteration_0023_20250811_201453.json",
+            "iteration_0023_20250814_121625.json",
+            "iteration_0043_20250815_092955.json",
+            "iteration_0043_20250815_094207.json",
+            "iteration_0043_20250815_142414.json",
+            "iteration_0043_20250815_151915.json",
+            "iteration_0043_20250816_065514.json"
+          ]
+        },
+        "tree_prototype": {
+          "file_count": 7,
+          "files": [
+            "iteration_0024_20250811_201453.json",
+            "iteration_0024_20250814_121626.json",
+            "iteration_0047_20250815_092957.json",
+            "iteration_0047_20250815_094208.json",
+            "iteration_0047_20250815_142420.json",
+            "iteration_0047_20250815_151920.json",
+            "iteration_0047_20250816_065518.json"
+          ]
+        },
+        "tree_shap": {
+          "file_count": 8,
+          "files": [
+            "iteration_0022_20250811_201452.json",
+            "iteration_0022_20250812_202025.json",
+            "iteration_0022_20250814_121620.json",
+            "iteration_0042_20250815_092954.json",
+            "iteration_0042_20250815_094206.json",
+            "iteration_0042_20250815_142357.json",
+            "iteration_0042_20250815_151852.json",
+            "iteration_0042_20250816_065500.json"
+          ]
+        },
+        "tree_shapley_flow": {
+          "file_count": 5,
+          "files": [
+            "iteration_0045_20250815_092956.json",
+            "iteration_0045_20250815_094208.json",
+            "iteration_0045_20250815_142416.json",
+            "iteration_0045_20250815_151917.json",
+            "iteration_0045_20250816_065516.json"
+          ]
+        },
+        "tree_shap_interactive": {
+          "file_count": 5,
+          "files": [
+            "iteration_0046_20250815_092957.json",
+            "iteration_0046_20250815_094208.json",
+            "iteration_0046_20250815_142418.json",
+            "iteration_0046_20250815_151918.json",
+            "iteration_0046_20250816_065517.json"
+          ]
+        }
+      },
+      "gradient": {
+        "boosting_bayesian_rule_list": {
+          "file_count": 5,
+          "files": [
+            "iteration_0068_20250815_093058.json",
+            "iteration_0068_20250815_094309.json",
+            "iteration_0068_20250815_142858.json",
+            "iteration_0068_20250815_152348.json",
+            "iteration_0068_20250816_065915.json"
+          ]
+        },
+        "boosting_causal_shap": {
+          "file_count": 5,
+          "files": [
+            "iteration_0064_20250815_093057.json",
+            "iteration_0064_20250815_094307.json",
+            "iteration_0064_20250815_142847.json",
+            "iteration_0064_20250815_152341.json",
+            "iteration_0064_20250816_065908.json"
+          ]
+        },
+        "boosting_corels": {
+          "file_count": 5,
+          "files": [
+            "iteration_0069_20250815_093058.json",
+            "iteration_0069_20250815_094309.json",
+            "iteration_0069_20250815_142900.json",
+            "iteration_0069_20250815_152350.json",
+            "iteration_0069_20250816_065916.json"
+          ]
+        },
+        "boosting_counterfactual": {
+          "file_count": 7,
+          "files": [
+            "iteration_0035_20250811_201507.json",
+            "iteration_0035_20250814_121651.json",
+            "iteration_0067_20250815_093058.json",
+            "iteration_0067_20250815_094309.json",
+            "iteration_0067_20250815_142857.json",
+            "iteration_0067_20250815_152347.json",
+            "iteration_0067_20250816_065913.json"
+          ]
+        },
+        "boosting_feature_ablation": {
+          "file_count": 7,
+          "files": [
+            "iteration_0036_20250811_201507.json",
+            "iteration_0036_20250814_121652.json",
+            "iteration_0070_20250815_093058.json",
+            "iteration_0070_20250815_094309.json",
+            "iteration_0070_20250815_142904.json",
+            "iteration_0070_20250815_152353.json",
+            "iteration_0070_20250816_065918.json"
+          ]
+        },
+        "boosting_lime": {
+          "file_count": 7,
+          "files": [
+            "iteration_0033_20250811_201507.json",
+            "iteration_0033_20250814_121648.json",
+            "iteration_0063_20250815_093056.json",
+            "iteration_0063_20250815_094306.json",
+            "iteration_0063_20250815_142843.json",
+            "iteration_0063_20250815_152338.json",
+            "iteration_0063_20250816_065906.json"
+          ]
+        },
+        "boosting_prototype": {
+          "file_count": 7,
+          "files": [
+            "iteration_0034_20250811_201507.json",
+            "iteration_0034_20250814_121649.json",
+            "iteration_0066_20250815_093058.json",
+            "iteration_0066_20250815_094309.json",
+            "iteration_0066_20250815_142853.json",
+            "iteration_0066_20250815_152346.json",
+            "iteration_0066_20250816_065912.json"
+          ]
+        },
+        "boosting_shap": {
+          "file_count": 8,
+          "files": [
+            "iteration_0024_20250812_202243.json",
+            "iteration_0032_20250811_201506.json",
+            "iteration_0032_20250814_121645.json",
+            "iteration_0062_20250815_093055.json",
+            "iteration_0062_20250815_094305.json",
+            "iteration_0062_20250815_142838.json",
+            "iteration_0062_20250815_152333.json",
+            "iteration_0062_20250816_065902.json"
+          ]
+        },
+        "boosting_shap_interactive": {
+          "file_count": 5,
+          "files": [
+            "iteration_0065_20250815_093058.json",
+            "iteration_0065_20250815_094309.json",
+            "iteration_0065_20250815_142850.json",
+            "iteration_0065_20250815_152343.json",
+            "iteration_0065_20250816_065910.json"
+          ]
+        }
+      },
+      "mlp": {
+        "bayesian_rule_list": {
+          "file_count": 5,
+          "files": [
+            "iteration_0080_20250815_093106.json",
+            "iteration_0080_20250815_094315.json",
+            "iteration_0080_20250815_142926.json",
+            "iteration_0080_20250815_152412.json",
+            "iteration_0080_20250816_065933.json"
+          ]
+        },
+        "causal_shap": {
+          "file_count": 5,
+          "files": [
+            "iteration_0074_20250815_093104.json",
+            "iteration_0074_20250815_094314.json",
+            "iteration_0074_20250815_142916.json",
+            "iteration_0074_20250815_152403.json",
+            "iteration_0074_20250816_065927.json"
+          ]
+        },
+        "corels": {
+          "file_count": 5,
+          "files": [
+            "iteration_0081_20250815_093106.json",
+            "iteration_0081_20250815_094315.json",
+            "iteration_0081_20250815_142927.json",
+            "iteration_0081_20250815_152413.json",
+            "iteration_0081_20250816_065934.json"
+          ]
+        },
+        "counterfactual": {
+          "file_count": 7,
+          "files": [
+            "iteration_0041_20250811_201515.json",
+            "iteration_0041_20250814_121703.json",
+            "iteration_0078_20250815_093105.json",
+            "iteration_0078_20250815_094315.json",
+            "iteration_0078_20250815_142924.json",
+            "iteration_0078_20250815_152409.json",
+            "iteration_0078_20250816_065931.json"
+          ]
+        },
+        "feature_ablation": {
+          "file_count": 7,
+          "files": [
+            "iteration_0042_20250811_201515.json",
+            "iteration_0042_20250814_121704.json",
+            "iteration_0082_20250815_093106.json",
+            "iteration_0082_20250815_094316.json",
+            "iteration_0082_20250815_142929.json",
+            "iteration_0082_20250815_152414.json",
+            "iteration_0082_20250816_065935.json"
+          ]
+        },
+        "influence_functions": {
+          "file_count": 5,
+          "files": [
+            "iteration_0079_20250815_093105.json",
+            "iteration_0079_20250815_094315.json",
+            "iteration_0079_20250815_142925.json",
+            "iteration_0079_20250815_152411.json",
+            "iteration_0079_20250816_065932.json"
+          ]
+        },
+        "integrated_gradients": {
+          "file_count": 7,
+          "files": [
+            "iteration_0039_20250811_201515.json",
+            "iteration_0039_20250814_121700.json",
+            "iteration_0073_20250815_093103.json",
+            "iteration_0073_20250815_094313.json",
+            "iteration_0073_20250815_142914.json",
+            "iteration_0073_20250815_152402.json",
+            "iteration_0073_20250816_065926.json"
+          ]
+        },
+        "lime": {
+          "file_count": 7,
+          "files": [
+            "iteration_0038_20250811_201514.json",
+            "iteration_0038_20250814_121658.json",
+            "iteration_0072_20250815_093102.json",
+            "iteration_0072_20250815_094312.json",
+            "iteration_0072_20250815_142912.json",
+            "iteration_0072_20250815_152359.json",
+            "iteration_0072_20250816_065925.json"
+          ]
+        },
+        "prototype": {
+          "file_count": 7,
+          "files": [
+            "iteration_0040_20250811_201515.json",
+            "iteration_0040_20250814_121702.json",
+            "iteration_0077_20250815_093105.json",
+            "iteration_0077_20250815_094315.json",
+            "iteration_0077_20250815_142922.json",
+            "iteration_0077_20250815_152409.json",
+            "iteration_0077_20250816_065930.json"
+          ]
+        },
+        "shap": {
+          "file_count": 8,
+          "files": [
+            "iteration_0025_20250812_202309.json",
+            "iteration_0037_20250811_201513.json",
+            "iteration_0037_20250814_121656.json",
+            "iteration_0071_20250815_093101.json",
+            "iteration_0071_20250815_094311.json",
+            "iteration_0071_20250815_142907.json",
+            "iteration_0071_20250815_152356.json",
+            "iteration_0071_20250816_065921.json"
+          ]
+        },
+        "shapley_flow": {
+          "file_count": 5,
+          "files": [
+            "iteration_0075_20250815_093104.json",
+            "iteration_0075_20250815_094314.json",
+            "iteration_0075_20250815_142918.json",
+            "iteration_0075_20250815_152405.json",
+            "iteration_0075_20250816_065928.json"
+          ]
+        },
+        "shap_interactive": {
+          "file_count": 5,
+          "files": [
+            "iteration_0076_20250815_093105.json",
+            "iteration_0076_20250815_094315.json",
+            "iteration_0076_20250815_142919.json",
+            "iteration_0076_20250815_152407.json",
+            "iteration_0076_20250816_065929.json"
+          ]
+        }
+      },
+      "random": {
+        "forest_bayesian_rule_list": {
+          "file_count": 5,
+          "files": [
+            "iteration_0059_20250815_093052.json",
+            "iteration_0059_20250815_094303.json",
+            "iteration_0059_20250815_142738.json",
+            "iteration_0059_20250815_152237.json",
+            "iteration_0059_20250816_065818.json"
+          ]
+        },
+        "forest_causal_shap": {
+          "file_count": 5,
+          "files": [
+            "iteration_0054_20250815_093030.json",
+            "iteration_0054_20250815_094239.json",
+            "iteration_0054_20250815_142556.json",
+            "iteration_0054_20250815_152100.json",
+            "iteration_0054_20250816_065651.json"
+          ]
+        },
+        "forest_corels": {
+          "file_count": 5,
+          "files": [
+            "iteration_0060_20250815_093053.json",
+            "iteration_0060_20250815_094303.json",
+            "iteration_0060_20250815_142753.json",
+            "iteration_0060_20250815_152249.json",
+            "iteration_0060_20250816_065829.json"
+          ]
+        },
+        "forest_counterfactual": {
+          "file_count": 7,
+          "files": [
+            "iteration_0030_20250811_201501.json",
+            "iteration_0030_20250814_121640.json",
+            "iteration_0058_20250815_093052.json",
+            "iteration_0058_20250815_094303.json",
+            "iteration_0058_20250815_142727.json",
+            "iteration_0058_20250815_152225.json",
+            "iteration_0058_20250816_065807.json"
+          ]
+        },
+        "forest_feature_ablation": {
+          "file_count": 7,
+          "files": [
+            "iteration_0031_20250811_201501.json",
+            "iteration_0031_20250814_121642.json",
+            "iteration_0061_20250815_093054.json",
+            "iteration_0061_20250815_094304.json",
+            "iteration_0061_20250815_142835.json",
+            "iteration_0061_20250815_152330.json",
+            "iteration_0061_20250816_065900.json"
+          ]
+        },
+        "forest_lime": {
+          "file_count": 7,
+          "files": [
+            "iteration_0028_20250811_201501.json",
+            "iteration_0028_20250814_121636.json",
+            "iteration_0053_20250815_093005.json",
+            "iteration_0053_20250815_094215.json",
+            "iteration_0053_20250815_142516.json",
+            "iteration_0053_20250815_152026.json",
+            "iteration_0053_20250816_065618.json"
+          ]
+        },
+        "forest_prototype": {
+          "file_count": 7,
+          "files": [
+            "iteration_0029_20250811_201501.json",
+            "iteration_0029_20250814_121638.json",
+            "iteration_0057_20250815_093051.json",
+            "iteration_0057_20250815_094302.json",
+            "iteration_0057_20250815_142703.json",
+            "iteration_0057_20250815_152211.json",
+            "iteration_0057_20250816_065755.json"
+          ]
+        },
+        "forest_shap": {
+          "file_count": 8,
+          "files": [
+            "iteration_0023_20250812_202221.json",
+            "iteration_0027_20250811_201459.json",
+            "iteration_0027_20250814_121634.json",
+            "iteration_0052_20250815_093003.json",
+            "iteration_0052_20250815_094213.json",
+            "iteration_0052_20250815_142444.json",
+            "iteration_0052_20250815_151944.json",
+            "iteration_0052_20250816_065540.json"
+          ]
+        },
+        "forest_shapley_flow": {
+          "file_count": 5,
+          "files": [
+            "iteration_0055_20250815_093036.json",
+            "iteration_0055_20250815_094245.json",
+            "iteration_0055_20250815_142612.json",
+            "iteration_0055_20250815_152119.json",
+            "iteration_0055_20250816_065709.json"
+          ]
+        },
+        "forest_shap_interactive": {
+          "file_count": 5,
+          "files": [
+            "iteration_0056_20250815_093050.json",
+            "iteration_0056_20250815_094301.json",
+            "iteration_0056_20250815_142639.json",
+            "iteration_0056_20250815_152146.json",
+            "iteration_0056_20250816_065733.json"
+          ]
+        }
+      }
+    },
+    "imdb": {
+      "bert": {
+        "attention_visualization": {
+          "file_count": 8,
+          "files": [
+            "iteration_0003_20250814_171403.json",
+            "iteration_0003_20250814_172215.json",
+            "iteration_0003_20250814_202528.json",
+            "iteration_0093_20250815_093210.json",
+            "iteration_0093_20250815_094401.json",
+            "iteration_0093_20250815_143119.json",
+            "iteration_0093_20250815_152608.json",
+            "iteration_0093_20250816_070127.json"
+          ]
+        },
+        "lime": {
+          "file_count": 12,
+          "files": [
+            "iteration_0001_20250814_125617.json",
+            "iteration_0001_20250814_155846.json",
+            "iteration_0001_20250814_163314.json",
+            "iteration_0001_20250814_171251.json",
+            "iteration_0001_20250814_172207.json",
+            "iteration_0001_20250814_202522.json",
+            "iteration_0051_20250814_121805.json",
+            "iteration_0091_20250815_093203.json",
+            "iteration_0091_20250815_094354.json",
+            "iteration_0091_20250815_143056.json",
+            "iteration_0091_20250815_152541.json",
+            "iteration_0091_20250816_070106.json"
+          ]
+        },
+        "text_occlusion": {
+          "file_count": 8,
+          "files": [
+            "iteration_0002_20250814_171356.json",
+            "iteration_0002_20250814_172210.json",
+            "iteration_0002_20250814_202524.json",
+            "iteration_0092_20250815_093205.json",
+            "iteration_0092_20250815_094356.json",
+            "iteration_0092_20250815_143107.json",
+            "iteration_0092_20250815_152552.json",
+            "iteration_0092_20250816_070116.json"
+          ]
+        }
+      },
+      "lstm": {
+        "attention_visualization": {
+          "file_count": 7,
+          "files": [
+            "iteration_0006_20250814_172231.json",
+            "iteration_0006_20250814_202545.json",
+            "iteration_0096_20250815_093220.json",
+            "iteration_0096_20250815_094414.json",
+            "iteration_0096_20250815_143207.json",
+            "iteration_0096_20250815_152657.json",
+            "iteration_0096_20250816_070204.json"
+          ]
+        },
+        "lime": {
+          "file_count": 12,
+          "files": [
+            "iteration_0002_20250814_125622.json",
+            "iteration_0002_20250814_160047.json",
+            "iteration_0002_20250814_163323.json",
+            "iteration_0004_20250814_171447.json",
+            "iteration_0004_20250814_172223.json",
+            "iteration_0004_20250814_202537.json",
+            "iteration_0052_20250814_121812.json",
+            "iteration_0094_20250815_093214.json",
+            "iteration_0094_20250815_094406.json",
+            "iteration_0094_20250815_143140.json",
+            "iteration_0094_20250815_152630.json",
+            "iteration_0094_20250816_070142.json"
+          ]
+        },
+        "text_occlusion": {
+          "file_count": 8,
+          "files": [
+            "iteration_0005_20250814_171523.json",
+            "iteration_0005_20250814_172226.json",
+            "iteration_0005_20250814_202539.json",
+            "iteration_0095_20250815_093216.json",
+            "iteration_0095_20250815_094408.json",
+            "iteration_0095_20250815_143152.json",
+            "iteration_0095_20250815_152641.json",
+            "iteration_0095_20250816_070152.json"
+          ]
+        }
+      }
+    },
+    "mnist": {
+      "cnn": {
+        "concept_bottleneck": {
+          "file_count": 9,
+          "files": [
+            "iteration_0004_20250813_210747.json",
+            "iteration_0004_20250814_073050.json",
+            "iteration_0004_20250814_094050.json",
+            "iteration_0046_20250814_121725.json",
+            "iteration_0086_20250815_093129.json",
+            "iteration_0086_20250815_094326.json",
+            "iteration_0086_20250815_142943.json",
+            "iteration_0086_20250815_152429.json",
+            "iteration_0086_20250816_070000.json"
+          ]
+        },
+        "counterfactual": {
+          "file_count": 9,
+          "files": [
+            "iteration_0002_20250813_210742.json",
+            "iteration_0002_20250814_073045.json",
+            "iteration_0002_20250814_094047.json",
+            "iteration_0044_20250814_121720.json",
+            "iteration_0084_20250815_093129.json",
+            "iteration_0084_20250815_094326.json",
+            "iteration_0084_20250815_142943.json",
+            "iteration_0084_20250815_152428.json",
+            "iteration_0084_20250816_065959.json"
+          ]
+        },
+        "occlusion": {
+          "file_count": 7,
+          "files": [
+            "iteration_0005_20250814_094052.json",
+            "iteration_0047_20250814_121727.json",
+            "iteration_0087_20250815_093130.json",
+            "iteration_0087_20250815_094326.json",
+            "iteration_0087_20250815_142950.json",
+            "iteration_0087_20250815_152435.json",
+            "iteration_0087_20250816_070005.json"
+          ]
+        },
+        "prototype": {
+          "file_count": 13,
+          "files": [
+            "iteration_0001_20250813_150545.json",
+            "iteration_0001_20250813_192043.json",
+            "iteration_0001_20250813_200134.json",
+            "iteration_0001_20250813_210043.json",
+            "iteration_0001_20250813_210735.json",
+            "iteration_0001_20250814_073041.json",
+            "iteration_0001_20250814_094044.json",
+            "iteration_0043_20250814_121716.json",
+            "iteration_0083_20250815_093128.json",
+            "iteration_0083_20250815_094326.json",
+            "iteration_0083_20250815_142942.json",
+            "iteration_0083_20250815_152427.json",
+            "iteration_0083_20250816_065958.json"
+          ]
+        },
+        "tcav": {
+          "file_count": 10,
+          "files": [
+            "iteration_0001_20250813_191810.json",
+            "iteration_0003_20250813_210745.json",
+            "iteration_0003_20250814_073049.json",
+            "iteration_0003_20250814_094049.json",
+            "iteration_0045_20250814_121723.json",
+            "iteration_0085_20250815_093129.json",
+            "iteration_0085_20250815_094326.json",
+            "iteration_0085_20250815_142943.json",
+            "iteration_0085_20250815_152428.json",
+            "iteration_0085_20250816_065959.json"
+          ]
+        }
+      },
+      "vit": {
+        "concept_bottleneck": {
+          "file_count": 8,
+          "files": [
+            "iteration_0006_20250814_073138.json",
+            "iteration_0007_20250814_095136.json",
+            "iteration_0049_20250814_121748.json",
+            "iteration_0089_20250815_093140.json",
+            "iteration_0089_20250815_094336.json",
+            "iteration_0089_20250815_143001.json",
+            "iteration_0089_20250815_152446.json",
+            "iteration_0089_20250816_070015.json"
+          ]
+        },
+        "occlusion": {
+          "file_count": 7,
+          "files": [
+            "iteration_0008_20250814_095139.json",
+            "iteration_0050_20250814_121751.json",
+            "iteration_0090_20250815_093141.json",
+            "iteration_0090_20250815_094337.json",
+            "iteration_0090_20250815_143021.json",
+            "iteration_0090_20250815_152509.json",
+            "iteration_0090_20250816_070033.json"
+          ]
+        },
+        "tcav": {
+          "file_count": 8,
+          "files": [
+            "iteration_0005_20250814_073137.json",
+            "iteration_0006_20250814_095133.json",
+            "iteration_0048_20250814_121746.json",
+            "iteration_0088_20250815_093140.json",
+            "iteration_0088_20250815_094336.json",
+            "iteration_0088_20250815_143001.json",
+            "iteration_0088_20250815_152445.json",
+            "iteration_0088_20250816_070013.json"
+          ]
+        }
+      }
+    }
+  },
+  "generated_at": "2025-08-16T07:02:32.438406"
+}

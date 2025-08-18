@@ -1,0 +1,480 @@
+{
+  "iteration_info": {
+    "iteration_number": 4,
+    "timestamp": "2025-08-11T20:14:10.754366",
+    "iteration_key": "adult_income_decision_tree_counterfactual",
+    "filename": "iteration_0004_20250811_201410.json",
+    "folder_path": "results\\iterations\\iterations\\adult\\income\\decision_tree_counterfactual"
+  },
+  "experiment_info": {
+    "config": {
+      "data": {
+        "tabular_datasets": [
+          {
+            "name": "adult_income",
+            "source": "uci",
+            "description": "Adult Income (UCI) - Binary classification, well-known interpretable baseline dataset",
+            "mandatory": true
+          },
+          {
+            "name": "compas",
+            "source": "custom",
+            "description": "COMPAS - Binary classification, real-world socially sensitive dataset",
+            "mandatory": true
+          },
+          {
+            "name": "iris",
+            "source": "sklearn",
+            "description": "Iris flower classification dataset",
+            "mandatory": false
+          },
+          {
+            "name": "breast_cancer",
+            "source": "sklearn",
+            "description": "Breast cancer diagnosis dataset",
+            "mandatory": false
+          },
+          {
+            "name": "diabetes",
+            "source": "sklearn",
+            "description": "Diabetes prediction dataset",
+            "mandatory": false
+          }
+        ],
+        "image_datasets": [
+          {
+            "name": "mnist",
+            "source": "torchvision",
+            "description": "MNIST - Multiclass classification, standard for image classification and attributions",
+            "mandatory": true
+          },
+          {
+            "name": "cifar10",
+            "source": "torchvision",
+            "description": "Color image classification dataset",
+            "mandatory": false
+          }
+        ],
+        "text_datasets": [
+          {
+            "name": "imdb",
+            "source": "huggingface",
+            "description": "IMDB Movie Reviews - Binary sentiment classification, common NLP task for text explanation methods",
+            "mandatory": true
+          },
+          {
+            "name": "20newsgroups",
+            "source": "sklearn",
+            "description": "News article classification dataset",
+            "mandatory": false
+          }
+        ]
+      },
+      "validation": {
+        "class_imbalance_ratio": 0.2,
+        "min_dataset_size": 100,
+        "min_test_size": 10,
+        "max_missing_ratio": 0.3,
+        "outlier_threshold": 3.0,
+        "feature_correlation_threshold": 0.95,
+        "min_features": 2,
+        "max_features": 1000,
+        "max_skewness": 3.0,
+        "max_outlier_ratio": 0.1
+      },
+      "hyperparameter_tuning": {
+        "cv_folds": 5,
+        "scoring": "accuracy",
+        "n_jobs": -1,
+        "verbose": 1,
+        "optimization_method": "grid_search",
+        "n_trials": 100,
+        "timeout": 3600,
+        "save_best_params": true,
+        "save_all_results": true,
+        "parameter_grids": {
+          "decision_tree": {
+            "max_depth": [
+              3,
+              5,
+              7,
+              10,
+              "None"
+            ],
+            "min_samples_split": [
+              2,
+              5,
+              10
+            ],
+            "min_samples_leaf": [
+              1,
+              2,
+              4
+            ],
+            "criterion": [
+              "gini",
+              "entropy"
+            ]
+          },
+          "random_forest": {
+            "n_estimators": [
+              50,
+              100,
+              200
+            ],
+            "max_depth": [
+              5,
+              10,
+              15,
+              "None"
+            ],
+            "min_samples_split": [
+              2,
+              5,
+              10
+            ],
+            "max_features": [
+              "sqrt",
+              "log2",
+              "None"
+            ]
+          },
+          "gradient_boosting": {
+            "n_estimators": [
+              50,
+              100,
+              200
+            ],
+            "learning_rate": [
+              0.01,
+              0.1,
+              0.2
+            ],
+            "max_depth": [
+              3,
+              5,
+              7
+            ],
+            "subsample": [
+              0.8,
+              0.9,
+              1.0
+            ]
+          },
+          "mlp": {
+            "hidden_layer_sizes": [
+              "(50",
+              ")",
+              "(100",
+              ")",
+              "(50",
+              "50)"
+            ],
+            "activation": [
+              "relu",
+              "tanh"
+            ],
+            "alpha": [
+              0.0001,
+              0.001,
+              0.01
+            ],
+            "max_iter": [
+              500,
+              1000
+            ]
+          }
+        }
+      },
+      "models": {
+        "models_to_train": [
+          "decision_tree",
+          "random_forest",
+          "gradient_boosting",
+          "mlp"
+        ],
+        "tabular": [
+          {
+            "name": "decision_tree",
+            "description": "Decision Tree Classifier",
+            "library": "sklearn"
+          },
+          {
+            "name": "random_forest",
+            "description": "Random Forest Classifier",
+            "library": "sklearn"
+          },
+          {
+            "name": "gradient_boosting",
+            "description": "Gradient Boosting Classifier",
+            "library": "sklearn"
+          },
+          {
+            "name": "mlp",
+            "description": "Multi-layer Perceptron",
+            "library": "sklearn"
+          }
+        ],
+        "image": [
+          {
+            "name": "cnn",
+            "description": "Convolutional Neural Network",
+            "library": "pytorch"
+          },
+          {
+            "name": "vit",
+            "description": "Vision Transformer",
+            "library": "pytorch"
+          }
+        ],
+        "text": [
+          {
+            "name": "bert",
+            "description": "BERT-based classifier (simplified)",
+            "library": "sklearn"
+          },
+          {
+            "name": "lstm",
+            "description": "LSTM-based classifier (simplified)",
+            "library": "sklearn"
+          }
+        ]
+      },
+      "explanations": {
+        "feature_attribution": [
+          {
+            "name": "shap",
+            "description": "SHAP (SHapley Additive exPlanations)",
+            "library": "shap"
+          },
+          {
+            "name": "lime",
+            "description": "LIME (Local Interpretable Model-agnostic Explanations)",
+            "library": "lime"
+          },
+          {
+            "name": "integrated_gradients",
+            "description": "Integrated Gradients",
+            "library": "captum"
+          }
+        ],
+        "example_based": [
+          {
+            "name": "prototype",
+            "description": "Prototype-based explanations",
+            "library": "custom"
+          },
+          {
+            "name": "counterfactual",
+            "description": "Counterfactual explanations",
+            "library": "alibi"
+          }
+        ],
+        "concept_based": [
+          {
+            "name": "tcav",
+            "description": "TCAV (Testing with Concept Activation Vectors)",
+            "library": "custom"
+          },
+          {
+            "name": "concept_bottleneck",
+            "description": "Concept Bottleneck Models",
+            "library": "custom"
+          }
+        ],
+        "perturbation": [
+          {
+            "name": "occlusion",
+            "description": "Occlusion-based explanations",
+            "library": "captum"
+          },
+          {
+            "name": "feature_ablation",
+            "description": "Feature ablation explanations",
+            "library": "captum"
+          }
+        ]
+      },
+      "evaluation": {
+        "fidelity": [
+          {
+            "name": "faithfulness",
+            "description": "How well explanations reflect model behavior"
+          },
+          {
+            "name": "monotonicity",
+            "description": "Consistency of explanation with model predictions"
+          },
+          {
+            "name": "completeness",
+            "description": "Coverage of explanation across features"
+          }
+        ],
+        "time_complexity": [
+          {
+            "name": "explanation_time",
+            "description": "Time taken to generate explanations"
+          },
+          {
+            "name": "training_time",
+            "description": "Time taken to train the model"
+          }
+        ],
+        "stability": [
+          {
+            "name": "consistency",
+            "description": "Consistency of explanations across similar inputs"
+          },
+          {
+            "name": "robustness",
+            "description": "Robustness to small input perturbations"
+          }
+        ],
+        "comprehensibility": [
+          {
+            "name": "sparsity",
+            "description": "Sparsity of explanations"
+          },
+          {
+            "name": "simplicity",
+            "description": "Simplicity of explanation structure"
+          }
+        ]
+      },
+      "experiment": {
+        "preprocessing": {
+          "test_size": 0.2,
+          "random_state": 42,
+          "scale_features": true,
+          "handle_missing": true
+        },
+        "data_splitting": {
+          "default_strategy": "stratified",
+          "test_size": 0.2,
+          "validation_size": 0.1,
+          "random_state": 42,
+          "stratify": true,
+          "shuffle": true,
+          "n_splits": 5,
+          "n_repeats": 3,
+          "time_column": null,
+          "gap": 0,
+          "group_column": null,
+          "min_samples_per_class": 2,
+          "max_imbalance_ratio": 0.3,
+          "strategies": {
+            "stratified": {
+              "description": "Maintains class distribution across splits",
+              "supports_validation": true,
+              "supports_cv": true
+            },
+            "time_based": {
+              "description": "Time-based splits for temporal data",
+              "supports_validation": false,
+              "supports_cv": false,
+              "requires_time_column": true
+            },
+            "cross_validation": {
+              "description": "K-fold cross-validation",
+              "supports_validation": false,
+              "supports_cv": true,
+              "cv_types": [
+                "stratified_kfold",
+                "kfold",
+                "leave_one_out",
+                "stratified_shuffle_split"
+              ]
+            },
+            "group_based": {
+              "description": "Group-based splits (e.g., by patient, subject)",
+              "supports_validation": false,
+              "supports_cv": false,
+              "requires_group_column": true
+            },
+            "custom": {
+              "description": "Custom split strategies",
+              "supports_validation": true,
+              "supports_cv": true
+            },
+            "holdout": {
+              "description": "Simple holdout split",
+              "supports_validation": true,
+              "supports_cv": false
+            }
+          }
+        },
+        "training": {
+          "max_iter": 1000,
+          "early_stopping": true,
+          "validation_split": 0.1
+        },
+        "explanation": {
+          "num_samples": 100,
+          "max_features": 10,
+          "random_state": 42
+        },
+        "evaluation": {
+          "num_runs": 5,
+          "confidence_level": 0.95,
+          "significance_level": 0.05,
+          "multiple_comparison_correction": "bonferroni",
+          "statistical_tests": [
+            "t_test",
+            "mann_whitney",
+            "wilcoxon",
+            "anova",
+            "kruskal_wallis",
+            "friedman"
+          ],
+          "effect_size_calculation": true,
+          "power_analysis": true,
+          "correlation_analysis": true
+        }
+      },
+      "output": {
+        "results_dir": "results",
+        "save_models": true,
+        "save_explanations": true,
+        "generate_plots": true,
+        "save_reports": true
+      },
+      "logging": {
+        "level": "INFO",
+        "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        "file": "benchmark.log"
+      }
+    },
+    "benchmark_timestamp": "2025-08-11 20:13:07"
+  },
+  "result_data": {
+    "dataset": "adult_income",
+    "model": "decision_tree",
+    "explanation_method": "counterfactual",
+    "evaluation_results": {
+      "time_complexity": 0.0,
+      "faithfulness": 0.0,
+      "monotonicity": 0.0,
+      "completeness": 0.0,
+      "stability": 0.0,
+      "consistency": 0.0,
+      "sparsity": 0.0,
+      "simplicity": 0.0
+    },
+    "explanation_results": {
+      "explanations": [],
+      "generation_time": 0.0,
+      "method": "counterfactual",
+      "info": {
+        "n_explanations": 0
+      }
+    },
+    "model_performance": {
+      "accuracy": 0.832587435769932,
+      "precision": 0.8263642948001589,
+      "recall": 0.832587435769932,
+      "f1_score": 0.8158879753348052
+    },
+    "validation_status": false,
+    "used_tuned_params": false
+  }
+}

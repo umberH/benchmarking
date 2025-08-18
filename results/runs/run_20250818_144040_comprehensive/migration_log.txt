@@ -1,0 +1,7 @@
+Migration performed at: 2025-08-18T14:41:06.108800
+Files migrated:
+  - Migrated: benchmark_results.json -> benchmark_results.json
+  - Migrated: comprehensive_report.md -> reports/comprehensive_report.md
+  - Migrated: detailed_results.json -> detailed_results.json
+  - Migrated directory: iterations -> iterations
+  - Migrated directory: detailed_explanations -> detailed_explanations

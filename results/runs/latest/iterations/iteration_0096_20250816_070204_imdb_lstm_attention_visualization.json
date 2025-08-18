@@ -1,0 +1,673 @@
+{
+  "iteration_info": {
+    "iteration_number": 96,
+    "timestamp": "2025-08-16T07:02:04.659670",
+    "iteration_key": "imdb_lstm_attention_visualization",
+    "filename": "iteration_0096_20250816_070204.json",
+    "folder_path": "results\\iterations\\iterations\\imdb\\lstm\\attention_visualization"
+  },
+  "experiment_info": {
+    "config": {
+      "data": {
+        "tabular_datasets": [
+          {
+            "name": "adult_income",
+            "source": "uci",
+            "description": "Adult Income (UCI) - Binary classification, well-known interpretable baseline dataset",
+            "mandatory": true
+          },
+          {
+            "name": "compas",
+            "source": "custom",
+            "description": "COMPAS - Binary classification, real-world socially sensitive dataset",
+            "mandatory": true
+          },
+          {
+            "name": "iris",
+            "source": "sklearn",
+            "description": "Iris flower classification dataset",
+            "mandatory": false
+          },
+          {
+            "name": "breast_cancer",
+            "source": "sklearn",
+            "description": "Breast cancer diagnosis dataset",
+            "mandatory": false
+          },
+          {
+            "name": "diabetes",
+            "source": "sklearn",
+            "description": "Diabetes prediction dataset",
+            "mandatory": false
+          }
+        ],
+        "image_datasets": [
+          {
+            "name": "mnist",
+            "source": "torchvision",
+            "description": "MNIST - Multiclass classification, standard for image classification and attributions",
+            "mandatory": true
+          },
+          {
+            "name": "cifar10",
+            "source": "torchvision",
+            "description": "Color image classification dataset",
+            "mandatory": false
+          }
+        ],
+        "text_datasets": [
+          {
+            "name": "imdb",
+            "source": "huggingface",
+            "description": "IMDB Movie Reviews - Binary sentiment classification, common NLP task for text explanation methods",
+            "mandatory": true
+          },
+          {
+            "name": "20newsgroups",
+            "source": "sklearn",
+            "description": "News article classification dataset",
+            "mandatory": false
+          }
+        ]
+      },
+      "validation": {
+        "class_imbalance_ratio": 0.2,
+        "min_dataset_size": 100,
+        "min_test_size": 10,
+        "max_missing_ratio": 0.3,
+        "outlier_threshold": 3.0,
+        "feature_correlation_threshold": 0.95,
+        "min_features": 2,
+        "max_features": 1000,
+        "max_skewness": 3.0,
+        "max_outlier_ratio": 0.1
+      },
+      "hyperparameter_tuning": {
+        "cv_folds": 5,
+        "scoring": "accuracy",
+        "n_jobs": -1,
+        "verbose": 1,
+        "optimization_method": "grid_search",
+        "n_trials": 100,
+        "timeout": 3600,
+        "save_best_params": true,
+        "save_all_results": true,
+        "parameter_grids": {
+          "decision_tree": {
+            "max_depth": [
+              3,
+              5,
+              7,
+              10,
+              "None"
+            ],
+            "min_samples_split": [
+              2,
+              5,
+              10
+            ],
+            "min_samples_leaf": [
+              1,
+              2,
+              4
+            ],
+            "criterion": [
+              "gini",
+              "entropy"
+            ]
+          },
+          "random_forest": {
+            "n_estimators": [
+              50,
+              100,
+              200
+            ],
+            "max_depth": [
+              5,
+              10,
+              15,
+              "None"
+            ],
+            "min_samples_split": [
+              2,
+              5,
+              10
+            ],
+            "max_features": [
+              "sqrt",
+              "log2",
+              "None"
+            ]
+          },
+          "gradient_boosting": {
+            "n_estimators": [
+              50,
+              100,
+              200
+            ],
+            "learning_rate": [
+              0.01,
+              0.1,
+              0.2
+            ],
+            "max_depth": [
+              3,
+              5,
+              7
+            ],
+            "subsample": [
+              0.8,
+              0.9,
+              1.0
+            ]
+          },
+          "mlp": {
+            "hidden_layer_sizes": [
+              "(50",
+              ")",
+              "(100",
+              ")",
+              "(50",
+              "50)"
+            ],
+            "activation": [
+              "relu",
+              "tanh"
+            ],
+            "alpha": [
+              0.0001,
+              0.001,
+              0.01
+            ],
+            "max_iter": [
+              500,
+              1000
+            ]
+          }
+        }
+      },
+      "models": {
+        "models_to_train": [
+          "decision_tree",
+          "random_forest",
+          "gradient_boosting",
+          "mlp",
+          "cnn",
+          "vit",
+          "bert",
+          "lstm"
+        ],
+        "tabular": [
+          {
+            "name": "decision_tree",
+            "description": "Decision Tree Classifier",
+            "library": "sklearn"
+          },
+          {
+            "name": "random_forest",
+            "description": "Random Forest Classifier",
+            "library": "sklearn"
+          },
+          {
+            "name": "gradient_boosting",
+            "description": "Gradient Boosting Classifier",
+            "library": "sklearn"
+          },
+          {
+            "name": "mlp",
+            "description": "Multi-layer Perceptron",
+            "library": "sklearn"
+          }
+        ],
+        "image": [
+          {
+            "name": "cnn",
+            "description": "Convolutional Neural Network",
+            "library": "pytorch"
+          },
+          {
+            "name": "vit",
+            "description": "Vision Transformer",
+            "library": "pytorch"
+          }
+        ],
+        "text": [
+          {
+            "name": "bert",
+            "description": "BERT-based classifier (simplified)",
+            "library": "sklearn"
+          },
+          {
+            "name": "lstm",
+            "description": "LSTM-based classifier (simplified)",
+            "library": "sklearn"
+          }
+        ]
+      },
+      "explanations": {
+        "feature_attribution": [
+          {
+            "name": "shap",
+            "description": "SHAP (SHapley Additive exPlanations)",
+            "library": "shap"
+          },
+          {
+            "name": "lime",
+            "description": "LIME (Local Interpretable Model-agnostic Explanations)",
+            "library": "lime"
+          },
+          {
+            "name": "integrated_gradients",
+            "description": "Integrated Gradients",
+            "library": "captum"
+          },
+          {
+            "name": "causal_shap",
+            "description": "Causal SHAP - SHAP values with causal structure consideration",
+            "library": "custom",
+            "data_types": [
+              "tabular"
+            ]
+          },
+          {
+            "name": "shapley_flow",
+            "description": "Shapley Flow - tracks value propagation through model layers",
+            "library": "custom",
+            "data_types": [
+              "tabular",
+              "image"
+            ]
+          },
+          {
+            "name": "shap_interactive",
+            "description": "SHAP Interactive - includes main effects and pairwise interactions",
+            "library": "custom",
+            "data_types": [
+              "tabular"
+            ]
+          }
+        ],
+        "example_based": [
+          {
+            "name": "prototype",
+            "description": "Prototype-based explanations",
+            "library": "custom"
+          },
+          {
+            "name": "counterfactual",
+            "description": "Counterfactual explanations",
+            "library": "alibi"
+          },
+          {
+            "name": "influence_functions",
+            "description": "Influence Functions - identifies training examples affecting predictions",
+            "library": "custom",
+            "data_types": [
+              "tabular",
+              "image",
+              "text"
+            ]
+          }
+        ],
+        "concept_based": [
+          {
+            "name": "tcav",
+            "description": "TCAV (Testing with Concept Activation Vectors)",
+            "library": "custom"
+          },
+          {
+            "name": "concept_bottleneck",
+            "description": "Concept Bottleneck Models",
+            "library": "custom"
+          },
+          {
+            "name": "bayesian_rule_list",
+            "description": "Bayesian Rule Lists - interpretable if-then rules with posteriors",
+            "library": "custom",
+            "data_types": [
+              "tabular"
+            ]
+          },
+          {
+            "name": "corels",
+            "description": "CORELS - certifiably optimal rule lists",
+            "library": "custom",
+            "data_types": [
+              "tabular"
+            ]
+          }
+        ],
+        "perturbation": [
+          {
+            "name": "occlusion",
+            "description": "Occlusion-based explanations",
+            "library": "captum"
+          },
+          {
+            "name": "feature_ablation",
+            "description": "Feature ablation explanations",
+            "library": "captum"
+          }
+        ]
+      },
+      "evaluation": {
+        "fidelity": [
+          {
+            "name": "faithfulness",
+            "description": "How well explanations reflect model behavior"
+          },
+          {
+            "name": "monotonicity",
+            "description": "Consistency of explanation with model predictions"
+          },
+          {
+            "name": "completeness",
+            "description": "Coverage of explanation across features"
+          }
+        ],
+        "time_complexity": [
+          {
+            "name": "explanation_time",
+            "description": "Time taken to generate explanations"
+          },
+          {
+            "name": "training_time",
+            "description": "Time taken to train the model"
+          }
+        ],
+        "stability": [
+          {
+            "name": "consistency",
+            "description": "Consistency of explanations across similar inputs"
+          },
+          {
+            "name": "robustness",
+            "description": "Robustness to small input perturbations"
+          }
+        ],
+        "comprehensibility": [
+          {
+            "name": "sparsity",
+            "description": "Sparsity of explanations"
+          },
+          {
+            "name": "simplicity",
+            "description": "Simplicity of explanation structure"
+          }
+        ]
+      },
+      "experiment": {
+        "preprocessing": {
+          "test_size": 0.2,
+          "random_state": 42,
+          "scale_features": true,
+          "handle_missing": true
+        },
+        "data_splitting": {
+          "default_strategy": "stratified",
+          "test_size": 0.2,
+          "validation_size": 0.1,
+          "random_state": 42,
+          "stratify": true,
+          "shuffle": true,
+          "n_splits": 5,
+          "n_repeats": 3,
+          "time_column": null,
+          "gap": 0,
+          "group_column": null,
+          "min_samples_per_class": 2,
+          "max_imbalance_ratio": 0.3,
+          "strategies": {
+            "stratified": {
+              "description": "Maintains class distribution across splits",
+              "supports_validation": true,
+              "supports_cv": true
+            },
+            "time_based": {
+              "description": "Time-based splits for temporal data",
+              "supports_validation": false,
+              "supports_cv": false,
+              "requires_time_column": true
+            },
+            "cross_validation": {
+              "description": "K-fold cross-validation",
+              "supports_validation": false,
+              "supports_cv": true,
+              "cv_types": [
+                "stratified_kfold",
+                "kfold",
+                "leave_one_out",
+                "stratified_shuffle_split"
+              ]
+            },
+            "group_based": {
+              "description": "Group-based splits (e.g., by patient, subject)",
+              "supports_validation": false,
+              "supports_cv": false,
+              "requires_group_column": true
+            },
+            "custom": {
+              "description": "Custom split strategies",
+              "supports_validation": true,
+              "supports_cv": true
+            },
+            "holdout": {
+              "description": "Simple holdout split",
+              "supports_validation": true,
+              "supports_cv": false
+            }
+          }
+        },
+        "training": {
+          "max_iter": 1000,
+          "early_stopping": true,
+          "validation_split": 0.1
+        },
+        "explanation": {
+          "num_samples": 100,
+          "max_features": 10,
+          "random_state": 42
+        },
+        "evaluation": {
+          "num_runs": 5,
+          "confidence_level": 0.95,
+          "significance_level": 0.05,
+          "multiple_comparison_correction": "bonferroni",
+          "statistical_tests": [
+            "t_test",
+            "mann_whitney",
+            "wilcoxon",
+            "anova",
+            "kruskal_wallis",
+            "friedman"
+          ],
+          "effect_size_calculation": true,
+          "power_analysis": true,
+          "correlation_analysis": true
+        }
+      },
+      "output": {
+        "results_dir": "results",
+        "save_models": true,
+        "save_explanations": true,
+        "generate_plots": true,
+        "save_reports": true
+      },
+      "logging": {
+        "level": "INFO",
+        "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        "file": "benchmark.log"
+      }
+    },
+    "benchmark_timestamp": "2025-08-16 06:35:02"
+  },
+  "result_data": {
+    "dataset": "imdb",
+    "dataset_type": "text",
+    "model": "lstm",
+    "model_type": "lstm",
+    "explanation_method": "attention_visualization",
+    "explanation_type": "attention_visualization",
+    "model_performance": {
+      "train_accuracy": 0.887,
+      "test_accuracy": 0.815,
+      "train_f1": 0.8869971749293732,
+      "test_f1": 0.8148843026891808,
+      "train_precision": 0.8870387038703871,
+      "test_precision": 0.8157894736842105,
+      "train_recall": 0.887,
+      "test_recall": 0.815,
+      "overfitting_gap": 0.07200000000000006,
+      "overfitting_severity": "low",
+      "class_accuracies": [
+        0.84,
+        0.79
+      ],
+      "n_classes": 2,
+      "n_train_samples": 1000,
+      "n_test_samples": 200,
+      "training_time": 0.5865278244018555,
+      "model_complexity": {
+        "n_parameters": 4,
+        "model_size_bytes": 48,
+        "model_size_mb": 4.57763671875e-05,
+        "complexity_level": "simple"
+      }
+    },
+    "explanation_info": {
+      "n_explanations": 50,
+      "feature_names": [
+        "word_0_This",
+        "word_1_movie",
+        "word_2_is",
+        "word_3_something",
+        "word_4_horrible.",
+        "word_5_I",
+        "word_6_was",
+        "word_7_laughing",
+        "word_8_all",
+        "word_9_the",
+        "word_10_time.",
+        "word_11_I",
+        "word_12_was",
+        "word_13_forced",
+        "word_14_to",
+        "word_15_stop",
+        "word_16_in",
+        "word_17_some",
+        "word_18_scenes",
+        "word_19_because",
+        "word_20_my",
+        "word_21_mom",
+        "word_22_thought",
+        "word_23_it's",
+        "word_24_not",
+        "word_25_polite",
+        "word_26_to",
+        "word_27_laugh",
+        "word_28_when",
+        "word_29_people",
+        "word_30_are",
+        "word_31_dying,",
+        "word_32_but",
+        "word_33_in",
+        "word_34_this",
+        "word_35_movie,",
+        "word_36_even",
+        "word_37_death",
+        "word_38_looks",
+        "word_39_ridiculous.",
+        "word_40_Especially",
+        "word_41_when",
+        "word_42_Tornado",
+        "word_43_Tommy",
+        "word_44_is",
+        "word_45_sucked",
+        "word_46_into",
+        "word_47_one",
+        "word_48_tornado.<br",
+        "word_49_/><br",
+        "word_50_/>Explosions",
+        "word_51_of",
+        "word_52_cars",
+        "word_53_thrown",
+        "word_54_onto",
+        "word_55_buildings",
+        "word_56_by",
+        "word_57_the",
+        "word_58_forces",
+        "word_59_of",
+        "word_60_wind",
+        "word_61_look",
+        "word_62_like",
+        "word_63_ones",
+        "word_64_from",
+        "word_65_the",
+        "word_66_old",
+        "word_67_school",
+        "word_68_side",
+        "word_69_scroller",
+        "word_70_game",
+        "word_71_called",
+        "word_72_R-Type.",
+        "word_73_Dialogues",
+        "word_74_are",
+        "word_75_very",
+        "word_76_bad",
+        "word_77_and",
+        "word_78_I",
+        "word_79_am",
+        "word_80_interested",
+        "word_81_how",
+        "word_82_they",
+        "word_83_managed",
+        "word_84_to",
+        "word_85_persuade",
+        "word_86_some",
+        "word_87_of",
+        "word_88_the",
+        "word_89_actors",
+        "word_90_to",
+        "word_91_play",
+        "word_92_in",
+        "word_93_this",
+        "word_94_movie.",
+        "word_95_It",
+        "word_96_is",
+        "word_97_simply",
+        "word_98_amazing",
+        "word_99_how"
+      ]
+    },
+    "evaluations": {
+      "time_complexity": 0.08614175796508788,
+      "faithfulness": 0.0,
+      "monotonicity": 0.0,
+      "completeness": 0.0,
+      "stability": 0.7134808264581659,
+      "consistency": 0.09237136425980307,
+      "sparsity": 0.6971267252597214,
+      "simplicity": 0.03845801910657315,
+      "semantic_coherence": 0.2434618675824154,
+      "syntax_awareness": 0.5214405746453695,
+      "context_sensitivity": 0.012859249193092896,
+      "word_significance": 0.01107233671685599,
+      "explanation_coverage": 0.6469529020895649,
+      "sentiment_consistency": 0.8539054887061632,
+      "advanced_identity": 1.0,
+      "advanced_separability": 0.037115935948745904,
+      "advanced_non_sensitivity": 0.0,
+      "advanced_compactness": 0.0058597145967462525,
+      "advanced_correctness": 0.5600189657492952,
+      "advanced_entropy": 0.9993761502523192,
+      "advanced_gini_coefficient": 0.038458019106573184,
+      "advanced_kl_divergence": 0.0006238476539739489
+    },
+    "detailed_explanations_file": null,
+    "detailed_explanations_summary": {
+      "error": "'charmap' codec can't encode character '\\u2713' in position 20: character maps to <undefined>"
+    },
+    "used_tuned_params": false,
+    "validation_status": true
+  }
+}

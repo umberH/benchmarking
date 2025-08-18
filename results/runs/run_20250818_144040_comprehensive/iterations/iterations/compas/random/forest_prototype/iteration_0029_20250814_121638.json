@@ -1,0 +1,3911 @@
+{
+  "iteration_info": {
+    "iteration_number": 29,
+    "timestamp": "2025-08-14T12:16:38.423297",
+    "iteration_key": "compas_random_forest_prototype",
+    "filename": "iteration_0029_20250814_121638.json",
+    "folder_path": "results\\iterations\\iterations\\compas\\random\\forest_prototype"
+  },
+  "experiment_info": {
+    "config": {
+      "data": {
+        "tabular_datasets": [
+          {
+            "name": "adult_income",
+            "source": "uci",
+            "description": "Adult Income (UCI) - Binary classification, well-known interpretable baseline dataset",
+            "mandatory": true
+          },
+          {
+            "name": "compas",
+            "source": "custom",
+            "description": "COMPAS - Binary classification, real-world socially sensitive dataset",
+            "mandatory": true
+          },
+          {
+            "name": "iris",
+            "source": "sklearn",
+            "description": "Iris flower classification dataset",
+            "mandatory": false
+          },
+          {
+            "name": "breast_cancer",
+            "source": "sklearn",
+            "description": "Breast cancer diagnosis dataset",
+            "mandatory": false
+          },
+          {
+            "name": "diabetes",
+            "source": "sklearn",
+            "description": "Diabetes prediction dataset",
+            "mandatory": false
+          }
+        ],
+        "image_datasets": [
+          {
+            "name": "mnist",
+            "source": "torchvision",
+            "description": "MNIST - Multiclass classification, standard for image classification and attributions",
+            "mandatory": true
+          },
+          {
+            "name": "cifar10",
+            "source": "torchvision",
+            "description": "Color image classification dataset",
+            "mandatory": false
+          }
+        ],
+        "text_datasets": [
+          {
+            "name": "imdb",
+            "source": "huggingface",
+            "description": "IMDB Movie Reviews - Binary sentiment classification, common NLP task for text explanation methods",
+            "mandatory": true
+          },
+          {
+            "name": "20newsgroups",
+            "source": "sklearn",
+            "description": "News article classification dataset",
+            "mandatory": false
+          }
+        ]
+      },
+      "validation": {
+        "class_imbalance_ratio": 0.2,
+        "min_dataset_size": 100,
+        "min_test_size": 10,
+        "max_missing_ratio": 0.3,
+        "outlier_threshold": 3.0,
+        "feature_correlation_threshold": 0.95,
+        "min_features": 2,
+        "max_features": 1000,
+        "max_skewness": 3.0,
+        "max_outlier_ratio": 0.1
+      },
+      "hyperparameter_tuning": {
+        "cv_folds": 5,
+        "scoring": "accuracy",
+        "n_jobs": -1,
+        "verbose": 1,
+        "optimization_method": "grid_search",
+        "n_trials": 100,
+        "timeout": 3600,
+        "save_best_params": true,
+        "save_all_results": true,
+        "parameter_grids": {
+          "decision_tree": {
+            "max_depth": [
+              3,
+              5,
+              7,
+              10,
+              "None"
+            ],
+            "min_samples_split": [
+              2,
+              5,
+              10
+            ],
+            "min_samples_leaf": [
+              1,
+              2,
+              4
+            ],
+            "criterion": [
+              "gini",
+              "entropy"
+            ]
+          },
+          "random_forest": {
+            "n_estimators": [
+              50,
+              100,
+              200
+            ],
+            "max_depth": [
+              5,
+              10,
+              15,
+              "None"
+            ],
+            "min_samples_split": [
+              2,
+              5,
+              10
+            ],
+            "max_features": [
+              "sqrt",
+              "log2",
+              "None"
+            ]
+          },
+          "gradient_boosting": {
+            "n_estimators": [
+              50,
+              100,
+              200
+            ],
+            "learning_rate": [
+              0.01,
+              0.1,
+              0.2
+            ],
+            "max_depth": [
+              3,
+              5,
+              7
+            ],
+            "subsample": [
+              0.8,
+              0.9,
+              1.0
+            ]
+          },
+          "mlp": {
+            "hidden_layer_sizes": [
+              "(50",
+              ")",
+              "(100",
+              ")",
+              "(50",
+              "50)"
+            ],
+            "activation": [
+              "relu",
+              "tanh"
+            ],
+            "alpha": [
+              0.0001,
+              0.001,
+              0.01
+            ],
+            "max_iter": [
+              500,
+              1000
+            ]
+          }
+        }
+      },
+      "models": {
+        "models_to_train": [
+          "decision_tree",
+          "random_forest",
+          "gradient_boosting",
+          "mlp",
+          "cnn",
+          "vit",
+          "bert",
+          "lstm"
+        ],
+        "tabular": [
+          {
+            "name": "decision_tree",
+            "description": "Decision Tree Classifier",
+            "library": "sklearn"
+          },
+          {
+            "name": "random_forest",
+            "description": "Random Forest Classifier",
+            "library": "sklearn"
+          },
+          {
+            "name": "gradient_boosting",
+            "description": "Gradient Boosting Classifier",
+            "library": "sklearn"
+          },
+          {
+            "name": "mlp",
+            "description": "Multi-layer Perceptron",
+            "library": "sklearn"
+          }
+        ],
+        "image": [
+          {
+            "name": "cnn",
+            "description": "Convolutional Neural Network",
+            "library": "pytorch"
+          },
+          {
+            "name": "vit",
+            "description": "Vision Transformer",
+            "library": "pytorch"
+          }
+        ],
+        "text": [
+          {
+            "name": "bert",
+            "description": "BERT-based classifier (simplified)",
+            "library": "sklearn"
+          },
+          {
+            "name": "lstm",
+            "description": "LSTM-based classifier (simplified)",
+            "library": "sklearn"
+          }
+        ]
+      },
+      "explanations": {
+        "feature_attribution": [
+          {
+            "name": "shap",
+            "description": "SHAP (SHapley Additive exPlanations)",
+            "library": "shap"
+          },
+          {
+            "name": "lime",
+            "description": "LIME (Local Interpretable Model-agnostic Explanations)",
+            "library": "lime"
+          },
+          {
+            "name": "integrated_gradients",
+            "description": "Integrated Gradients",
+            "library": "captum"
+          }
+        ],
+        "example_based": [
+          {
+            "name": "prototype",
+            "description": "Prototype-based explanations",
+            "library": "custom"
+          },
+          {
+            "name": "counterfactual",
+            "description": "Counterfactual explanations",
+            "library": "alibi"
+          }
+        ],
+        "concept_based": [
+          {
+            "name": "tcav",
+            "description": "TCAV (Testing with Concept Activation Vectors)",
+            "library": "custom"
+          },
+          {
+            "name": "concept_bottleneck",
+            "description": "Concept Bottleneck Models",
+            "library": "custom"
+          }
+        ],
+        "perturbation": [
+          {
+            "name": "occlusion",
+            "description": "Occlusion-based explanations",
+            "library": "captum"
+          },
+          {
+            "name": "feature_ablation",
+            "description": "Feature ablation explanations",
+            "library": "captum"
+          }
+        ]
+      },
+      "evaluation": {
+        "fidelity": [
+          {
+            "name": "faithfulness",
+            "description": "How well explanations reflect model behavior"
+          },
+          {
+            "name": "monotonicity",
+            "description": "Consistency of explanation with model predictions"
+          },
+          {
+            "name": "completeness",
+            "description": "Coverage of explanation across features"
+          }
+        ],
+        "time_complexity": [
+          {
+            "name": "explanation_time",
+            "description": "Time taken to generate explanations"
+          },
+          {
+            "name": "training_time",
+            "description": "Time taken to train the model"
+          }
+        ],
+        "stability": [
+          {
+            "name": "consistency",
+            "description": "Consistency of explanations across similar inputs"
+          },
+          {
+            "name": "robustness",
+            "description": "Robustness to small input perturbations"
+          }
+        ],
+        "comprehensibility": [
+          {
+            "name": "sparsity",
+            "description": "Sparsity of explanations"
+          },
+          {
+            "name": "simplicity",
+            "description": "Simplicity of explanation structure"
+          }
+        ]
+      },
+      "experiment": {
+        "preprocessing": {
+          "test_size": 0.2,
+          "random_state": 42,
+          "scale_features": true,
+          "handle_missing": true
+        },
+        "data_splitting": {
+          "default_strategy": "stratified",
+          "test_size": 0.2,
+          "validation_size": 0.1,
+          "random_state": 42,
+          "stratify": true,
+          "shuffle": true,
+          "n_splits": 5,
+          "n_repeats": 3,
+          "time_column": null,
+          "gap": 0,
+          "group_column": null,
+          "min_samples_per_class": 2,
+          "max_imbalance_ratio": 0.3,
+          "strategies": {
+            "stratified": {
+              "description": "Maintains class distribution across splits",
+              "supports_validation": true,
+              "supports_cv": true
+            },
+            "time_based": {
+              "description": "Time-based splits for temporal data",
+              "supports_validation": false,
+              "supports_cv": false,
+              "requires_time_column": true
+            },
+            "cross_validation": {
+              "description": "K-fold cross-validation",
+              "supports_validation": false,
+              "supports_cv": true,
+              "cv_types": [
+                "stratified_kfold",
+                "kfold",
+                "leave_one_out",
+                "stratified_shuffle_split"
+              ]
+            },
+            "group_based": {
+              "description": "Group-based splits (e.g., by patient, subject)",
+              "supports_validation": false,
+              "supports_cv": false,
+              "requires_group_column": true
+            },
+            "custom": {
+              "description": "Custom split strategies",
+              "supports_validation": true,
+              "supports_cv": true
+            },
+            "holdout": {
+              "description": "Simple holdout split",
+              "supports_validation": true,
+              "supports_cv": false
+            }
+          }
+        },
+        "training": {
+          "max_iter": 1000,
+          "early_stopping": true,
+          "validation_split": 0.1
+        },
+        "explanation": {
+          "num_samples": 100,
+          "max_features": 10,
+          "random_state": 42
+        },
+        "evaluation": {
+          "num_runs": 5,
+          "confidence_level": 0.95,
+          "significance_level": 0.05,
+          "multiple_comparison_correction": "bonferroni",
+          "statistical_tests": [
+            "t_test",
+            "mann_whitney",
+            "wilcoxon",
+            "anova",
+            "kruskal_wallis",
+            "friedman"
+          ],
+          "effect_size_calculation": true,
+          "power_analysis": true,
+          "correlation_analysis": true
+        }
+      },
+      "output": {
+        "results_dir": "results",
+        "save_models": true,
+        "save_explanations": true,
+        "generate_plots": true,
+        "save_reports": true
+      },
+      "logging": {
+        "level": "INFO",
+        "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        "file": "benchmark.log"
+      }
+    },
+    "benchmark_timestamp": "2025-08-14 11:45:06"
+  },
+  "result_data": {
+    "dataset": "compas",
+    "model": "random_forest",
+    "explanation_method": "prototype",
+    "evaluation_results": {
+      "time_complexity": 0.0029127883911132814,
+      "faithfulness": 0.675,
+      "monotonicity": 0.6984001434881314,
+      "completeness": 1.0,
+      "stability": 0.9491516885471643,
+      "consistency": 0.0,
+      "sparsity": 0.0,
+      "simplicity": 0.0
+    },
+    "explanation_results": {
+      "explanations": [
+        {
+          "instance_id": "745",
+          "original": [
+            -1.249723306130379,
+            -0.50532766081895,
+            -0.340336106439631
+          ],
+          "prediction": 0,
+          "prototype": [
+            -1.249723306130379,
+            -0.50532766081895,
+            -0.32717125629361365
+          ],
+          "proto_distance": 0.01316485014601737,
+          "true_label": 0,
+          "confidence": 0.8257405472659194
+        },
+        {
+          "instance_id": "586",
+          "original": [
+            0.8635919379208227,
+            -0.50532766081895,
+            -0.007202689830261979
+          ],
+          "prediction": 0,
+          "prototype": [
+            0.8635919379208227,
+            -0.50532766081895,
+            -0.007202689830261979
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.9359197128953276
+        },
+        {
+          "instance_id": "1410",
+          "original": [
+            2.8078419624479283,
+            0.3121776809950973,
+            -0.10336880381131876
+          ],
+          "prediction": 0,
+          "prototype": [
+            2.8078419624479283,
+            0.10780134554158548,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.20815740680482697,
+          "true_label": 0,
+          "confidence": 0.6298461682647866
+        },
+        {
+          "instance_id": "631",
+          "original": [
+            0.6945267183967265,
+            -0.09657498991192634,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            0.7790593281587745,
+            -0.09657498991192634,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.08453260976204802,
+          "true_label": 0,
+          "confidence": 0.5588077928930808
+        },
+        {
+          "instance_id": "421",
+          "original": [
+            2.385178913637688,
+            0.3121776809950973,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            2.385178913637688,
+            0.5165540164486091,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.2043763354535118,
+          "true_label": 0,
+          "confidence": 0.6469413822331649
+        },
+        {
+          "instance_id": "788",
+          "original": [
+            0.7790593281587745,
+            -0.7097039962724618,
+            -0.05070940322724937
+          ],
+          "prediction": 0,
+          "prototype": [
+            0.7790593281587745,
+            -0.7097039962724618,
+            -0.05070940322724937
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.8482645087543307
+        },
+        {
+          "instance_id": "202",
+          "original": [
+            -0.1507993792237541,
+            -0.50532766081895,
+            -1.2355459163688105
+          ],
+          "prediction": 0,
+          "prototype": [
+            -0.3198645987478502,
+            -0.50532766081895,
+            -1.0380731641785503
+          ],
+          "proto_distance": 0.25995872039677126,
+          "true_label": 0,
+          "confidence": 0.5396840262900718
+        },
+        {
+          "instance_id": "1022",
+          "original": [
+            -0.48892981827194637,
+            -0.7097039962724618,
+            -0.05070940322724937
+          ],
+          "prediction": 0,
+          "prototype": [
+            -0.48892981827194637,
+            -0.7097039962724618,
+            -0.05070940322724937
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.7355391523597813
+        },
+        {
+          "instance_id": "63",
+          "original": [
+            1.0326571574449188,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            1.0326571574449188,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.8022641492868474
+        },
+        {
+          "instance_id": "1427",
+          "original": [
+            -1.0806580866062827,
+            -0.7097039962724618,
+            -0.07703910351928407
+          ],
+          "prediction": 0,
+          "prototype": [
+            -1.0806580866062827,
+            -0.7097039962724618,
+            -0.07703910351928407
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.7806756442510964
+        },
+        {
+          "instance_id": "181",
+          "original": [
+            -1.165190696368331,
+            -0.7097039962724618,
+            -0.07703910351928407
+          ],
+          "prediction": 0,
+          "prototype": [
+            -1.165190696368331,
+            -0.7097039962724618,
+            -0.07703910351928407
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.5178658638676858
+        },
+        {
+          "instance_id": "444",
+          "original": [
+            -0.6579950377960425,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            -0.6579950377960425,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.6596892173726857
+        },
+        {
+          "instance_id": "338",
+          "original": [
+            0.9481245476828707,
+            -0.30095132536543817,
+            -0.23501730527149223
+          ],
+          "prediction": 0,
+          "prototype": [
+            0.9481245476828707,
+            -0.30095132536543817,
+            -0.2745118557095443
+          ],
+          "proto_distance": 0.039494550438052056,
+          "true_label": 0,
+          "confidence": 0.7024242431124536
+        },
+        {
+          "instance_id": "149",
+          "original": [
+            2.2161136941135915,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            2.2161136941135915,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.9459819207185635
+        },
+        {
+          "instance_id": "724",
+          "original": [
+            1.4553202062551591,
+            -0.50532766081895,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            1.4553202062551591,
+            -0.50532766081895,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.7441327551538564
+        },
+        {
+          "instance_id": "529",
+          "original": [
+            -1.165190696368331,
+            -0.7097039962724618,
+            -0.05070940322724937
+          ],
+          "prediction": 0,
+          "prototype": [
+            -1.165190696368331,
+            -0.7097039962724618,
+            -0.05070940322724937
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.5183624768922545
+        },
+        {
+          "instance_id": "28",
+          "original": [
+            0.18733105982443815,
+            0.720930351902121,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            0.18733105982443815,
+            0.720930351902121,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.5806495721470845
+        },
+        {
+          "instance_id": "1233",
+          "original": [
+            -0.7425276475580905,
+            -0.30095132536543817,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.7425276475580905,
+            -0.30095132536543817,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.5482305228860325
+        },
+        {
+          "instance_id": "921",
+          "original": [
+            -1.165190696368331,
+            -0.50532766081895,
+            -0.379830656877683
+          ],
+          "prediction": 0,
+          "prototype": [
+            -1.165190696368331,
+            -0.50532766081895,
+            -0.340336106439631
+          ],
+          "proto_distance": 0.039494550438052,
+          "true_label": 0,
+          "confidence": 0.59487576097668
+        },
+        {
+          "instance_id": "354",
+          "original": [
+            -0.6579950377960425,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            -0.6579950377960425,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.6596892173726857
+        },
+        {
+          "instance_id": "995",
+          "original": [
+            2.2161136941135915,
+            -0.7097039962724618,
+            -0.05070940322724937
+          ],
+          "prediction": 0,
+          "prototype": [
+            2.2161136941135915,
+            -0.7097039962724618,
+            -0.05070940322724937
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.9639724680176752
+        },
+        {
+          "instance_id": "1006",
+          "original": [
+            1.6243854257792552,
+            0.720930351902121,
+            -0.05070940322724937
+          ],
+          "prediction": 1,
+          "prototype": [
+            1.4553202062551591,
+            0.720930351902121,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.16957700826497052,
+          "true_label": 0,
+          "confidence": 0.5362977424850157
+        },
+        {
+          "instance_id": "1086",
+          "original": [
+            0.01826584030034202,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            0.01826584030034202,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.6996831421773372
+        },
+        {
+          "instance_id": "108",
+          "original": [
+            1.7089180355413032,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            1.7089180355413032,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.8259735217508287
+        },
+        {
+          "instance_id": "988",
+          "original": [
+            -0.8270602573201387,
+            1.1296830228091446,
+            -0.05070940322724937
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.8270602573201387,
+            1.1296830228091446,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.013164850146017343,
+          "true_label": 0,
+          "confidence": 0.7930976837996218
+        },
+        {
+          "instance_id": "897",
+          "original": [
+            1.5398528160172071,
+            -0.50532766081895,
+            3.6749431880956593
+          ],
+          "prediction": 0,
+          "prototype": [
+            0.9481245476828707,
+            -0.30095132536543817,
+            3.4511407356133645
+          ],
+          "proto_distance": 0.6648304804808882,
+          "true_label": 0,
+          "confidence": 0.6730946007004657
+        },
+        {
+          "instance_id": "1018",
+          "original": [
+            1.2017223769690148,
+            -0.09657498991192634,
+            -0.05070940322724937
+          ],
+          "prediction": 0,
+          "prototype": [
+            1.2017223769690148,
+            -0.09657498991192634,
+            -0.05070940322724937
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.6609422012039251
+        },
+        {
+          "instance_id": "1054",
+          "original": [
+            -0.9115928670821867,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            -0.9115928670821867,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.739101410127866
+        },
+        {
+          "instance_id": "203",
+          "original": [
+            0.7790593281587745,
+            0.10780134554158548,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            0.7790593281587745,
+            0.10780134554158548,
+            -0.05070940322724937
+          ],
+          "proto_distance": 0.013164850146017343,
+          "true_label": 0,
+          "confidence": 0.5300285598480721
+        },
+        {
+          "instance_id": "398",
+          "original": [
+            1.5398528160172071,
+            -0.50532766081895,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            1.5398528160172071,
+            -0.50532766081895,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.7797214736101533
+        },
+        {
+          "instance_id": "943",
+          "original": [
+            -1.165190696368331,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            -1.165190696368331,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.5219585757858517
+        },
+        {
+          "instance_id": "476",
+          "original": [
+            -0.8270602573201387,
+            -0.09657498991192634,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.8270602573201387,
+            -0.09657498991192634,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.708641004331259
+        },
+        {
+          "instance_id": "937",
+          "original": [
+            1.1171897672069668,
+            -0.50532766081895,
+            -0.4588197577537871
+          ],
+          "prediction": 0,
+          "prototype": [
+            1.0326571574449188,
+            -0.50532766081895,
+            -0.4061603571697177
+          ],
+          "proto_distance": 0.09959304485282183,
+          "true_label": 0,
+          "confidence": 0.8389472425771785
+        },
+        {
+          "instance_id": "231",
+          "original": [
+            2.638776742923832,
+            -0.50532766081895,
+            4.306855995104492
+          ],
+          "prediction": 0,
+          "prototype": [
+            0.8635919379208227,
+            -0.09657498991192634,
+            4.372680245834578
+          ],
+          "proto_distance": 1.8228254633593897,
+          "true_label": 0,
+          "confidence": 0.7373214559695537
+        },
+        {
+          "instance_id": "1093",
+          "original": [
+            0.3563962793485343,
+            -0.50532766081895,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            0.3563962793485343,
+            -0.50532766081895,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.7569200787372258
+        },
+        {
+          "instance_id": "1155",
+          "original": [
+            -0.3198645987478502,
+            -0.09657498991192634,
+            -0.05070940322724937
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.3198645987478502,
+            -0.09657498991192634,
+            -0.05070940322724937
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.5615552352589109
+        },
+        {
+          "instance_id": "661",
+          "original": [
+            -0.4043972085098983,
+            -0.30095132536543817,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            -0.4043972085098983,
+            -0.30095132536543817,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.5705312929662909
+        },
+        {
+          "instance_id": "183",
+          "original": [
+            1.5398528160172071,
+            0.3121776809950973,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            1.5398528160172071,
+            0.3121776809950973,
+            -0.007202689830261979
+          ],
+          "proto_distance": 0.05667156354300473,
+          "true_label": 0,
+          "confidence": 0.5174650748708821
+        },
+        {
+          "instance_id": "1398",
+          "original": [
+            0.9481245476828707,
+            0.3121776809950973,
+            1.594896865024919
+          ],
+          "prediction": 0,
+          "prototype": [
+            0.8635919379208227,
+            -0.09657498991192634,
+            1.3184350119585546
+          ],
+          "proto_distance": 0.5006552349548502,
+          "true_label": 0,
+          "confidence": 0.6542072446195307
+        },
+        {
+          "instance_id": "887",
+          "original": [
+            1.0326571574449188,
+            0.10780134554158548,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            1.0326571574449188,
+            0.10780134554158548,
+            -0.05070940322724937
+          ],
+          "proto_distance": 0.013164850146017343,
+          "true_label": 0,
+          "confidence": 0.6100801522764316
+        },
+        {
+          "instance_id": "596",
+          "original": [
+            1.2017223769690148,
+            -0.7097039962724618,
+            -0.09020395366530141
+          ],
+          "prediction": 0,
+          "prototype": [
+            1.2017223769690148,
+            -0.7097039962724618,
+            -0.09020395366530141
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.8110631225243291
+        },
+        {
+          "instance_id": "674",
+          "original": [
+            0.6099941086346785,
+            -0.50532766081895,
+            -0.05070940322724937
+          ],
+          "prediction": 0,
+          "prototype": [
+            0.6099941086346785,
+            -0.50532766081895,
+            -0.05070940322724937
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.709439799168547
+        },
+        {
+          "instance_id": "1413",
+          "original": [
+            0.5254614988726304,
+            -0.30095132536543817,
+            -0.6694573600900646
+          ],
+          "prediction": 0,
+          "prototype": [
+            0.5254614988726304,
+            -0.30095132536543817,
+            -0.6036331093599778
+          ],
+          "proto_distance": 0.0658242507300868,
+          "true_label": 0,
+          "confidence": 0.788119233087536
+        },
+        {
+          "instance_id": "102",
+          "original": [
+            -0.7425276475580905,
+            -0.09657498991192634,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.7425276475580905,
+            -0.09657498991192634,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.6969933506888871
+        },
+        {
+          "instance_id": "977",
+          "original": [
+            -0.48892981827194637,
+            -0.50532766081895,
+            0.43639005217539245
+          ],
+          "prediction": 0,
+          "prototype": [
+            -0.4043972085098983,
+            -0.50532766081895,
+            0.4758846026134445
+          ],
+          "proto_distance": 0.09330370639736957,
+          "true_label": 0,
+          "confidence": 0.7465322877808199
+        },
+        {
+          "instance_id": "868",
+          "original": [
+            1.8779832550653994,
+            0.5165540164486091,
+            -0.35350095658564834
+          ],
+          "prediction": 0,
+          "prototype": [
+            1.7934506453033514,
+            0.720930351902121,
+            -0.5509737087759085
+          ],
+          "proto_distance": 0.2964977849228978,
+          "true_label": 0,
+          "confidence": 0.6471615469735924
+        },
+        {
+          "instance_id": "565",
+          "original": [
+            0.3563962793485343,
+            -0.09657498991192634,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            0.3563962793485343,
+            -0.09657498991192634,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.572220857501665
+        },
+        {
+          "instance_id": "1352",
+          "original": [
+            0.2718636695864862,
+            -0.50532766081895,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            0.2718636695864862,
+            -0.50532766081895,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.6893705861367772
+        },
+        {
+          "instance_id": "1146",
+          "original": [
+            1.7089180355413032,
+            -0.50532766081895,
+            -0.05070940322724937
+          ],
+          "prediction": 0,
+          "prototype": [
+            1.7089180355413032,
+            -0.50532766081895,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.013164850146017343,
+          "true_label": 0,
+          "confidence": 0.7065796206908327
+        },
+        {
+          "instance_id": "1250",
+          "original": [
+            -0.3198645987478502,
+            -0.7097039962724618,
+            -0.05070940322724937
+          ],
+          "prediction": 0,
+          "prototype": [
+            -0.3198645987478502,
+            -0.7097039962724618,
+            -0.05070940322724937
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.8001779871715589
+        },
+        {
+          "instance_id": "902",
+          "original": [
+            1.6243854257792552,
+            -0.30095132536543817,
+            -0.007202689830261979
+          ],
+          "prediction": 0,
+          "prototype": [
+            1.6243854257792552,
+            -0.30095132536543817,
+            -0.007202689830261979
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.944463653800092
+        },
+        {
+          "instance_id": "1137",
+          "original": [
+            -0.4043972085098983,
+            -0.7097039962724618,
+            -0.05070940322724937
+          ],
+          "prediction": 0,
+          "prototype": [
+            -0.4043972085098983,
+            -0.7097039962724618,
+            -0.05070940322724937
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.7754336084101431
+        },
+        {
+          "instance_id": "254",
+          "original": [
+            -0.48892981827194637,
+            0.3121776809950973,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.48892981827194637,
+            0.3121776809950973,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.6511553818590937
+        },
+        {
+          "instance_id": "580",
+          "original": [
+            0.3563962793485343,
+            -0.50532766081895,
+            -0.1691930545414055
+          ],
+          "prediction": 0,
+          "prototype": [
+            0.3563962793485343,
+            -0.50532766081895,
+            -0.12969850410335346
+          ],
+          "proto_distance": 0.039494550438052056,
+          "true_label": 0,
+          "confidence": 0.8173528969350248
+        },
+        {
+          "instance_id": "1296",
+          "original": [
+            0.18733105982443815,
+            -0.30095132536543817,
+            -0.07703910351928407
+          ],
+          "prediction": 0,
+          "prototype": [
+            0.18733105982443815,
+            -0.30095132536543817,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.013164850146017357,
+          "true_label": 0,
+          "confidence": 0.6761098578882334
+        },
+        {
+          "instance_id": "589",
+          "original": [
+            1.6243854257792552,
+            -0.30095132536543817,
+            -0.3929955070237004
+          ],
+          "prediction": 0,
+          "prototype": [
+            1.7089180355413032,
+            -0.30095132536543817,
+            -0.4719846078998044
+          ],
+          "proto_distance": 0.11569373436101901,
+          "true_label": 0,
+          "confidence": 0.6972516983293369
+        },
+        {
+          "instance_id": "128",
+          "original": [
+            1.8779832550653994,
+            -0.7097039962724618,
+            -0.05070940322724937
+          ],
+          "prediction": 0,
+          "prototype": [
+            1.8779832550653994,
+            -0.7097039962724618,
+            -0.05070940322724937
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.9492662977440465
+        },
+        {
+          "instance_id": "1440",
+          "original": [
+            2.892374572209976,
+            -0.7097039962724618,
+            -0.05070940322724937
+          ],
+          "prediction": 0,
+          "prototype": [
+            2.892374572209976,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.013164850146017343,
+          "true_label": 0,
+          "confidence": 0.9775760361428892
+        },
+        {
+          "instance_id": "79",
+          "original": [
+            -0.9115928670821867,
+            -0.50532766081895,
+            -0.07703910351928407
+          ],
+          "prediction": 0,
+          "prototype": [
+            -0.9115928670821867,
+            -0.50532766081895,
+            -0.09020395366530141
+          ],
+          "proto_distance": 0.013164850146017343,
+          "true_label": 0,
+          "confidence": 0.7163347429881888
+        },
+        {
+          "instance_id": "489",
+          "original": [
+            -0.5734624280339944,
+            -0.30095132536543817,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            -0.5734624280339944,
+            -0.30095132536543817,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.5450990848014962
+        },
+        {
+          "instance_id": "1009",
+          "original": [
+            0.10279845006239008,
+            -0.50532766081895,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            0.10279845006239008,
+            -0.50532766081895,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.7274448225283304
+        },
+        {
+          "instance_id": "220",
+          "original": [
+            -0.3198645987478502,
+            -0.7097039962724618,
+            -0.007202689830261979
+          ],
+          "prediction": 0,
+          "prototype": [
+            -0.3198645987478502,
+            -0.7097039962724618,
+            -0.007202689830261979
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.5965650302478858
+        },
+        {
+          "instance_id": "1390",
+          "original": [
+            2.638776742923832,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            2.638776742923832,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.957060417227899
+        },
+        {
+          "instance_id": "125",
+          "original": [
+            -0.7425276475580905,
+            -0.30095132536543817,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.7425276475580905,
+            -0.30095132536543817,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.5482305228860325
+        },
+        {
+          "instance_id": "1193",
+          "original": [
+            -1.165190696368331,
+            -0.50532766081895,
+            -0.1955227548334402
+          ],
+          "prediction": 0,
+          "prototype": [
+            -1.165190696368331,
+            -0.50532766081895,
+            -0.18235790468742286
+          ],
+          "proto_distance": 0.013164850146017343,
+          "true_label": 0,
+          "confidence": 0.7246736682725049
+        },
+        {
+          "instance_id": "713",
+          "original": [
+            2.8078419624479283,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            2.892374572209976,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0845326097620478,
+          "true_label": 0,
+          "confidence": 0.9398921586550886
+        },
+        {
+          "instance_id": "542",
+          "original": [
+            -0.48892981827194637,
+            0.3121776809950973,
+            -0.05070940322724937
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.48892981827194637,
+            0.3121776809950973,
+            -0.05070940322724937
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.6339721574437059
+        },
+        {
+          "instance_id": "328",
+          "original": [
+            -0.9115928670821867,
+            -0.7097039962724618,
+            -0.05070940322724937
+          ],
+          "prediction": 0,
+          "prototype": [
+            -0.9115928670821867,
+            -0.7097039962724618,
+            -0.05070940322724937
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.7297413375819539
+        },
+        {
+          "instance_id": "649",
+          "original": [
+            0.01826584030034202,
+            -0.50532766081895,
+            -0.05070940322724937
+          ],
+          "prediction": 0,
+          "prototype": [
+            0.01826584030034202,
+            -0.50532766081895,
+            -0.05070940322724937
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.7422413144083991
+        },
+        {
+          "instance_id": "876",
+          "original": [
+            -1.0806580866062827,
+            0.10780134554158548,
+            -0.20868760497945754
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.9961254768442347,
+            0.10780134554158548,
+            -0.1955227548334402
+          ],
+          "proto_distance": 0.0855515949152895,
+          "true_label": 0,
+          "confidence": 0.7191086354479209
+        },
+        {
+          "instance_id": "114",
+          "original": [
+            -0.23533198898580215,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            -0.23533198898580215,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.693982107356531
+        },
+        {
+          "instance_id": "463",
+          "original": [
+            -0.9115928670821867,
+            -0.30095132536543817,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.9115928670821867,
+            -0.30095132536543817,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.6713356255747804
+        },
+        {
+          "instance_id": "49",
+          "original": [
+            -0.06626676946170604,
+            0.3121776809950973,
+            -0.22185245512547488
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.06626676946170604,
+            0.3121776809950973,
+            -0.340336106439631
+          ],
+          "proto_distance": 0.11848365131415614,
+          "true_label": 0,
+          "confidence": 0.5318437236389896
+        },
+        {
+          "instance_id": "826",
+          "original": [
+            -0.3198645987478502,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            -0.3198645987478502,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.7482274515438914
+        },
+        {
+          "instance_id": "1049",
+          "original": [
+            0.9481245476828707,
+            -0.7097039962724618,
+            -0.05070940322724937
+          ],
+          "prediction": 0,
+          "prototype": [
+            0.9481245476828707,
+            -0.7097039962724618,
+            -0.05070940322724937
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.8423079485650571
+        },
+        {
+          "instance_id": "1364",
+          "original": [
+            -0.5734624280339944,
+            -0.50532766081895,
+            -0.05070940322724937
+          ],
+          "prediction": 0,
+          "prototype": [
+            -0.5734624280339944,
+            -0.50532766081895,
+            -0.05070940322724937
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.5553215510648323
+        },
+        {
+          "instance_id": "1433",
+          "original": [
+            -0.48892981827194637,
+            -0.7097039962724618,
+            -0.05070940322724937
+          ],
+          "prediction": 0,
+          "prototype": [
+            -0.48892981827194637,
+            -0.7097039962724618,
+            -0.05070940322724937
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.7355391523597813
+        },
+        {
+          "instance_id": "1244",
+          "original": [
+            -0.7425276475580905,
+            -0.30095132536543817,
+            -0.84060041198829
+          ],
+          "prediction": 0,
+          "prototype": [
+            -0.8270602573201387,
+            -0.30095132536543817,
+            -0.8800949624263421
+          ],
+          "proto_distance": 0.09330370639736962,
+          "true_label": 0,
+          "confidence": 0.6797998066889384
+        },
+        {
+          "instance_id": "1377",
+          "original": [
+            -1.0806580866062827,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            -1.0806580866062827,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.5507972665377104
+        },
+        {
+          "instance_id": "905",
+          "original": [
+            -0.9961254768442347,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            -0.9961254768442347,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.7035401460823294
+        },
+        {
+          "instance_id": "95",
+          "original": [
+            -0.7425276475580905,
+            -0.50532766081895,
+            -0.4588197577537871
+          ],
+          "prediction": 0,
+          "prototype": [
+            -0.7425276475580905,
+            -0.50532766081895,
+            -0.3666658067316657
+          ],
+          "proto_distance": 0.09215395102212137,
+          "true_label": 0,
+          "confidence": 0.6950844731839888
+        },
+        {
+          "instance_id": "1101",
+          "original": [
+            0.5254614988726304,
+            -0.50532766081895,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            0.5254614988726304,
+            -0.50532766081895,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.7516040237509878
+        },
+        {
+          "instance_id": "1353",
+          "original": [
+            -0.06626676946170604,
+            -0.7097039962724618,
+            -0.05070940322724937
+          ],
+          "prediction": 0,
+          "prototype": [
+            -0.06626676946170604,
+            -0.7097039962724618,
+            -0.05070940322724937
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.5738694969687053
+        },
+        {
+          "instance_id": "1246",
+          "original": [
+            -0.1507993792237541,
+            -0.30095132536543817,
+            -0.23501730527149223
+          ],
+          "prediction": 0,
+          "prototype": [
+            -0.06626676946170604,
+            -0.30095132536543817,
+            -0.20868760497945754
+          ],
+          "proto_distance": 0.08853821339202117,
+          "true_label": 0,
+          "confidence": 0.6486674733727236
+        },
+        {
+          "instance_id": "387",
+          "original": [
+            0.9481245476828707,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            0.9481245476828707,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.799853343819198
+        },
+        {
+          "instance_id": "812",
+          "original": [
+            -0.6579950377960425,
+            -0.30095132536543817,
+            -0.007202689830261979
+          ],
+          "prediction": 0,
+          "prototype": [
+            -0.6579950377960425,
+            -0.30095132536543817,
+            -0.007202689830261979
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.8891580518524623
+        },
+        {
+          "instance_id": "590",
+          "original": [
+            -0.23533198898580215,
+            1.1296830228091446,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.23533198898580215,
+            1.1296830228091446,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.6651991752650589
+        },
+        {
+          "instance_id": "12",
+          "original": [
+            -0.23533198898580215,
+            0.720930351902121,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.23533198898580215,
+            0.720930351902121,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.6561671906793997
+        },
+        {
+          "instance_id": "388",
+          "original": [
+            -0.6579950377960425,
+            0.9253066873556328,
+            -0.05070940322724937
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.6579950377960425,
+            0.9253066873556328,
+            -0.05070940322724937
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.8375267214175532
+        },
+        {
+          "instance_id": "611",
+          "original": [
+            1.6243854257792552,
+            0.10780134554158548,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            1.6243854257792552,
+            0.10780134554158548,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.5201591992783432
+        },
+        {
+          "instance_id": "1420",
+          "original": [
+            0.5254614988726304,
+            -0.7097039962724618,
+            -0.05070940322724937
+          ],
+          "prediction": 0,
+          "prototype": [
+            0.5254614988726304,
+            -0.7097039962724618,
+            -0.05070940322724937
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.8805302449144583
+        },
+        {
+          "instance_id": "884",
+          "original": [
+            0.3563962793485343,
+            -0.09657498991192634,
+            -0.32717125629361365
+          ],
+          "prediction": 0,
+          "prototype": [
+            0.2718636695864862,
+            -0.09657498991192634,
+            -0.32717125629361365
+          ],
+          "proto_distance": 0.08453260976204807,
+          "true_label": 0,
+          "confidence": 0.5939679819445216
+        },
+        {
+          "instance_id": "215",
+          "original": [
+            -0.8270602573201387,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            -0.8270602573201387,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.7039006408608128
+        },
+        {
+          "instance_id": "1207",
+          "original": [
+            -1.165190696368331,
+            -0.30095132536543817,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            -1.165190696368331,
+            -0.30095132536543817,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.7277785842808377
+        },
+        {
+          "instance_id": "962",
+          "original": [
+            -0.48892981827194637,
+            -0.50532766081895,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            -0.48892981827194637,
+            -0.50532766081895,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.6118158016848109
+        },
+        {
+          "instance_id": "1182",
+          "original": [
+            1.4553202062551591,
+            0.5165540164486091,
+            -0.22185245512547488
+          ],
+          "prediction": 0,
+          "prototype": [
+            1.5398528160172071,
+            0.5165540164486091,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.17917274999855332,
+          "true_label": 0,
+          "confidence": 0.648003046821635
+        },
+        {
+          "instance_id": "518",
+          "original": [
+            0.01826584030034202,
+            -0.30095132536543817,
+            -0.007202689830261979
+          ],
+          "prediction": 0,
+          "prototype": [
+            0.01826584030034202,
+            -0.30095132536543817,
+            -0.007202689830261979
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.9327490527708855
+        },
+        {
+          "instance_id": "765",
+          "original": [
+            0.5254614988726304,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            0.5254614988726304,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.8066248762414727
+        },
+        {
+          "instance_id": "506",
+          "original": [
+            1.8779832550653994,
+            3.1734463773442627,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            1.8779832550653994,
+            3.3778227127977747,
+            -0.05070940322724937
+          ],
+          "proto_distance": 0.20479990178897436,
+          "true_label": 0,
+          "confidence": 0.5198440028652658
+        },
+        {
+          "instance_id": "320",
+          "original": [
+            -0.1507993792237541,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            -0.1507993792237541,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.7220743581073225
+        },
+        {
+          "instance_id": "1180",
+          "original": [
+            -1.165190696368331,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            -1.165190696368331,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.5219585757858517
+        },
+        {
+          "instance_id": "501",
+          "original": [
+            -0.3198645987478502,
+            0.9253066873556328,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.3198645987478502,
+            0.9253066873556328,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.8149644887413824
+        },
+        {
+          "instance_id": "539",
+          "original": [
+            0.01826584030034202,
+            0.3121776809950973,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            0.01826584030034202,
+            0.3121776809950973,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.5449366878998395
+        },
+        {
+          "instance_id": "1230",
+          "original": [
+            -1.249723306130379,
+            -0.30095132536543817,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            -1.249723306130379,
+            -0.30095132536543817,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.9668388946281938
+        },
+        {
+          "instance_id": "306",
+          "original": [
+            -1.165190696368331,
+            -0.50532766081895,
+            -0.1955227548334402
+          ],
+          "prediction": 0,
+          "prototype": [
+            -1.165190696368331,
+            -0.50532766081895,
+            -0.18235790468742286
+          ],
+          "proto_distance": 0.013164850146017343,
+          "true_label": 1,
+          "confidence": 0.7246736682725049
+        },
+        {
+          "instance_id": "1004",
+          "original": [
+            -0.5734624280339944,
+            -0.50532766081895,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            -0.5734624280339944,
+            -0.50532766081895,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.592193427486319
+        },
+        {
+          "instance_id": "854",
+          "original": [
+            -0.9961254768442347,
+            0.5165540164486091,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.9961254768442347,
+            0.5165540164486091,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.6478045208524192
+        },
+        {
+          "instance_id": "24",
+          "original": [
+            -1.0806580866062827,
+            -0.09657498991192634,
+            -0.1955227548334402
+          ],
+          "prediction": 1,
+          "prototype": [
+            -1.0806580866062827,
+            -0.09657498991192634,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.13164850146017348,
+          "true_label": 1,
+          "confidence": 0.5194935764182902
+        },
+        {
+          "instance_id": "243",
+          "original": [
+            -0.7425276475580905,
+            -0.50532766081895,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            -0.7425276475580905,
+            -0.50532766081895,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.5731181300722152
+        },
+        {
+          "instance_id": "1185",
+          "original": [
+            -0.3198645987478502,
+            0.3121776809950973,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.3198645987478502,
+            0.3121776809950973,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.5965373028737981
+        },
+        {
+          "instance_id": "329",
+          "original": [
+            1.6243854257792552,
+            5.012833396425869,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            1.2017223769690148,
+            5.217209731879381,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.4694824164151135,
+          "true_label": 1,
+          "confidence": 0.6698163363011281
+        },
+        {
+          "instance_id": "474",
+          "original": [
+            -0.4043972085098983,
+            0.3121776809950973,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.4043972085098983,
+            0.3121776809950973,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.6226599513319008
+        },
+        {
+          "instance_id": "1290",
+          "original": [
+            -1.0806580866062827,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            -1.0806580866062827,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.5507972665377104
+        },
+        {
+          "instance_id": "64",
+          "original": [
+            -0.8270602573201387,
+            3.582199048251286,
+            -0.05070940322724937
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.6579950377960425,
+            3.582199048251286,
+            -0.05070940322724937
+          ],
+          "proto_distance": 0.16906521952409614,
+          "true_label": 1,
+          "confidence": 0.8912110554558632
+        },
+        {
+          "instance_id": "1301",
+          "original": [
+            0.4409288891105823,
+            0.9253066873556328,
+            -0.4193252073157351
+          ],
+          "prediction": 0,
+          "prototype": [
+            0.4409288891105823,
+            0.720930351902121,
+            -0.48514945804582177
+          ],
+          "proto_distance": 0.2147149703154946,
+          "true_label": 1,
+          "confidence": 0.5304775949318011
+        },
+        {
+          "instance_id": "1131",
+          "original": [
+            -0.5734624280339944,
+            -0.09657498991192634,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.5734624280339944,
+            -0.09657498991192634,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.5640231714906266
+        },
+        {
+          "instance_id": "1381",
+          "original": [
+            1.6243854257792552,
+            -0.09657498991192634,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            1.6243854257792552,
+            -0.09657498991192634,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.5188808030363521
+        },
+        {
+          "instance_id": "1393",
+          "original": [
+            -0.9961254768442347,
+            -0.50532766081895,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            -0.9961254768442347,
+            -0.50532766081895,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.5440030835906277
+        },
+        {
+          "instance_id": "85",
+          "original": [
+            -0.8270602573201387,
+            -0.7097039962724618,
+            -0.05070940322724937
+          ],
+          "prediction": 0,
+          "prototype": [
+            -0.8270602573201387,
+            -0.7097039962724618,
+            -0.05070940322724937
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.6784940917007887
+        },
+        {
+          "instance_id": "719",
+          "original": [
+            0.6099941086346785,
+            -0.50532766081895,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            0.6099941086346785,
+            -0.50532766081895,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.7385252980020597
+        },
+        {
+          "instance_id": "780",
+          "original": [
+            -0.5734624280339944,
+            -0.09657498991192634,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.5734624280339944,
+            -0.09657498991192634,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.5640231714906266
+        },
+        {
+          "instance_id": "561",
+          "original": [
+            -1.249723306130379,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            -1.249723306130379,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.6140415626853799
+        },
+        {
+          "instance_id": "1198",
+          "original": [
+            1.2862549867310629,
+            -0.30095132536543817,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            1.2862549867310629,
+            -0.30095132536543817,
+            -0.05070940322724937
+          ],
+          "proto_distance": 0.013164850146017343,
+          "true_label": 1,
+          "confidence": 0.6988011426555727
+        },
+        {
+          "instance_id": "697",
+          "original": [
+            0.5254614988726304,
+            -0.50532766081895,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            0.5254614988726304,
+            -0.50532766081895,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.7516040237509878
+        },
+        {
+          "instance_id": "656",
+          "original": [
+            -0.4043972085098983,
+            0.3121776809950973,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.4043972085098983,
+            0.3121776809950973,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.6226599513319008
+        },
+        {
+          "instance_id": "267",
+          "original": [
+            -0.6579950377960425,
+            -0.50532766081895,
+            -0.4588197577537871
+          ],
+          "prediction": 0,
+          "prototype": [
+            -0.5734624280339944,
+            -0.50532766081895,
+            -0.379830656877683
+          ],
+          "proto_distance": 0.11569373436101912,
+          "true_label": 1,
+          "confidence": 0.7452236379465699
+        },
+        {
+          "instance_id": "42",
+          "original": [
+            1.8779832550653994,
+            -0.50532766081895,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            1.8779832550653994,
+            -0.50532766081895,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.8333734999991165
+        },
+        {
+          "instance_id": "413",
+          "original": [
+            -0.4043972085098983,
+            1.1296830228091446,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.4043972085098983,
+            1.1296830228091446,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.8358131284751916
+        },
+        {
+          "instance_id": "23",
+          "original": [
+            0.3563962793485343,
+            0.9253066873556328,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            0.4409288891105823,
+            0.9253066873556328,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.08453260976204802,
+          "true_label": 1,
+          "confidence": 0.5063680712315111
+        },
+        {
+          "instance_id": "1437",
+          "original": [
+            -0.48892981827194637,
+            0.5165540164486091,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.48892981827194637,
+            0.5165540164486091,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.7376986981373825
+        },
+        {
+          "instance_id": "204",
+          "original": [
+            -0.06626676946170604,
+            3.582199048251286,
+            -0.05070940322724937
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.06626676946170604,
+            3.582199048251286,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.013164850146017343,
+          "true_label": 1,
+          "confidence": 0.8178754090931768
+        },
+        {
+          "instance_id": "581",
+          "original": [
+            -1.249723306130379,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            -1.249723306130379,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.6140415626853799
+        },
+        {
+          "instance_id": "1210",
+          "original": [
+            -0.23533198898580215,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            -0.23533198898580215,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.693982107356531
+        },
+        {
+          "instance_id": "623",
+          "original": [
+            -0.3198645987478502,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            -0.3198645987478502,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.7482274515438914
+        },
+        {
+          "instance_id": "55",
+          "original": [
+            -0.48892981827194637,
+            -0.50532766081895,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            -0.48892981827194637,
+            -0.50532766081895,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.6118158016848109
+        },
+        {
+          "instance_id": "609",
+          "original": [
+            -0.7425276475580905,
+            0.10780134554158548,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.7425276475580905,
+            0.10780134554158548,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.7041660231932508
+        },
+        {
+          "instance_id": "70",
+          "original": [
+            -1.249723306130379,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            -1.249723306130379,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.6140415626853799
+        },
+        {
+          "instance_id": "1441",
+          "original": [
+            0.3563962793485343,
+            0.10780134554158548,
+            -0.07703910351928407
+          ],
+          "prediction": 0,
+          "prototype": [
+            0.3563962793485343,
+            0.10780134554158548,
+            -0.09020395366530141
+          ],
+          "proto_distance": 0.013164850146017343,
+          "true_label": 1,
+          "confidence": 0.5443687163801368
+        },
+        {
+          "instance_id": "1342",
+          "original": [
+            0.10279845006239008,
+            4.604080725518846,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            0.10279845006239008,
+            4.604080725518846,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.8437373258736733
+        },
+        {
+          "instance_id": "74",
+          "original": [
+            0.01826584030034202,
+            1.3340593582626565,
+            -0.05070940322724937
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.06626676946170604,
+            1.3340593582626565,
+            -0.05070940322724937
+          ],
+          "proto_distance": 0.08453260976204806,
+          "true_label": 1,
+          "confidence": 0.6131649539949546
+        },
+        {
+          "instance_id": "1304",
+          "original": [
+            1.2862549867310629,
+            -0.09657498991192634,
+            -0.05070940322724937
+          ],
+          "prediction": 0,
+          "prototype": [
+            1.2862549867310629,
+            -0.09657498991192634,
+            -0.05070940322724937
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.6502648106574779
+        },
+        {
+          "instance_id": "748",
+          "original": [
+            -0.4043972085098983,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            -0.4043972085098983,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.7250290622423867
+        },
+        {
+          "instance_id": "121",
+          "original": [
+            1.370787596493111,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            1.370787596493111,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.7510716412011823
+        },
+        {
+          "instance_id": "345",
+          "original": [
+            0.10279845006239008,
+            -0.09657498991192634,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            0.10279845006239008,
+            -0.09657498991192634,
+            -0.007202689830261979
+          ],
+          "proto_distance": 0.05667156354300473,
+          "true_label": 1,
+          "confidence": 0.5132906002588455
+        },
+        {
+          "instance_id": "737",
+          "original": [
+            -0.1507993792237541,
+            3.582199048251286,
+            -0.12969850410335346
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.23533198898580215,
+            3.582199048251286,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.1071382009246003,
+          "true_label": 1,
+          "confidence": 0.7515493061691082
+        },
+        {
+          "instance_id": "4",
+          "original": [
+            -0.6579950377960425,
+            1.5384356937161683,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.6579950377960425,
+            1.5384356937161683,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.7293168419241118
+        },
+        {
+          "instance_id": "960",
+          "original": [
+            -1.165190696368331,
+            0.9253066873556328,
+            0.344236101153271
+          ],
+          "prediction": 1,
+          "prototype": [
+            -1.249723306130379,
+            0.9253066873556328,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.41677310803956513,
+          "true_label": 1,
+          "confidence": 0.9076328123166573
+        },
+        {
+          "instance_id": "839",
+          "original": [
+            -1.334255915892427,
+            0.3121776809950973,
+            -0.4588197577537871
+          ],
+          "prediction": 1,
+          "prototype": [
+            -1.0806580866062827,
+            0.3121776809950973,
+            -0.6036331093599778
+          ],
+          "proto_distance": 0.2920321314890925,
+          "true_label": 1,
+          "confidence": 0.8944419091043347
+        },
+        {
+          "instance_id": "38",
+          "original": [
+            0.18733105982443815,
+            -0.50532766081895,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            0.18733105982443815,
+            -0.50532766081895,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.6937672953423494
+        },
+        {
+          "instance_id": "433",
+          "original": [
+            -0.1507993792237541,
+            5.012833396425869,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.06626676946170604,
+            4.808457060972358,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.22116837162349592,
+          "true_label": 1,
+          "confidence": 0.8424698344131653
+        },
+        {
+          "instance_id": "253",
+          "original": [
+            -1.249723306130379,
+            -0.7097039962724618,
+            -0.05070940322724937
+          ],
+          "prediction": 1,
+          "prototype": [
+            -1.249723306130379,
+            -0.7097039962724618,
+            -0.05070940322724937
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.6843454574987955
+        },
+        {
+          "instance_id": "245",
+          "original": [
+            0.01826584030034202,
+            -0.30095132536543817,
+            -0.05070940322724937
+          ],
+          "prediction": 0,
+          "prototype": [
+            0.01826584030034202,
+            -0.30095132536543817,
+            -0.05070940322724937
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.6921875177281323
+        },
+        {
+          "instance_id": "867",
+          "original": [
+            0.8635919379208227,
+            0.720930351902121,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            0.9481245476828707,
+            0.720930351902121,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.08453260976204802,
+          "true_label": 1,
+          "confidence": 0.5567607658222051
+        },
+        {
+          "instance_id": "1167",
+          "original": [
+            2.638776742923832,
+            0.3121776809950973,
+            -0.5773034090679432
+          ],
+          "prediction": 0,
+          "prototype": [
+            2.554244133161784,
+            0.5165540164486091,
+            -0.8537652621343075
+          ],
+          "proto_distance": 0.3540432244902832,
+          "true_label": 1,
+          "confidence": 0.5976516634734099
+        },
+        {
+          "instance_id": "1177",
+          "original": [
+            -0.7425276475580905,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            -0.7425276475580905,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.7013042076329435
+        },
+        {
+          "instance_id": "822",
+          "original": [
+            -0.6579950377960425,
+            1.1296830228091446,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.6579950377960425,
+            1.1296830228091446,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.8299702800404947
+        },
+        {
+          "instance_id": "1378",
+          "original": [
+            0.5254614988726304,
+            0.3121776809950973,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            0.5254614988726304,
+            0.3121776809950973,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.6147564670221266
+        },
+        {
+          "instance_id": "477",
+          "original": [
+            -1.249723306130379,
+            0.3121776809950973,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            -1.165190696368331,
+            0.3121776809950973,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.08453260976204802,
+          "true_label": 1,
+          "confidence": 0.9503626053379973
+        },
+        {
+          "instance_id": "791",
+          "original": [
+            1.1171897672069668,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            1.1171897672069668,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.8085202718275959
+        },
+        {
+          "instance_id": "1302",
+          "original": [
+            -0.1507993792237541,
+            -0.09657498991192634,
+            -0.30084155600157897
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.1507993792237541,
+            -0.09657498991192634,
+            -0.2613470055635269
+          ],
+          "proto_distance": 0.039494550438052056,
+          "true_label": 1,
+          "confidence": 0.5131087874812374
+        },
+        {
+          "instance_id": "563",
+          "original": [
+            -0.7425276475580905,
+            -0.50532766081895,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            -0.7425276475580905,
+            -0.50532766081895,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.5731181300722152
+        },
+        {
+          "instance_id": "368",
+          "original": [
+            0.6099941086346785,
+            -0.7097039962724618,
+            -0.05070940322724937
+          ],
+          "prediction": 0,
+          "prototype": [
+            0.6099941086346785,
+            -0.7097039962724618,
+            -0.05070940322724937
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.8500399951948012
+        },
+        {
+          "instance_id": "870",
+          "original": [
+            -0.9115928670821867,
+            -0.7097039962724618,
+            -0.05070940322724937
+          ],
+          "prediction": 0,
+          "prototype": [
+            -0.9115928670821867,
+            -0.7097039962724618,
+            -0.05070940322724937
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.7297413375819539
+        },
+        {
+          "instance_id": "120",
+          "original": [
+            0.10279845006239008,
+            -0.30095132536543817,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            0.10279845006239008,
+            -0.30095132536543817,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.6742705666997202
+        },
+        {
+          "instance_id": "1059",
+          "original": [
+            1.370787596493111,
+            3.1734463773442627,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            1.2862549867310629,
+            2.9690700418907507,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.2211683716234968,
+          "true_label": 1,
+          "confidence": 0.615601809827468
+        },
+        {
+          "instance_id": "1224",
+          "original": [
+            -0.6579950377960425,
+            0.3121776809950973,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.6579950377960425,
+            0.3121776809950973,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.6711037960291591
+        },
+        {
+          "instance_id": "1330",
+          "original": [
+            -1.0806580866062827,
+            -0.09657498991192634,
+            0.6075331040736179
+          ],
+          "prediction": 1,
+          "prototype": [
+            -1.0806580866062827,
+            -0.30095132536543817,
+            0.5943682539276006
+          ],
+          "proto_distance": 0.20479990178897423,
+          "true_label": 1,
+          "confidence": 0.9223142012234071
+        },
+        {
+          "instance_id": "1190",
+          "original": [
+            0.01826584030034202,
+            0.9253066873556328,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            0.01826584030034202,
+            0.9253066873556328,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.5235076442538302
+        },
+        {
+          "instance_id": "1411",
+          "original": [
+            -0.6579950377960425,
+            2.3559410355302153,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.6579950377960425,
+            2.3559410355302153,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.8637988863487024
+        },
+        {
+          "instance_id": "648",
+          "original": [
+            -0.8270602573201387,
+            -0.30095132536543817,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.8270602573201387,
+            -0.30095132536543817,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.5686614829185855
+        },
+        {
+          "instance_id": "1183",
+          "original": [
+            -0.3198645987478502,
+            -0.50532766081895,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            -0.3198645987478502,
+            -0.50532766081895,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.576966997072045
+        },
+        {
+          "instance_id": "1386",
+          "original": [
+            -0.3198645987478502,
+            -0.7097039962724618,
+            -0.05070940322724937
+          ],
+          "prediction": 0,
+          "prototype": [
+            -0.3198645987478502,
+            -0.7097039962724618,
+            -0.05070940322724937
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.8001779871715589
+        },
+        {
+          "instance_id": "566",
+          "original": [
+            -0.8270602573201387,
+            2.3559410355302153,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.6579950377960425,
+            2.3559410355302153,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.16906521952409614,
+          "true_label": 1,
+          "confidence": 0.820400513135948
+        },
+        {
+          "instance_id": "1429",
+          "original": [
+            -0.7425276475580905,
+            1.3340593582626565,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.7425276475580905,
+            1.3340593582626565,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.8542936150586357
+        },
+        {
+          "instance_id": "1085",
+          "original": [
+            -0.9115928670821867,
+            0.5165540164486091,
+            -0.05070940322724937
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.9115928670821867,
+            0.5165540164486091,
+            -0.05070940322724937
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.696967395696894
+        },
+        {
+          "instance_id": "1395",
+          "original": [
+            1.2017223769690148,
+            -0.30095132536543817,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            1.2017223769690148,
+            -0.30095132536543817,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.7221199696954992
+        },
+        {
+          "instance_id": "1050",
+          "original": [
+            0.01826584030034202,
+            3.99095171915831,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            0.01826584030034202,
+            3.99095171915831,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.8464216485668183
+        },
+        {
+          "instance_id": "1132",
+          "original": [
+            -1.0806580866062827,
+            -0.7097039962724618,
+            -0.05070940322724937
+          ],
+          "prediction": 0,
+          "prototype": [
+            -1.0806580866062827,
+            -0.7097039962724618,
+            -0.05070940322724937
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.6845024400616587
+        },
+        {
+          "instance_id": "1317",
+          "original": [
+            -0.6579950377960425,
+            -0.30095132536543817,
+            -0.05070940322724937
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.6579950377960425,
+            -0.30095132536543817,
+            -0.05070940322724937
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.5356826340378589
+        },
+        {
+          "instance_id": "332",
+          "original": [
+            -1.0806580866062827,
+            -0.50532766081895,
+            -0.05070940322724937
+          ],
+          "prediction": 1,
+          "prototype": [
+            -1.0806580866062827,
+            -0.50532766081895,
+            -0.05070940322724937
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.7179234217540941
+        },
+        {
+          "instance_id": "1239",
+          "original": [
+            -0.48892981827194637,
+            0.5165540164486091,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.48892981827194637,
+            0.5165540164486091,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.7376986981373825
+        },
+        {
+          "instance_id": "1245",
+          "original": [
+            0.4409288891105823,
+            0.9253066873556328,
+            -0.05070940322724937
+          ],
+          "prediction": 1,
+          "prototype": [
+            0.4409288891105823,
+            0.9253066873556328,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.013164850146017343,
+          "true_label": 1,
+          "confidence": 0.5187537905002668
+        },
+        {
+          "instance_id": "1282",
+          "original": [
+            0.9481245476828707,
+            0.3121776809950973,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            0.9481245476828707,
+            0.3121776809950973,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.5433873138103897
+        },
+        {
+          "instance_id": "1303",
+          "original": [
+            -0.9115928670821867,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            -0.9115928670821867,
+            -0.7097039962724618,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.739101410127866
+        },
+        {
+          "instance_id": "72",
+          "original": [
+            -0.1507993792237541,
+            3.99095171915831,
+            6.860836923431857
+          ],
+          "prediction": 1,
+          "prototype": [
+            0.10279845006239008,
+            3.1734463773442627,
+            7.110969076206187
+          ],
+          "proto_distance": 0.8917359120079597,
+          "true_label": 1,
+          "confidence": 0.891296388383744
+        },
+        {
+          "instance_id": "1153",
+          "original": [
+            -1.165190696368331,
+            -0.50532766081895,
+            -0.05070940322724937
+          ],
+          "prediction": 1,
+          "prototype": [
+            -1.165190696368331,
+            -0.50532766081895,
+            -0.05070940322724937
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.6378615953569262
+        },
+        {
+          "instance_id": "926",
+          "original": [
+            2.892374572209976,
+            -0.7097039962724618,
+            -0.10336880381131876
+          ],
+          "prediction": 0,
+          "prototype": [
+            2.892374572209976,
+            -0.7097039962724618,
+            -0.09020395366530141
+          ],
+          "proto_distance": 0.013164850146017343,
+          "true_label": 1,
+          "confidence": 0.9258747344829215
+        },
+        {
+          "instance_id": "2",
+          "original": [
+            -0.6579950377960425,
+            -0.30095132536543817,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.6579950377960425,
+            -0.30095132536543817,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.5775555975563983
+        },
+        {
+          "instance_id": "915",
+          "original": [
+            -0.9115928670821867,
+            1.1296830228091446,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.9115928670821867,
+            1.1296830228091446,
+            -0.1428633542493708
+          ],
+          "proto_distance": 0.07898910087610408,
+          "true_label": 1,
+          "confidence": 0.8281404106460987
+        },
+        {
+          "instance_id": "1203",
+          "original": [
+            -0.5734624280339944,
+            0.5165540164486091,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.5734624280339944,
+            0.5165540164486091,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.7024293125832374
+        },
+        {
+          "instance_id": "732",
+          "original": [
+            1.7934506453033514,
+            -0.7097039962724618,
+            -0.05070940322724937
+          ],
+          "prediction": 0,
+          "prototype": [
+            1.7934506453033514,
+            -0.7097039962724618,
+            -0.05070940322724937
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.9536114664240425
+        },
+        {
+          "instance_id": "665",
+          "original": [
+            -0.9961254768442347,
+            -0.30095132536543817,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.9961254768442347,
+            -0.30095132536543817,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.5892471608472993
+        },
+        {
+          "instance_id": "1029",
+          "original": [
+            -0.8270602573201387,
+            0.5165540164486091,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.8270602573201387,
+            0.5165540164486091,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.6719085576164197
+        },
+        {
+          "instance_id": "1026",
+          "original": [
+            0.4409288891105823,
+            0.3121776809950973,
+            0.04144454779487205
+          ],
+          "prediction": 0,
+          "prototype": [
+            0.4409288891105823,
+            0.3121776809950973,
+            -0.05070940322724937
+          ],
+          "proto_distance": 0.09215395102212143,
+          "true_label": 1,
+          "confidence": 0.7161038263006207
+        },
+        {
+          "instance_id": "1249",
+          "original": [
+            0.18733105982443815,
+            1.9471883646231918,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            0.10279845006239008,
+            1.9471883646231918,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.08453260976204807,
+          "true_label": 1,
+          "confidence": 0.560220318123746
+        },
+        {
+          "instance_id": "402",
+          "original": [
+            -0.6579950377960425,
+            -0.50532766081895,
+            -0.06387425337326672
+          ],
+          "prediction": 0,
+          "prototype": [
+            -0.6579950377960425,
+            -0.50532766081895,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.58763444580839
+        },
+        {
+          "instance_id": "466",
+          "original": [
+            0.18733105982443815,
+            0.9253066873556328,
+            -0.8800949624263421
+          ],
+          "prediction": 0,
+          "prototype": [
+            0.3563962793485343,
+            0.9253066873556328,
+            -0.7879410114042207
+          ],
+          "proto_distance": 0.19254973160645636,
+          "true_label": 1,
+          "confidence": 0.6183669835839705
+        },
+        {
+          "instance_id": "809",
+          "original": [
+            0.3563962793485343,
+            1.3340593582626565,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            0.3563962793485343,
+            1.3340593582626565,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.6457611337992045
+        },
+        {
+          "instance_id": "455",
+          "original": [
+            -1.165190696368331,
+            -0.7097039962724618,
+            -0.07703910351928407
+          ],
+          "prediction": 0,
+          "prototype": [
+            -1.165190696368331,
+            -0.7097039962724618,
+            -0.07703910351928407
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.5178658638676858
+        },
+        {
+          "instance_id": "1163",
+          "original": [
+            -0.6579950377960425,
+            1.5384356937161683,
+            -0.06387425337326672
+          ],
+          "prediction": 1,
+          "prototype": [
+            -0.6579950377960425,
+            1.5384356937161683,
+            -0.06387425337326672
+          ],
+          "proto_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.7293168419241118
+        }
+      ],
+      "generation_time": 0.5825576782226562,
+      "method": "prototype",
+      "info": {
+        "n_explanations": 200,
+        "accuracy": 0.675,
+        "class_coverage": 2,
+        "avg_proto_distance": 0.054252869830124464,
+        "std_proto_distance": 0.16825886948651816,
+        "total_classes": 2,
+        "sampling_strategy": "stratified"
+      }
+    },
+    "model_performance": {
+      "train_accuracy": 0.7537688442211056,
+      "test_accuracy": 0.6826056826056826,
+      "train_f1": 0.751567890179697,
+      "test_f1": 0.6797232963196744,
+      "train_precision": 0.7542763714102922,
+      "test_precision": 0.6813319556981529,
+      "train_recall": 0.7537688442211056,
+      "test_recall": 0.6826056826056826,
+      "overfitting_gap": 0.07116316161542302,
+      "overfitting_severity": "low",
+      "class_accuracies": [
+        0.7629255989911727,
+        0.5846153846153846
+      ],
+      "n_classes": 2,
+      "n_train_samples": 5771,
+      "n_test_samples": 1443,
+      "training_time": 0.18672990798950195,
+      "model_complexity": {
+        "n_parameters": 19,
+        "model_size_bytes": 48,
+        "model_size_mb": 4.57763671875e-05,
+        "complexity_level": "simple"
+      }
+    },
+    "validation_status": true,
+    "used_tuned_params": false
+  }
+}

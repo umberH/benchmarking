@@ -1,0 +1,4711 @@
+{
+  "iteration_info": {
+    "iteration_number": 4,
+    "timestamp": "2025-08-14T12:15:14.975526",
+    "iteration_key": "adult_income_decision_tree_counterfactual",
+    "filename": "iteration_0004_20250814_121514.json",
+    "folder_path": "results\\iterations\\iterations\\adult\\income\\decision_tree_counterfactual"
+  },
+  "experiment_info": {
+    "config": {
+      "data": {
+        "tabular_datasets": [
+          {
+            "name": "adult_income",
+            "source": "uci",
+            "description": "Adult Income (UCI) - Binary classification, well-known interpretable baseline dataset",
+            "mandatory": true
+          },
+          {
+            "name": "compas",
+            "source": "custom",
+            "description": "COMPAS - Binary classification, real-world socially sensitive dataset",
+            "mandatory": true
+          },
+          {
+            "name": "iris",
+            "source": "sklearn",
+            "description": "Iris flower classification dataset",
+            "mandatory": false
+          },
+          {
+            "name": "breast_cancer",
+            "source": "sklearn",
+            "description": "Breast cancer diagnosis dataset",
+            "mandatory": false
+          },
+          {
+            "name": "diabetes",
+            "source": "sklearn",
+            "description": "Diabetes prediction dataset",
+            "mandatory": false
+          }
+        ],
+        "image_datasets": [
+          {
+            "name": "mnist",
+            "source": "torchvision",
+            "description": "MNIST - Multiclass classification, standard for image classification and attributions",
+            "mandatory": true
+          },
+          {
+            "name": "cifar10",
+            "source": "torchvision",
+            "description": "Color image classification dataset",
+            "mandatory": false
+          }
+        ],
+        "text_datasets": [
+          {
+            "name": "imdb",
+            "source": "huggingface",
+            "description": "IMDB Movie Reviews - Binary sentiment classification, common NLP task for text explanation methods",
+            "mandatory": true
+          },
+          {
+            "name": "20newsgroups",
+            "source": "sklearn",
+            "description": "News article classification dataset",
+            "mandatory": false
+          }
+        ]
+      },
+      "validation": {
+        "class_imbalance_ratio": 0.2,
+        "min_dataset_size": 100,
+        "min_test_size": 10,
+        "max_missing_ratio": 0.3,
+        "outlier_threshold": 3.0,
+        "feature_correlation_threshold": 0.95,
+        "min_features": 2,
+        "max_features": 1000,
+        "max_skewness": 3.0,
+        "max_outlier_ratio": 0.1
+      },
+      "hyperparameter_tuning": {
+        "cv_folds": 5,
+        "scoring": "accuracy",
+        "n_jobs": -1,
+        "verbose": 1,
+        "optimization_method": "grid_search",
+        "n_trials": 100,
+        "timeout": 3600,
+        "save_best_params": true,
+        "save_all_results": true,
+        "parameter_grids": {
+          "decision_tree": {
+            "max_depth": [
+              3,
+              5,
+              7,
+              10,
+              "None"
+            ],
+            "min_samples_split": [
+              2,
+              5,
+              10
+            ],
+            "min_samples_leaf": [
+              1,
+              2,
+              4
+            ],
+            "criterion": [
+              "gini",
+              "entropy"
+            ]
+          },
+          "random_forest": {
+            "n_estimators": [
+              50,
+              100,
+              200
+            ],
+            "max_depth": [
+              5,
+              10,
+              15,
+              "None"
+            ],
+            "min_samples_split": [
+              2,
+              5,
+              10
+            ],
+            "max_features": [
+              "sqrt",
+              "log2",
+              "None"
+            ]
+          },
+          "gradient_boosting": {
+            "n_estimators": [
+              50,
+              100,
+              200
+            ],
+            "learning_rate": [
+              0.01,
+              0.1,
+              0.2
+            ],
+            "max_depth": [
+              3,
+              5,
+              7
+            ],
+            "subsample": [
+              0.8,
+              0.9,
+              1.0
+            ]
+          },
+          "mlp": {
+            "hidden_layer_sizes": [
+              "(50",
+              ")",
+              "(100",
+              ")",
+              "(50",
+              "50)"
+            ],
+            "activation": [
+              "relu",
+              "tanh"
+            ],
+            "alpha": [
+              0.0001,
+              0.001,
+              0.01
+            ],
+            "max_iter": [
+              500,
+              1000
+            ]
+          }
+        }
+      },
+      "models": {
+        "models_to_train": [
+          "decision_tree",
+          "random_forest",
+          "gradient_boosting",
+          "mlp",
+          "cnn",
+          "vit",
+          "bert",
+          "lstm"
+        ],
+        "tabular": [
+          {
+            "name": "decision_tree",
+            "description": "Decision Tree Classifier",
+            "library": "sklearn"
+          },
+          {
+            "name": "random_forest",
+            "description": "Random Forest Classifier",
+            "library": "sklearn"
+          },
+          {
+            "name": "gradient_boosting",
+            "description": "Gradient Boosting Classifier",
+            "library": "sklearn"
+          },
+          {
+            "name": "mlp",
+            "description": "Multi-layer Perceptron",
+            "library": "sklearn"
+          }
+        ],
+        "image": [
+          {
+            "name": "cnn",
+            "description": "Convolutional Neural Network",
+            "library": "pytorch"
+          },
+          {
+            "name": "vit",
+            "description": "Vision Transformer",
+            "library": "pytorch"
+          }
+        ],
+        "text": [
+          {
+            "name": "bert",
+            "description": "BERT-based classifier (simplified)",
+            "library": "sklearn"
+          },
+          {
+            "name": "lstm",
+            "description": "LSTM-based classifier (simplified)",
+            "library": "sklearn"
+          }
+        ]
+      },
+      "explanations": {
+        "feature_attribution": [
+          {
+            "name": "shap",
+            "description": "SHAP (SHapley Additive exPlanations)",
+            "library": "shap"
+          },
+          {
+            "name": "lime",
+            "description": "LIME (Local Interpretable Model-agnostic Explanations)",
+            "library": "lime"
+          },
+          {
+            "name": "integrated_gradients",
+            "description": "Integrated Gradients",
+            "library": "captum"
+          }
+        ],
+        "example_based": [
+          {
+            "name": "prototype",
+            "description": "Prototype-based explanations",
+            "library": "custom"
+          },
+          {
+            "name": "counterfactual",
+            "description": "Counterfactual explanations",
+            "library": "alibi"
+          }
+        ],
+        "concept_based": [
+          {
+            "name": "tcav",
+            "description": "TCAV (Testing with Concept Activation Vectors)",
+            "library": "custom"
+          },
+          {
+            "name": "concept_bottleneck",
+            "description": "Concept Bottleneck Models",
+            "library": "custom"
+          }
+        ],
+        "perturbation": [
+          {
+            "name": "occlusion",
+            "description": "Occlusion-based explanations",
+            "library": "captum"
+          },
+          {
+            "name": "feature_ablation",
+            "description": "Feature ablation explanations",
+            "library": "captum"
+          }
+        ]
+      },
+      "evaluation": {
+        "fidelity": [
+          {
+            "name": "faithfulness",
+            "description": "How well explanations reflect model behavior"
+          },
+          {
+            "name": "monotonicity",
+            "description": "Consistency of explanation with model predictions"
+          },
+          {
+            "name": "completeness",
+            "description": "Coverage of explanation across features"
+          }
+        ],
+        "time_complexity": [
+          {
+            "name": "explanation_time",
+            "description": "Time taken to generate explanations"
+          },
+          {
+            "name": "training_time",
+            "description": "Time taken to train the model"
+          }
+        ],
+        "stability": [
+          {
+            "name": "consistency",
+            "description": "Consistency of explanations across similar inputs"
+          },
+          {
+            "name": "robustness",
+            "description": "Robustness to small input perturbations"
+          }
+        ],
+        "comprehensibility": [
+          {
+            "name": "sparsity",
+            "description": "Sparsity of explanations"
+          },
+          {
+            "name": "simplicity",
+            "description": "Simplicity of explanation structure"
+          }
+        ]
+      },
+      "experiment": {
+        "preprocessing": {
+          "test_size": 0.2,
+          "random_state": 42,
+          "scale_features": true,
+          "handle_missing": true
+        },
+        "data_splitting": {
+          "default_strategy": "stratified",
+          "test_size": 0.2,
+          "validation_size": 0.1,
+          "random_state": 42,
+          "stratify": true,
+          "shuffle": true,
+          "n_splits": 5,
+          "n_repeats": 3,
+          "time_column": null,
+          "gap": 0,
+          "group_column": null,
+          "min_samples_per_class": 2,
+          "max_imbalance_ratio": 0.3,
+          "strategies": {
+            "stratified": {
+              "description": "Maintains class distribution across splits",
+              "supports_validation": true,
+              "supports_cv": true
+            },
+            "time_based": {
+              "description": "Time-based splits for temporal data",
+              "supports_validation": false,
+              "supports_cv": false,
+              "requires_time_column": true
+            },
+            "cross_validation": {
+              "description": "K-fold cross-validation",
+              "supports_validation": false,
+              "supports_cv": true,
+              "cv_types": [
+                "stratified_kfold",
+                "kfold",
+                "leave_one_out",
+                "stratified_shuffle_split"
+              ]
+            },
+            "group_based": {
+              "description": "Group-based splits (e.g., by patient, subject)",
+              "supports_validation": false,
+              "supports_cv": false,
+              "requires_group_column": true
+            },
+            "custom": {
+              "description": "Custom split strategies",
+              "supports_validation": true,
+              "supports_cv": true
+            },
+            "holdout": {
+              "description": "Simple holdout split",
+              "supports_validation": true,
+              "supports_cv": false
+            }
+          }
+        },
+        "training": {
+          "max_iter": 1000,
+          "early_stopping": true,
+          "validation_split": 0.1
+        },
+        "explanation": {
+          "num_samples": 100,
+          "max_features": 10,
+          "random_state": 42
+        },
+        "evaluation": {
+          "num_runs": 5,
+          "confidence_level": 0.95,
+          "significance_level": 0.05,
+          "multiple_comparison_correction": "bonferroni",
+          "statistical_tests": [
+            "t_test",
+            "mann_whitney",
+            "wilcoxon",
+            "anova",
+            "kruskal_wallis",
+            "friedman"
+          ],
+          "effect_size_calculation": true,
+          "power_analysis": true,
+          "correlation_analysis": true
+        }
+      },
+      "output": {
+        "results_dir": "results",
+        "save_models": true,
+        "save_explanations": true,
+        "generate_plots": true,
+        "save_reports": true
+      },
+      "logging": {
+        "level": "INFO",
+        "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        "file": "benchmark.log"
+      }
+    },
+    "benchmark_timestamp": "2025-08-14 11:45:06"
+  },
+  "result_data": {
+    "dataset": "adult_income",
+    "model": "decision_tree",
+    "explanation_method": "counterfactual",
+    "evaluation_results": {
+      "time_complexity": 0.0004679107666015625,
+      "faithfulness": 0.7,
+      "monotonicity": 0.18596883892568752,
+      "completeness": 1.0,
+      "stability": 0.8917938960529851,
+      "consistency": 0.7848254788996095,
+      "sparsity": 0.0,
+      "simplicity": 0.0
+    },
+    "explanation_results": {
+      "explanations": [
+        {
+          "instance_id": "4348",
+          "original": [
+            -0.2659878268979243,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.2659878268979243,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.7812781278127813
+        },
+        {
+          "instance_id": "3091",
+          "original": [
+            -0.8009056347317575,
+            0.3425696912059551,
+            0.17130895960083317,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.8009056347317575,
+            0.3425696912059551,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.3179117159668464,
+          "true_label": 0,
+          "confidence": 0.8885172798216276
+        },
+        {
+          "instance_id": "2082",
+          "original": [
+            1.0330982778413849,
+            0.3425696912059551,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            1.0330982778413849,
+            0.3425696912059551,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.6718266253869969
+        },
+        {
+          "instance_id": "2884",
+          "original": [
+            0.039679491864266114,
+            -2.78769836242093,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            0.3453468106264565,
+            -2.78769836242093,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.3056673187621904,
+          "true_label": 0,
+          "confidence": 0.9617224880382775
+        },
+        {
+          "instance_id": "5931",
+          "original": [
+            0.2689299809359089,
+            -2.78769836242093,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.2459172768340927
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            0.3453468106264565,
+            -2.78769836242093,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.18311415855861266,
+          "true_label": 0,
+          "confidence": 0.9923076923076923
+        },
+        {
+          "instance_id": "2374",
+          "original": [
+            -0.9537392941128526,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.9537392941128526,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.9803921568627451
+        },
+        {
+          "instance_id": "303",
+          "original": [
+            0.2689299809359089,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            1.5845588491412297
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            0.2689299809359089,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            1.5845588491412297
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.7603174603174603
+        },
+        {
+          "instance_id": "5278",
+          "original": [
+            -0.6480719753506623,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.6480719753506623,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.8885172798216276
+        },
+        {
+          "instance_id": "539",
+          "original": [
+            2.2557675528901466,
+            -2.3964148557175693,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -2.5756141644390484
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            2.0265170638185035,
+            -1.613847842310848,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -1.5771726411797817
+          ],
+          "cf_distance": 1.2891285399758194,
+          "true_label": 0,
+          "confidence": 1.0
+        },
+        {
+          "instance_id": "24",
+          "original": [
+            -0.2659878268979243,
+            -2.78769836242093,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -2.1595968630810205
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.03673733782628149,
+            -2.3964148557175693,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.4955276576489094
+          ],
+          "cf_distance": 1.7247564726143583,
+          "true_label": 0,
+          "confidence": 1.0
+        },
+        {
+          "instance_id": "5234",
+          "original": [
+            -0.3424046565884719,
+            -1.613847842310848,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.4952383159695671,
+            -1.613847842310848,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.15283365938109517,
+          "true_label": 0,
+          "confidence": 1.0
+        },
+        {
+          "instance_id": "3466",
+          "original": [
+            -1.2594066128750432,
+            0.7338531979093157,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -2.1595968630810205
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.8009056347317575,
+            0.7338531979093157,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -2.076393402809415
+          ],
+          "cf_distance": 0.4659892303042189,
+          "true_label": 0,
+          "confidence": 0.9976442873969376
+        },
+        {
+          "instance_id": "5381",
+          "original": [
+            -0.3424046565884719,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.3424046565884719,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.8932584269662921
+        },
+        {
+          "instance_id": "1875",
+          "original": [
+            0.4217636403170041,
+            0.7338531979093157,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            0.4217636403170041,
+            0.7338531979093157,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.7812781278127813
+        },
+        {
+          "instance_id": "3814",
+          "original": [
+            0.1925131512453613,
+            0.3425696912059551,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            0.1925131512453613,
+            0.3425696912059551,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.7812781278127813
+        },
+        {
+          "instance_id": "4654",
+          "original": [
+            1.568016085675218,
+            -2.3964148557175693,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.7451380384637261
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            1.6444329153657657,
+            -2.3964148557175693,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.6699998083094857,
+          "true_label": 0,
+          "confidence": 0.9387755102040817
+        },
+        {
+          "instance_id": "6016",
+          "original": [
+            0.039679491864266114,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            0.039679491864266114,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.7812781278127813
+        },
+        {
+          "instance_id": "5800",
+          "original": [
+            -0.6480719753506623,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.6480719753506623,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.8885172798216276
+        },
+        {
+          "instance_id": "4507",
+          "original": [
+            -0.4952383159695671,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            1.5845588491412297
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.4952383159695671,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            1.5845588491412297
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.7850746268656716
+        },
+        {
+          "instance_id": "3374",
+          "original": [
+            -0.4952383159695671,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            1.168541547783202
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.4952383159695671,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            1.168541547783202
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.7850746268656716
+        },
+        {
+          "instance_id": "2875",
+          "original": [
+            1.6444329153657657,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            1.6444329153657657,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.7594059405940594
+        },
+        {
+          "instance_id": "1914",
+          "original": [
+            -0.03673733782628149,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.0036931039807239978
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.03673733782628149,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.08320346027160556,
+          "true_label": 0,
+          "confidence": 0.7812781278127813
+        },
+        {
+          "instance_id": "3384",
+          "original": [
+            -0.5716551456601147,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.4955276576489094
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.6480719753506623,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.4955276576489094
+          ],
+          "cf_distance": 0.07641682969054764,
+          "true_label": 0,
+          "confidence": 0.985
+        },
+        {
+          "instance_id": "2925",
+          "original": [
+            1.2623487669130278,
+            -2.0051313490142086,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.586117325881963
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            1.4915992559846705,
+            -2.0051313490142086,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "cf_distance": 0.283279102554816,
+          "true_label": 0,
+          "confidence": 0.9767441860465116
+        },
+        {
+          "instance_id": "4984",
+          "original": [
+            -1.6414907613277812,
+            -1.613847842310848,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.9115449590069372
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.7244888050412099,
+            -1.613847842310848,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.4955276576489094
+          ],
+          "cf_distance": 1.0069572894927643,
+          "true_label": 0,
+          "confidence": 1.0
+        },
+        {
+          "instance_id": "2958",
+          "original": [
+            0.3453468106264565,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            0.3453468106264565,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.8298086606243706
+        },
+        {
+          "instance_id": "3189",
+          "original": [
+            -0.03673733782628149,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.03673733782628149,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.8298086606243706
+        },
+        {
+          "instance_id": "568",
+          "original": [
+            -0.1895709972073767,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.1895709972073767,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.7812781278127813
+        },
+        {
+          "instance_id": "3649",
+          "original": [
+            -1.0301561238034003,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.4955276576489094
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.8009056347317575,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.4955276576489094
+          ],
+          "cf_distance": 0.2292504890716428,
+          "true_label": 0,
+          "confidence": 0.9548872180451128
+        },
+        {
+          "instance_id": "2522",
+          "original": [
+            -0.9537392941128526,
+            1.516420211316037,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -1.0301561238034003,
+            1.516420211316037,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.07641682969054764,
+          "true_label": 0,
+          "confidence": 1.0
+        },
+        {
+          "instance_id": "405",
+          "original": [
+            -0.8009056347317575,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.586117325881963
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.8009056347317575,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.586117325881963
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.603448275862069
+        },
+        {
+          "instance_id": "362",
+          "original": [
+            -1.0301561238034003,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -1.327562260364965
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.6480719753506623,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -1.327562260364965
+          ],
+          "cf_distance": 0.38208414845273797,
+          "true_label": 0,
+          "confidence": 1.0
+        },
+        {
+          "instance_id": "2660",
+          "original": [
+            1.1859319372224801,
+            -1.613847842310848,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            2.4165934518572856
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            0.8802646184602897,
+            -1.2225643356074873,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            2.4165934518572856
+          ],
+          "cf_distance": 0.4965232042687889,
+          "true_label": 0,
+          "confidence": 0.7701149425287356
+        },
+        {
+          "instance_id": "4123",
+          "original": [
+            1.0330982778413849,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            1.0330982778413849,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.7594059405940594
+        },
+        {
+          "instance_id": "445",
+          "original": [
+            -1.5650739316372335,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.9115449590069372
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -1.2594066128750432,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.7451380384637261
+          ],
+          "cf_distance": 0.3480284082714241,
+          "true_label": 0,
+          "confidence": 1.0
+        },
+        {
+          "instance_id": "4807",
+          "original": [
+            0.4981804700075517,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            0.4981804700075517,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.8298086606243706
+        },
+        {
+          "instance_id": "1913",
+          "original": [
+            -0.4188214862790195,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.4188214862790195,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.9104683195592287
+        },
+        {
+          "instance_id": "3575",
+          "original": [
+            1.0330982778413849,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -1.327562260364965
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            0.9566814481508373,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -1.327562260364965
+          ],
+          "cf_distance": 0.07641682969054753,
+          "true_label": 0,
+          "confidence": 0.6363636363636364
+        },
+        {
+          "instance_id": "3818",
+          "original": [
+            1.4915992559846705,
+            -2.78769836242093,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            1.1859319372224801,
+            -2.78769836242093,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.30566731876219033,
+          "true_label": 0,
+          "confidence": 0.9337016574585635
+        },
+        {
+          "instance_id": "71",
+          "original": [
+            0.3453468106264565,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            1.5845588491412297
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            0.2689299809359089,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            1.5845588491412297
+          ],
+          "cf_distance": 0.07641682969054758,
+          "true_label": 0,
+          "confidence": 0.7603174603174603
+        },
+        {
+          "instance_id": "3609",
+          "original": [
+            0.1925131512453613,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            0.1925131512453613,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.8298086606243706
+        },
+        {
+          "instance_id": "238",
+          "original": [
+            -0.5716551456601147,
+            1.516420211316037,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.5716551456601147,
+            1.516420211316037,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.5660377358490566
+        },
+        {
+          "instance_id": "5559",
+          "original": [
+            0.6510141293886469,
+            1.516420211316037,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            0.6510141293886469,
+            1.516420211316037,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.6170212765957447
+        },
+        {
+          "instance_id": "5072",
+          "original": [
+            0.4981804700075517,
+            -0.8312808289041268,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            0.803847788769742,
+            -0.8312808289041268,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.30566731876219033,
+          "true_label": 0,
+          "confidence": 0.8298086606243706
+        },
+        {
+          "instance_id": "915",
+          "original": [
+            -0.9537392941128526,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.9115449590069372
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -1.0301561238034003,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.9115449590069372
+          ],
+          "cf_distance": 0.07641682969054764,
+          "true_label": 0,
+          "confidence": 1.0
+        },
+        {
+          "instance_id": "4374",
+          "original": [
+            -0.4952383159695671,
+            -1.2225643356074873,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.4188214862790195,
+            -1.2225643356074873,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.07641682969054758,
+          "true_label": 0,
+          "confidence": 0.9637305699481865
+        },
+        {
+          "instance_id": "2800",
+          "original": [
+            1.1095151075319325,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            1.1095151075319325,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.7594059405940594
+        },
+        {
+          "instance_id": "3244",
+          "original": [
+            0.4217636403170041,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            0.4217636403170041,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.7812781278127813
+        },
+        {
+          "instance_id": "1565",
+          "original": [
+            -1.2594066128750432,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -1.7435795617229928
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -1.0301561238034003,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -1.2443588000933594
+          ],
+          "cf_distance": 0.6744478765625537,
+          "true_label": 0,
+          "confidence": 0.9976442873969376
+        },
+        {
+          "instance_id": "5470",
+          "original": [
+            -0.7244888050412099,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.7244888050412099,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.8885172798216276
+        },
+        {
+          "instance_id": "2440",
+          "original": [
+            1.0330982778413849,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -2.2428003233526264
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            1.2623487669130278,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -2.409207243895837
+          ],
+          "cf_distance": 0.483062969562293,
+          "true_label": 0,
+          "confidence": 0.9587813620071685
+        },
+        {
+          "instance_id": "5883",
+          "original": [
+            -0.1895709972073767,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.586117325881963
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.1131541675168291,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.586117325881963
+          ],
+          "cf_distance": 0.0764168296905476,
+          "true_label": 0,
+          "confidence": 0.6050505050505051
+        },
+        {
+          "instance_id": "2127",
+          "original": [
+            0.039679491864266114,
+            -0.43999732220076615,
+            0.4675598856139767,
+            -0.22163866807363142,
+            0.586117325881963
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            0.039679491864266114,
+            -0.43999732220076615,
+            0.4724467711523121,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "cf_distance": 0.16647866186073032,
+          "true_label": 0,
+          "confidence": 0.7603174603174603
+        },
+        {
+          "instance_id": "3270",
+          "original": [
+            -0.8773224644223051,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.8773224644223051,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.8885172798216276
+        },
+        {
+          "instance_id": "3495",
+          "original": [
+            -1.106572953493948,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -1.7435795617229928
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.6480719753506623,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -1.327562260364965
+          ],
+          "cf_distance": 0.6191070521223011,
+          "true_label": 0,
+          "confidence": 1.0
+        },
+        {
+          "instance_id": "5112",
+          "original": [
+            -0.6480719753506623,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.6480719753506623,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.6711590296495957
+        },
+        {
+          "instance_id": "2756",
+          "original": [
+            0.7274309590791945,
+            -2.3964148557175693,
+            -0.14660275636601325,
+            3.852114542577751,
+            1.168541547783202
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            1.0330982778413849,
+            -1.613847842310848,
+            -0.14660275636601325,
+            4.375952425526344,
+            0.5029138656103573
+          ],
+          "cf_distance": 1.1930255567750587,
+          "true_label": 0,
+          "confidence": 0.75
+        },
+        {
+          "instance_id": "674",
+          "original": [
+            -0.03673733782628149,
+            0.7338531979093157,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.33650694506714623
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.1131541675168291,
+            0.7338531979093157,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.33650694506714623
+          ],
+          "cf_distance": 0.07641682969054761,
+          "true_label": 0,
+          "confidence": 0.6050505050505051
+        },
+        {
+          "instance_id": "4090",
+          "original": [
+            -1.2594066128750432,
+            0.3425696912059551,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.9115449590069372
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -1.106572953493948,
+            0.3425696912059551,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.9115449590069372
+          ],
+          "cf_distance": 0.15283365938109528,
+          "true_label": 0,
+          "confidence": 0.9976442873969376
+        },
+        {
+          "instance_id": "3336",
+          "original": [
+            0.3453468106264565,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            1.168541547783202
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            0.3453468106264565,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            1.168541547783202
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.6109979633401222
+        },
+        {
+          "instance_id": "3686",
+          "original": [
+            -1.3358234425655906,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -1.1829897831844955,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.15283365938109505,
+          "true_label": 0,
+          "confidence": 0.9976442873969376
+        },
+        {
+          "instance_id": "2838",
+          "original": [
+            -0.6480719753506623,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            2.4165934518572856
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.4188214862790195,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            2.4165934518572856
+          ],
+          "cf_distance": 0.2292504890716428,
+          "true_label": 0,
+          "confidence": 0.7850746268656716
+        },
+        {
+          "instance_id": "4804",
+          "original": [
+            -1.4886571019466859,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -2.5756141644390484
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.7244888050412099,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -2.5756141644390484
+          ],
+          "cf_distance": 0.8585196378729462,
+          "true_label": 0,
+          "confidence": 1.0
+        },
+        {
+          "instance_id": "3426",
+          "original": [
+            -1.1829897831844955,
+            0.3425696912059551,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -1.0301561238034003,
+            0.3425696912059551,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.08689656425232957
+          ],
+          "cf_distance": 0.22594112207495837,
+          "true_label": 0,
+          "confidence": 0.9886792452830189
+        },
+        {
+          "instance_id": "633",
+          "original": [
+            -1.0301561238034003,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -1.0301561238034003,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.9230769230769231
+        },
+        {
+          "instance_id": "5928",
+          "original": [
+            -0.5716551456601147,
+            -2.0051313490142086,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.5716551456601147,
+            -1.613847842310848,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.39128350670336065,
+          "true_label": 0,
+          "confidence": 0.9637305699481865
+        },
+        {
+          "instance_id": "5577",
+          "original": [
+            0.4981804700075517,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            0.4981804700075517,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.6596858638743456
+        },
+        {
+          "instance_id": "1388",
+          "original": [
+            1.0330982778413849,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.2459172768340927
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            1.0330982778413849,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.3291207371056983
+          ],
+          "cf_distance": 0.08320346027160558,
+          "true_label": 0,
+          "confidence": 0.8223140495867769
+        },
+        {
+          "instance_id": "3530",
+          "original": [
+            0.4981804700075517,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.33650694506714623
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            0.4981804700075517,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.33650694506714623
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.6050505050505051
+        },
+        {
+          "instance_id": "5131",
+          "original": [
+            -0.8773224644223051,
+            -2.78769836242093,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            1.5845588491412297
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -1.4886571019466859,
+            -2.3964148557175693,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            1.5845588491412297
+          ],
+          "cf_distance": 0.7258325024791498,
+          "true_label": 0,
+          "confidence": 0.9789473684210527
+        },
+        {
+          "instance_id": "6015",
+          "original": [
+            0.11609632155481371,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -1.7435795617229928
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            0.039679491864266114,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -1.7435795617229928
+          ],
+          "cf_distance": 0.0764168296905476,
+          "true_label": 0,
+          "confidence": 0.7136363636363636
+        },
+        {
+          "instance_id": "4149",
+          "original": [
+            -0.8773224644223051,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.8773224644223051,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.9739413680781759
+        },
+        {
+          "instance_id": "4660",
+          "original": [
+            -1.2594066128750432,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            1.168541547783202
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.9537392941128526,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.9189311669683852
+          ],
+          "cf_distance": 0.39463635409042647,
+          "true_label": 0,
+          "confidence": 0.9333333333333333
+        },
+        {
+          "instance_id": "919",
+          "original": [
+            -0.4188214862790195,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.4188214862790195,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.8885172798216276
+        },
+        {
+          "instance_id": "1396",
+          "original": [
+            -1.4886571019466859,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -1.0779518795501484
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -1.0301561238034003,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -1.2443588000933594
+          ],
+          "cf_distance": 0.4877647077874989,
+          "true_label": 0,
+          "confidence": 1.0
+        },
+        {
+          "instance_id": "2937",
+          "original": [
+            -0.4188214862790195,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.4188214862790195,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.9104683195592287
+        },
+        {
+          "instance_id": "1132",
+          "original": [
+            -0.9537392941128526,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -1.7435795617229928
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.6480719753506623,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -1.327562260364965
+          ],
+          "cf_distance": 0.516239193386634,
+          "true_label": 0,
+          "confidence": 1.0
+        },
+        {
+          "instance_id": "1802",
+          "original": [
+            -0.8009056347317575,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.8009056347317575,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.9739413680781759
+        },
+        {
+          "instance_id": "4715",
+          "original": [
+            -0.5716551456601147,
+            -1.2225643356074873,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.4188214862790195,
+            -1.2225643356074873,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.15283365938109517,
+          "true_label": 0,
+          "confidence": 0.9637305699481865
+        },
+        {
+          "instance_id": "4409",
+          "original": [
+            1.4915992559846705,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            1.4915992559846705,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.7594059405940594
+        },
+        {
+          "instance_id": "4096",
+          "original": [
+            0.2689299809359089,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            0.2689299809359089,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.5789473684210527
+        },
+        {
+          "instance_id": "5968",
+          "original": [
+            0.4981804700075517,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            0.4981804700075517,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.8298086606243706
+        },
+        {
+          "instance_id": "3856",
+          "original": [
+            0.803847788769742,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.9115449590069372
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            0.7274309590791945,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.9115449590069372
+          ],
+          "cf_distance": 0.07641682969054753,
+          "true_label": 0,
+          "confidence": 0.935251798561151
+        },
+        {
+          "instance_id": "3465",
+          "original": [
+            0.8802646184602897,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.2459172768340927
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            0.8802646184602897,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.2459172768340927
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.8964401294498382
+        },
+        {
+          "instance_id": "1887",
+          "original": [
+            -0.8009056347317575,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.8009056347317575,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.8351648351648352
+        },
+        {
+          "instance_id": "4422",
+          "original": [
+            -1.4122402722561382,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -1.7435795617229928
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -1.0301561238034003,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -1.2443588000933594
+          ],
+          "cf_distance": 0.7404812272833148,
+          "true_label": 0,
+          "confidence": 1.0
+        },
+        {
+          "instance_id": "4950",
+          "original": [
+            0.3453468106264565,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            0.3453468106264565,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.8298086606243706
+        },
+        {
+          "instance_id": "1590",
+          "original": [
+            1.1095151075319325,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            1.334948468326413
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            1.0330982778413849,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            1.168541547783202
+          ],
+          "cf_distance": 0.18311415855861263,
+          "true_label": 0,
+          "confidence": 0.6109979633401222
+        },
+        {
+          "instance_id": "3260",
+          "original": [
+            -1.4122402722561382,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -1.1829897831844955,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.2292504890716427,
+          "true_label": 0,
+          "confidence": 1.0
+        },
+        {
+          "instance_id": "4532",
+          "original": [
+            0.9566814481508373,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            1.8341692299560464
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            1.0330982778413849,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            2.0005761504992576
+          ],
+          "cf_distance": 0.18311415855861277,
+          "true_label": 0,
+          "confidence": 0.6050505050505051
+        },
+        {
+          "instance_id": "4759",
+          "original": [
+            0.4217636403170041,
+            1.9077037180193976,
+            0.16430882626213653,
+            -0.22163866807363142,
+            4.8294937997338465
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            0.4217636403170041,
+            1.516420211316037,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            4.8294937997338465
+          ],
+          "cf_distance": 0.49976874134985644,
+          "true_label": 0,
+          "confidence": 0.8648648648648649
+        },
+        {
+          "instance_id": "1609",
+          "original": [
+            -1.4886571019466859,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -1.7435795617229928
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -1.0301561238034003,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -1.2443588000933594
+          ],
+          "cf_distance": 0.7826540093927199,
+          "true_label": 0,
+          "confidence": 1.0
+        },
+        {
+          "instance_id": "4958",
+          "original": [
+            -0.7244888050412099,
+            -0.04871381549740553,
+            0.303915259073502,
+            -0.22163866807363142,
+            2.4165934518572856
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.6480719753506623,
+            -0.43999732220076615,
+            0.2632352389165478,
+            -0.22163866807363142,
+            2.4165934518572856
+          ],
+          "cf_distance": 0.4007457779166279,
+          "true_label": 0,
+          "confidence": 0.8648648648648649
+        },
+        {
+          "instance_id": "5334",
+          "original": [
+            -0.9537392941128526,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.9537392941128526,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.9803921568627451
+        },
+        {
+          "instance_id": "645",
+          "original": [
+            -0.8773224644223051,
+            0.3425696912059551,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.9115449590069372
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -1.106572953493948,
+            0.3425696912059551,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.9115449590069372
+          ],
+          "cf_distance": 0.2292504890716428,
+          "true_label": 0,
+          "confidence": 0.75
+        },
+        {
+          "instance_id": "1603",
+          "original": [
+            -1.0301561238034003,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -1.0301561238034003,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.9230769230769231
+        },
+        {
+          "instance_id": "1570",
+          "original": [
+            -0.1895709972073767,
+            0.7338531979093157,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.1895709972073767,
+            0.7338531979093157,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 0,
+          "confidence": 0.7812781278127813
+        },
+        {
+          "instance_id": "3018",
+          "original": [
+            3.936937806082194,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            4.8294937997338465
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            2.6378517013428846,
+            -2.3964148557175693,
+            0.7010737675538955,
+            -0.22163866807363142,
+            4.8294937997338465
+          ],
+          "cf_distance": 2.496747837124058,
+          "true_label": 0,
+          "confidence": 0.6596858638743456
+        },
+        {
+          "instance_id": "178",
+          "original": [
+            1.8736834044374084,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -1.7435795617229928
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            1.7972665747468608,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -1.7435795617229928
+          ],
+          "cf_distance": 0.07641682969054764,
+          "true_label": 0,
+          "confidence": 0.8389830508474576
+        },
+        {
+          "instance_id": "4553",
+          "original": [
+            -1.3358234425655906,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -1.1829897831844955,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.15283365938109505,
+          "true_label": 0,
+          "confidence": 0.9976442873969376
+        },
+        {
+          "instance_id": "4873",
+          "original": [
+            1.8736834044374084,
+            0.7338531979093157,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            1.8736834044374084,
+            0.7338531979093157,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.6718266253869969
+        },
+        {
+          "instance_id": "3968",
+          "original": [
+            2.6378517013428846,
+            -0.04871381549740553,
+            2.501692971449208,
+            -0.22163866807363142,
+            -0.4123241973773038
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            1.7208497450563134,
+            -0.43999732220076615,
+            2.764396088631617,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 1.0834082107163165,
+          "true_label": 1,
+          "confidence": 1.0
+        },
+        {
+          "instance_id": "2102",
+          "original": [
+            0.4217636403170041,
+            1.1251367046126763,
+            -0.14660275636601325,
+            5.984012903415047,
+            0.7525242464251741
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            0.11609632155481371,
+            0.7338531979093157,
+            -0.14660275636601325,
+            5.569815507595229,
+            0.7525242464251741
+          ],
+          "cf_distance": 0.6466024861390992,
+          "true_label": 1,
+          "confidence": 1.0
+        },
+        {
+          "instance_id": "5959",
+          "original": [
+            0.039679491864266114,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            0.039679491864266114,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.6711590296495957
+        },
+        {
+          "instance_id": "155",
+          "original": [
+            0.1925131512453613,
+            -0.43999732220076615,
+            0.8173023965737646,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            0.2689299809359089,
+            -0.43999732220076615,
+            0.5738826655696524,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "cf_distance": 0.25513270527721155,
+          "true_label": 1,
+          "confidence": 1.0
+        },
+        {
+          "instance_id": "4579",
+          "original": [
+            -0.4188214862790195,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.4188214862790195,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.5660377358490566
+        },
+        {
+          "instance_id": "3576",
+          "original": [
+            0.6510141293886469,
+            1.1251367046126763,
+            1.837736928173206,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            0.5745972996980994,
+            1.516420211316037,
+            0.7115079285681791,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "cf_distance": 1.1947108746593766,
+          "true_label": 1,
+          "confidence": 1.0
+        },
+        {
+          "instance_id": "5374",
+          "original": [
+            -0.4188214862790195,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.4188214862790195,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.5660377358490566
+        },
+        {
+          "instance_id": "5565",
+          "original": [
+            1.4915992559846705,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.4955276576489094
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            1.4915992559846705,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.4955276576489094
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.8964401294498382
+        },
+        {
+          "instance_id": "4307",
+          "original": [
+            -0.5716551456601147,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.5716551456601147,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.5660377358490566
+        },
+        {
+          "instance_id": "145",
+          "original": [
+            0.1925131512453613,
+            1.9077037180193976,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            0.1925131512453613,
+            1.9077037180193976,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.6290322580645161
+        },
+        {
+          "instance_id": "380",
+          "original": [
+            0.2689299809359089,
+            1.1251367046126763,
+            1.837736928173206,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            0.5745972996980994,
+            1.516420211316037,
+            0.7115079285681791,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "cf_distance": 1.230823729024057,
+          "true_label": 1,
+          "confidence": 1.0
+        },
+        {
+          "instance_id": "2641",
+          "original": [
+            0.1925131512453613,
+            1.516420211316037,
+            3.528863480412301,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            1.8736834044374084,
+            1.516420211316037,
+            5.309538908191704,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "cf_distance": 2.448905551325974,
+          "true_label": 1,
+          "confidence": 1.0
+        },
+        {
+          "instance_id": "3833",
+          "original": [
+            1.3387655966035754,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            1.3387655966035754,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.6718266253869969
+        },
+        {
+          "instance_id": "4074",
+          "original": [
+            -0.3424046565884719,
+            1.516420211316037,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            1.168541547783202
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            -0.2659878268979243,
+            1.516420211316037,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            1.168541547783202
+          ],
+          "cf_distance": 0.07641682969054764,
+          "true_label": 1,
+          "confidence": 0.5284552845528455
+        },
+        {
+          "instance_id": "5739",
+          "original": [
+            0.4217636403170041,
+            1.516420211316037,
+            -0.14660275636601325,
+            5.662400807837306,
+            1.168541547783202
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            -0.03673733782628149,
+            1.516420211316037,
+            -0.14660275636601325,
+            5.279877330521357,
+            1.5845588491412297
+          ],
+          "cf_distance": 0.7277484130422074,
+          "true_label": 1,
+          "confidence": 1.0
+        },
+        {
+          "instance_id": "5969",
+          "original": [
+            -1.106572953493948,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -1.106572953493948,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.9830508474576272
+        },
+        {
+          "instance_id": "2202",
+          "original": [
+            1.6444329153657657,
+            -1.2225643356074873,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            1.950100234127956,
+            -1.2225643356074873,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.30566731876219033,
+          "true_label": 1,
+          "confidence": 0.9379310344827586
+        },
+        {
+          "instance_id": "4578",
+          "original": [
+            0.2689299809359089,
+            1.516420211316037,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.33650694506714623
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            0.2689299809359089,
+            1.516420211316037,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.33650694506714623
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.6109979633401222
+        },
+        {
+          "instance_id": "1382",
+          "original": [
+            -0.6480719753506623,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.33650694506714623
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.6480719753506623,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.33650694506714623
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.5660377358490566
+        },
+        {
+          "instance_id": "5843",
+          "original": [
+            -0.7244888050412099,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            4.375952425526344,
+            -0.9115449590069372
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            -0.8009056347317575,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            4.017793500905678,
+            -0.9115449590069372
+          ],
+          "cf_distance": 0.3662203532647877,
+          "true_label": 1,
+          "confidence": 1.0
+        },
+        {
+          "instance_id": "869",
+          "original": [
+            -0.4188214862790195,
+            -2.78769836242093,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.1895709972073767,
+            -2.78769836242093,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "cf_distance": 0.2292504890716428,
+          "true_label": 1,
+          "confidence": 1.0
+        },
+        {
+          "instance_id": "4425",
+          "original": [
+            2.9435190201050747,
+            -2.3964148557175693,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -1.7435795617229928
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            2.6378517013428846,
+            -2.3964148557175693,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.9115449590069372
+          ],
+          "cf_distance": 0.8864051499602936,
+          "true_label": 1,
+          "confidence": 1.0
+        },
+        {
+          "instance_id": "4794",
+          "original": [
+            0.9566814481508373,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            3.248628054573341
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            0.6510141293886469,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            3.248628054573341
+          ],
+          "cf_distance": 0.30566731876219044,
+          "true_label": 1,
+          "confidence": 0.6596858638743456
+        },
+        {
+          "instance_id": "736",
+          "original": [
+            1.1095151075319325,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            1.1095151075319325,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.5085836909871244
+        },
+        {
+          "instance_id": "470",
+          "original": [
+            0.6510141293886469,
+            -0.43999732220076615,
+            0.8173023965737646,
+            -0.22163866807363142,
+            0.33650694506714623
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            0.7274309590791945,
+            -0.04871381549740553,
+            0.5155041950846727,
+            -0.22163866807363142,
+            0.33650694506714623
+          ],
+          "cf_distance": 0.5000244683013858,
+          "true_label": 1,
+          "confidence": 1.0
+        },
+        {
+          "instance_id": "2575",
+          "original": [
+            -0.7244888050412099,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.7244888050412099,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.9104683195592287
+        },
+        {
+          "instance_id": "2656",
+          "original": [
+            -0.5716551456601147,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            4.2809306700147385,
+            -0.07951035629088157
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            -0.6480719753506623,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            4.412499254569269,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.15215066316528775,
+          "true_label": 1,
+          "confidence": 1.0
+        },
+        {
+          "instance_id": "768",
+          "original": [
+            0.9566814481508373,
+            1.516420211316037,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            0.9566814481508373,
+            1.516420211316037,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.6170212765957447
+        },
+        {
+          "instance_id": "911",
+          "original": [
+            0.039679491864266114,
+            1.516420211316037,
+            -0.14660275636601325,
+            4.2809306700147385,
+            0.33650694506714623
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            0.4217636403170041,
+            1.516420211316037,
+            -0.14660275636601325,
+            4.349151417561532,
+            0.08689656425232957
+          ],
+          "cf_distance": 0.461462576061391,
+          "true_label": 1,
+          "confidence": 0.6109979633401222
+        },
+        {
+          "instance_id": "5786",
+          "original": [
+            -0.8009056347317575,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.8009056347317575,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.603448275862069
+        },
+        {
+          "instance_id": "5478",
+          "original": [
+            0.2689299809359089,
+            1.516420211316037,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.4955276576489094
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            0.3453468106264565,
+            1.516420211316037,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.4955276576489094
+          ],
+          "cf_distance": 0.07641682969054758,
+          "true_label": 1,
+          "confidence": 0.7136363636363636
+        },
+        {
+          "instance_id": "3224",
+          "original": [
+            -0.5716551456601147,
+            1.516420211316037,
+            -0.14660275636601325,
+            4.595233399783894,
+            0.586117325881963
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            -0.4952383159695671,
+            1.1251367046126763,
+            -0.14660275636601325,
+            4.349151417561532,
+            0.7525242464251741
+          ],
+          "cf_distance": 0.49718197841152156,
+          "true_label": 1,
+          "confidence": 1.0
+        },
+        {
+          "instance_id": "317",
+          "original": [
+            0.5745972996980994,
+            1.516420211316037,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.4955276576489094
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            0.5745972996980994,
+            1.516420211316037,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.4955276576489094
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.7136363636363636
+        },
+        {
+          "instance_id": "3791",
+          "original": [
+            0.8802646184602897,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            4.412499254569269,
+            -0.2459172768340927
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            0.6510141293886469,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            4.349151417561532,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.290275728227182,
+          "true_label": 1,
+          "confidence": 0.9834710743801653
+        },
+        {
+          "instance_id": "3579",
+          "original": [
+            -0.2659878268979243,
+            1.516420211316037,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.2533034847955407
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.2659878268979243,
+            1.516420211316037,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.33650694506714623
+          ],
+          "cf_distance": 0.08320346027160552,
+          "true_label": 1,
+          "confidence": 0.5660377358490566
+        },
+        {
+          "instance_id": "1438",
+          "original": [
+            0.3453468106264565,
+            1.516420211316037,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.17010002452393513
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            0.4217636403170041,
+            1.516420211316037,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.08689656425232957
+          ],
+          "cf_distance": 0.11297056103747914,
+          "true_label": 1,
+          "confidence": 0.5789473684210527
+        },
+        {
+          "instance_id": "1919",
+          "original": [
+            1.3387655966035754,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.586117325881963
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            1.2623487669130278,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.586117325881963
+          ],
+          "cf_distance": 0.07641682969054764,
+          "true_label": 1,
+          "confidence": 0.6109979633401222
+        },
+        {
+          "instance_id": "4901",
+          "original": [
+            0.9566814481508373,
+            -0.43999732220076615,
+            0.9911170281534778,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            1.1095151075319325,
+            -0.43999732220076615,
+            0.7579993801761268,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.2787507223996178,
+          "true_label": 1,
+          "confidence": 1.0
+        },
+        {
+          "instance_id": "5300",
+          "original": [
+            1.0330982778413849,
+            1.1251367046126763,
+            0.8688128117075702,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            0.8802646184602897,
+            1.1251367046126763,
+            0.7579993801761268,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.18877961766989176,
+          "true_label": 1,
+          "confidence": 1.0
+        },
+        {
+          "instance_id": "6",
+          "original": [
+            0.8802646184602897,
+            1.1251367046126763,
+            1.837736928173206,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            0.8802646184602897,
+            1.1251367046126763,
+            0.7579993801761268,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 1.0797375479970794,
+          "true_label": 1,
+          "confidence": 1.0
+        },
+        {
+          "instance_id": "5498",
+          "original": [
+            1.4151824262941228,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            1.4151824262941228,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.6050505050505051
+        },
+        {
+          "instance_id": "1040",
+          "original": [
+            2.2557675528901466,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -2.5756141644390484
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            1.950100234127956,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -2.1595968630810205
+          ],
+          "cf_distance": 0.5162391933866343,
+          "true_label": 1,
+          "confidence": 0.9587813620071685
+        },
+        {
+          "instance_id": "464",
+          "original": [
+            3.09635267948617,
+            2.298987224722758,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -2.908428005525471
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            2.4850180419617893,
+            1.9077037180193976,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -2.409207243895837
+          ],
+          "cf_distance": 0.880939379581374,
+          "true_label": 1,
+          "confidence": 0.6923076923076923
+        },
+        {
+          "instance_id": "328",
+          "original": [
+            -0.1131541675168291,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.1131541675168291,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.8298086606243706
+        },
+        {
+          "instance_id": "5046",
+          "original": [
+            -0.7244888050412099,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.7244888050412099,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.5660377358490566
+        },
+        {
+          "instance_id": "4604",
+          "original": [
+            0.4217636403170041,
+            0.7338531979093157,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            0.4217636403170041,
+            0.7338531979093157,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.7812781278127813
+        },
+        {
+          "instance_id": "4245",
+          "original": [
+            1.4915992559846705,
+            1.516420211316037,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            1.4915992559846705,
+            1.516420211316037,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.6170212765957447
+        },
+        {
+          "instance_id": "210",
+          "original": [
+            0.803847788769742,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            0.803847788769742,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.7594059405940594
+        },
+        {
+          "instance_id": "2493",
+          "original": [
+            0.9566814481508373,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            1.2517450080548074
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            1.0330982778413849,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            1.168541547783202
+          ],
+          "cf_distance": 0.11297056103747899,
+          "true_label": 1,
+          "confidence": 0.6109979633401222
+        },
+        {
+          "instance_id": "1794",
+          "original": [
+            0.7274309590791945,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            0.7274309590791945,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.7594059405940594
+        },
+        {
+          "instance_id": "1990",
+          "original": [
+            -0.1895709972073767,
+            -2.0051313490142086,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.1131541675168291,
+            -2.0051313490142086,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "cf_distance": 0.0764168296905476,
+          "true_label": 1,
+          "confidence": 0.9148936170212766
+        },
+        {
+          "instance_id": "566",
+          "original": [
+            0.039679491864266114,
+            1.1251367046126763,
+            1.837736928173206,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            0.5745972996980994,
+            1.516420211316037,
+            0.7115079285681791,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "cf_distance": 1.3067637901729496,
+          "true_label": 1,
+          "confidence": 1.0
+        },
+        {
+          "instance_id": "3733",
+          "original": [
+            0.803847788769742,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            0.803847788769742,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.6050505050505051
+        },
+        {
+          "instance_id": "300",
+          "original": [
+            1.4915992559846705,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -1.7435795617229928
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            1.568016085675218,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -1.7435795617229928
+          ],
+          "cf_distance": 0.07641682969054764,
+          "true_label": 1,
+          "confidence": 0.8547717842323651
+        },
+        {
+          "instance_id": "5285",
+          "original": [
+            -0.2659878268979243,
+            1.516420211316037,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            1.5845588491412297
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            -0.2659878268979243,
+            1.516420211316037,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            1.5845588491412297
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.5284552845528455
+        },
+        {
+          "instance_id": "4710",
+          "original": [
+            -0.03673733782628149,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.03673733782628149,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.7812781278127813
+        },
+        {
+          "instance_id": "3687",
+          "original": [
+            -0.4952383159695671,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.4952383159695671,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.8885172798216276
+        },
+        {
+          "instance_id": "3053",
+          "original": [
+            0.1925131512453613,
+            -0.8312808289041268,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            0.11609632155481371,
+            -0.8312808289041268,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0764168296905476,
+          "true_label": 1,
+          "confidence": 0.8298086606243706
+        },
+        {
+          "instance_id": "56",
+          "original": [
+            -0.03673733782628149,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            2.4165934518572856
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            -0.03673733782628149,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            2.4165934518572856
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.5060240963855421
+        },
+        {
+          "instance_id": "2805",
+          "original": [
+            1.1859319372224801,
+            -0.43999732220076615,
+            1.837736928173206,
+            -0.22163866807363142,
+            0.9189311669683852
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            0.803847788769742,
+            -0.43999732220076615,
+            0.5155041950846727,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "cf_distance": 1.3863545578798742,
+          "true_label": 1,
+          "confidence": 1.0
+        },
+        {
+          "instance_id": "745",
+          "original": [
+            -0.1895709972073767,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            1.168541547783202
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            -0.1895709972073767,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            1.168541547783202
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.6109979633401222
+        },
+        {
+          "instance_id": "5950",
+          "original": [
+            0.1925131512453613,
+            1.1251367046126763,
+            -0.14660275636601325,
+            4.412499254569269,
+            1.168541547783202
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            0.1925131512453613,
+            1.1251367046126763,
+            -0.14660275636601325,
+            4.60254276559248,
+            1.2517450080548074
+          ],
+          "cf_distance": 0.2074592776503326,
+          "true_label": 1,
+          "confidence": 1.0
+        },
+        {
+          "instance_id": "2489",
+          "original": [
+            0.1925131512453613,
+            2.298987224722758,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            0.11609632155481371,
+            2.298987224722758,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0764168296905476,
+          "true_label": 1,
+          "confidence": 0.6290322580645161
+        },
+        {
+          "instance_id": "3072",
+          "original": [
+            0.8802646184602897,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            0.8802646184602897,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.6596858638743456
+        },
+        {
+          "instance_id": "3989",
+          "original": [
+            -0.8773224644223051,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.8773224644223051,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.9739413680781759
+        },
+        {
+          "instance_id": "2529",
+          "original": [
+            0.2689299809359089,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            0.2689299809359089,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.7812781278127813
+        },
+        {
+          "instance_id": "1466",
+          "original": [
+            -0.2659878268979243,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.2659878268979243,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.7540983606557377
+        },
+        {
+          "instance_id": "4832",
+          "original": [
+            -1.106572953493948,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -1.0301561238034003,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.07641682969054764,
+          "true_label": 1,
+          "confidence": 0.9803921568627451
+        },
+        {
+          "instance_id": "2021",
+          "original": [
+            0.4981804700075517,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.586117325881963
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            0.4981804700075517,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.586117325881963
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.6596858638743456
+        },
+        {
+          "instance_id": "3707",
+          "original": [
+            1.7972665747468608,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            4.0806626572893965
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            1.4151824262941228,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            3.581441895659763
+          ],
+          "cf_distance": 0.6286570331595163,
+          "true_label": 1,
+          "confidence": 0.6596858638743456
+        },
+        {
+          "instance_id": "1177",
+          "original": [
+            0.8802646184602897,
+            1.516420211316037,
+            0.8688128117075702,
+            -0.22163866807363142,
+            0.33650694506714623
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            0.6510141293886469,
+            1.516420211316037,
+            0.5738826655696524,
+            -0.22163866807363142,
+            0.33650694506714623
+          ],
+          "cf_distance": 0.37354996699306636,
+          "true_label": 1,
+          "confidence": 1.0
+        },
+        {
+          "instance_id": "3194",
+          "original": [
+            0.7274309590791945,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            0.7274309590791945,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.7594059405940594
+        },
+        {
+          "instance_id": "2817",
+          "original": [
+            0.11609632155481371,
+            0.3425696912059551,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            0.11609632155481371,
+            0.3425696912059551,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.6050505050505051
+        },
+        {
+          "instance_id": "2869",
+          "original": [
+            -0.1131541675168291,
+            0.7338531979093157,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.1131541675168291,
+            0.7338531979093157,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.7812781278127813
+        },
+        {
+          "instance_id": "1582",
+          "original": [
+            1.4151824262941228,
+            1.1251367046126763,
+            0.432691296908016,
+            -0.22163866807363142,
+            -2.3260037836242318
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            1.4151824262941228,
+            1.516420211316037,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -2.2428003233526264
+          ],
+          "cf_distance": 0.7039937489622343,
+          "true_label": 1,
+          "confidence": 0.8389830508474576
+        },
+        {
+          "instance_id": "965",
+          "original": [
+            0.9566814481508373,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            0.9566814481508373,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.5085836909871244
+        },
+        {
+          "instance_id": "5717",
+          "original": [
+            -0.5716551456601147,
+            1.516420211316037,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            4.0806626572893965
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            -0.8009056347317575,
+            1.9077037180193976,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            4.0806626572893965
+          ],
+          "cf_distance": 0.4534959419417844,
+          "true_label": 1,
+          "confidence": 1.0
+        },
+        {
+          "instance_id": "230",
+          "original": [
+            0.3453468106264565,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -1.327562260364965
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            0.11609632155481371,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -1.4107657206365707
+          ],
+          "cf_distance": 0.24388235389374952,
+          "true_label": 1,
+          "confidence": 0.9587813620071685
+        },
+        {
+          "instance_id": "2308",
+          "original": [
+            1.4151824262941228,
+            1.9077037180193976,
+            1.837736928173206,
+            -0.22163866807363142,
+            -0.4955276576489094
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            1.0330982778413849,
+            1.516420211316037,
+            0.5155041950846727,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 1.4901210939373086,
+          "true_label": 1,
+          "confidence": 1.0
+        },
+        {
+          "instance_id": "3057",
+          "original": [
+            0.5745972996980994,
+            1.1251367046126763,
+            0.9911170281534778,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            0.6510141293886469,
+            1.1251367046126763,
+            0.7115079285681791,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.2898633823559913,
+          "true_label": 1,
+          "confidence": 1.0
+        },
+        {
+          "instance_id": "3517",
+          "original": [
+            2.2557675528901466,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            2.2557675528901466,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.5
+        },
+        {
+          "instance_id": "2153",
+          "original": [
+            1.6444329153657657,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            2.4165934518572856
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            1.4915992559846705,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            2.5830003724004964
+          ],
+          "cf_distance": 0.22594112207495812,
+          "true_label": 1,
+          "confidence": 0.6596858638743456
+        },
+        {
+          "instance_id": "1479",
+          "original": [
+            -0.1131541675168291,
+            1.9077037180193976,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            1.5845588491412297
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            -0.03673733782628149,
+            1.9077037180193976,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            1.5845588491412297
+          ],
+          "cf_distance": 0.07641682969054761,
+          "true_label": 1,
+          "confidence": 0.8648648648648649
+        },
+        {
+          "instance_id": "896",
+          "original": [
+            0.803847788769742,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            0.803847788769742,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.7594059405940594
+        },
+        {
+          "instance_id": "463",
+          "original": [
+            0.5745972996980994,
+            1.516420211316037,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            1.168541547783202
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            0.4981804700075517,
+            1.516420211316037,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            1.168541547783202
+          ],
+          "cf_distance": 0.07641682969054764,
+          "true_label": 1,
+          "confidence": 0.6109979633401222
+        },
+        {
+          "instance_id": "3029",
+          "original": [
+            1.3387655966035754,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            1.3387655966035754,
+            -0.04871381549740553,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.6718266253869969
+        },
+        {
+          "instance_id": "3191",
+          "original": [
+            1.8736834044374084,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            1.950100234127956,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "cf_distance": 0.07641682969054764,
+          "true_label": 1,
+          "confidence": 0.6109979633401222
+        },
+        {
+          "instance_id": "4573",
+          "original": [
+            0.039679491864266114,
+            1.9077037180193976,
+            1.837736928173206,
+            -0.22163866807363142,
+            1.5845588491412297
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            0.1925131512453613,
+            1.516420211316037,
+            0.4675598856139767,
+            -0.22163866807363142,
+            1.168541547783202
+          ],
+          "cf_distance": 1.4922856405673373,
+          "true_label": 1,
+          "confidence": 1.0
+        },
+        {
+          "instance_id": "3592",
+          "original": [
+            0.3453468106264565,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            0.3453468106264565,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.8298086606243706
+        },
+        {
+          "instance_id": "312",
+          "original": [
+            1.0330982778413849,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            1.5845588491412297
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            1.0330982778413849,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            1.5845588491412297
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.6109979633401222
+        },
+        {
+          "instance_id": "3222",
+          "original": [
+            0.7274309590791945,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.33650694506714623
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            0.7274309590791945,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.33650694506714623
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.6109979633401222
+        },
+        {
+          "instance_id": "4144",
+          "original": [
+            -0.03673733782628149,
+            1.9077037180193976,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            -0.03673733782628149,
+            1.9077037180193976,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.7525242464251741
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.8648648648648649
+        },
+        {
+          "instance_id": "4061",
+          "original": [
+            -0.4188214862790195,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.33650694506714623
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.4188214862790195,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            0.33650694506714623
+          ],
+          "cf_distance": 0.0,
+          "true_label": 1,
+          "confidence": 0.5660377358490566
+        },
+        {
+          "instance_id": "5371",
+          "original": [
+            -0.3424046565884719,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            2.0005761504992576
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            -0.4188214862790195,
+            -0.43999732220076615,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            2.0005761504992576
+          ],
+          "cf_distance": 0.07641682969054758,
+          "true_label": 1,
+          "confidence": 0.7603174603174603
+        },
+        {
+          "instance_id": "1477",
+          "original": [
+            1.4915992559846705,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -1.7435795617229928
+          ],
+          "prediction": 0,
+          "counterfactual": [
+            1.568016085675218,
+            1.1251367046126763,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -1.5771726411797817
+          ],
+          "cf_distance": 0.18311415855861263,
+          "true_label": 1,
+          "confidence": 0.8389830508474576
+        },
+        {
+          "instance_id": "5330",
+          "original": [
+            -0.4188214862790195,
+            1.9077037180193976,
+            -0.14660275636601325,
+            4.375952425526344,
+            -0.07951035629088157
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            -0.6480719753506623,
+            1.9077037180193976,
+            -0.14660275636601325,
+            4.017793500905678,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.4252453433313752,
+          "true_label": 1,
+          "confidence": 1.0
+        },
+        {
+          "instance_id": "1348",
+          "original": [
+            0.8802646184602897,
+            1.1251367046126763,
+            1.837736928173206,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            0.8802646184602897,
+            1.1251367046126763,
+            0.7579993801761268,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 1.0797375479970794,
+          "true_label": 1,
+          "confidence": 1.0
+        },
+        {
+          "instance_id": "3547",
+          "original": [
+            0.4981804700075517,
+            1.9077037180193976,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            1.168541547783202
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            0.4981804700075517,
+            1.516420211316037,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            1.168541547783202
+          ],
+          "cf_distance": 0.39128350670336065,
+          "true_label": 1,
+          "confidence": 0.8648648648648649
+        },
+        {
+          "instance_id": "4172",
+          "original": [
+            1.8736834044374084,
+            1.516420211316037,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "prediction": 1,
+          "counterfactual": [
+            1.7972665747468608,
+            1.516420211316037,
+            -0.14660275636601325,
+            -0.22163866807363142,
+            -0.07951035629088157
+          ],
+          "cf_distance": 0.07641682969054764,
+          "true_label": 1,
+          "confidence": 0.6170212765957447
+        }
+      ],
+      "generation_time": 0.0935821533203125,
+      "method": "counterfactual",
+      "info": {
+        "n_explanations": 200,
+        "accuracy": 0.7,
+        "class_coverage": 2,
+        "avg_cf_distance": 0.2475314884827968,
+        "std_cf_distance": 0.41602722231370143,
+        "total_classes": 2,
+        "sampling_strategy": "stratified"
+      }
+    },
+    "model_performance": {
+      "train_accuracy": 0.8404824070620416,
+      "test_accuracy": 0.832587435769932,
+      "train_f1": 0.8246746513383884,
+      "test_f1": 0.8158879753348052,
+      "train_precision": 0.8364889263521135,
+      "test_precision": 0.8263642948001589,
+      "train_recall": 0.8404824070620416,
+      "test_recall": 0.832587435769932,
+      "overfitting_gap": 0.007894971292109587,
+      "overfitting_severity": "low",
+      "class_accuracies": [
+        0.957845950121386,
+        0.45472703062583225
+      ],
+      "n_classes": 2,
+      "n_train_samples": 24129,
+      "n_test_samples": 6033,
+      "training_time": 0.32595038414001465,
+      "model_complexity": {
+        "n_parameters": 13,
+        "model_size_bytes": 48,
+        "model_size_mb": 4.57763671875e-05,
+        "complexity_level": "simple"
+      }
+    },
+    "validation_status": true,
+    "used_tuned_params": false
+  }
+}

@@ -1,0 +1,1036 @@
+{
+  "iteration_info": {
+    "iteration_number": 33,
+    "timestamp": "2025-08-11T20:15:07.411987",
+    "iteration_key": "compas_gradient_boosting_lime",
+    "filename": "iteration_0033_20250811_201507.json",
+    "folder_path": "results\\iterations\\iterations\\compas\\gradient\\boosting_lime"
+  },
+  "experiment_info": {
+    "config": {
+      "data": {
+        "tabular_datasets": [
+          {
+            "name": "adult_income",
+            "source": "uci",
+            "description": "Adult Income (UCI) - Binary classification, well-known interpretable baseline dataset",
+            "mandatory": true
+          },
+          {
+            "name": "compas",
+            "source": "custom",
+            "description": "COMPAS - Binary classification, real-world socially sensitive dataset",
+            "mandatory": true
+          },
+          {
+            "name": "iris",
+            "source": "sklearn",
+            "description": "Iris flower classification dataset",
+            "mandatory": false
+          },
+          {
+            "name": "breast_cancer",
+            "source": "sklearn",
+            "description": "Breast cancer diagnosis dataset",
+            "mandatory": false
+          },
+          {
+            "name": "diabetes",
+            "source": "sklearn",
+            "description": "Diabetes prediction dataset",
+            "mandatory": false
+          }
+        ],
+        "image_datasets": [
+          {
+            "name": "mnist",
+            "source": "torchvision",
+            "description": "MNIST - Multiclass classification, standard for image classification and attributions",
+            "mandatory": true
+          },
+          {
+            "name": "cifar10",
+            "source": "torchvision",
+            "description": "Color image classification dataset",
+            "mandatory": false
+          }
+        ],
+        "text_datasets": [
+          {
+            "name": "imdb",
+            "source": "huggingface",
+            "description": "IMDB Movie Reviews - Binary sentiment classification, common NLP task for text explanation methods",
+            "mandatory": true
+          },
+          {
+            "name": "20newsgroups",
+            "source": "sklearn",
+            "description": "News article classification dataset",
+            "mandatory": false
+          }
+        ]
+      },
+      "validation": {
+        "class_imbalance_ratio": 0.2,
+        "min_dataset_size": 100,
+        "min_test_size": 10,
+        "max_missing_ratio": 0.3,
+        "outlier_threshold": 3.0,
+        "feature_correlation_threshold": 0.95,
+        "min_features": 2,
+        "max_features": 1000,
+        "max_skewness": 3.0,
+        "max_outlier_ratio": 0.1
+      },
+      "hyperparameter_tuning": {
+        "cv_folds": 5,
+        "scoring": "accuracy",
+        "n_jobs": -1,
+        "verbose": 1,
+        "optimization_method": "grid_search",
+        "n_trials": 100,
+        "timeout": 3600,
+        "save_best_params": true,
+        "save_all_results": true,
+        "parameter_grids": {
+          "decision_tree": {
+            "max_depth": [
+              3,
+              5,
+              7,
+              10,
+              "None"
+            ],
+            "min_samples_split": [
+              2,
+              5,
+              10
+            ],
+            "min_samples_leaf": [
+              1,
+              2,
+              4
+            ],
+            "criterion": [
+              "gini",
+              "entropy"
+            ]
+          },
+          "random_forest": {
+            "n_estimators": [
+              50,
+              100,
+              200
+            ],
+            "max_depth": [
+              5,
+              10,
+              15,
+              "None"
+            ],
+            "min_samples_split": [
+              2,
+              5,
+              10
+            ],
+            "max_features": [
+              "sqrt",
+              "log2",
+              "None"
+            ]
+          },
+          "gradient_boosting": {
+            "n_estimators": [
+              50,
+              100,
+              200
+            ],
+            "learning_rate": [
+              0.01,
+              0.1,
+              0.2
+            ],
+            "max_depth": [
+              3,
+              5,
+              7
+            ],
+            "subsample": [
+              0.8,
+              0.9,
+              1.0
+            ]
+          },
+          "mlp": {
+            "hidden_layer_sizes": [
+              "(50",
+              ")",
+              "(100",
+              ")",
+              "(50",
+              "50)"
+            ],
+            "activation": [
+              "relu",
+              "tanh"
+            ],
+            "alpha": [
+              0.0001,
+              0.001,
+              0.01
+            ],
+            "max_iter": [
+              500,
+              1000
+            ]
+          }
+        }
+      },
+      "models": {
+        "models_to_train": [
+          "decision_tree",
+          "random_forest",
+          "gradient_boosting",
+          "mlp"
+        ],
+        "tabular": [
+          {
+            "name": "decision_tree",
+            "description": "Decision Tree Classifier",
+            "library": "sklearn"
+          },
+          {
+            "name": "random_forest",
+            "description": "Random Forest Classifier",
+            "library": "sklearn"
+          },
+          {
+            "name": "gradient_boosting",
+            "description": "Gradient Boosting Classifier",
+            "library": "sklearn"
+          },
+          {
+            "name": "mlp",
+            "description": "Multi-layer Perceptron",
+            "library": "sklearn"
+          }
+        ],
+        "image": [
+          {
+            "name": "cnn",
+            "description": "Convolutional Neural Network",
+            "library": "pytorch"
+          },
+          {
+            "name": "vit",
+            "description": "Vision Transformer",
+            "library": "pytorch"
+          }
+        ],
+        "text": [
+          {
+            "name": "bert",
+            "description": "BERT-based classifier (simplified)",
+            "library": "sklearn"
+          },
+          {
+            "name": "lstm",
+            "description": "LSTM-based classifier (simplified)",
+            "library": "sklearn"
+          }
+        ]
+      },
+      "explanations": {
+        "feature_attribution": [
+          {
+            "name": "shap",
+            "description": "SHAP (SHapley Additive exPlanations)",
+            "library": "shap"
+          },
+          {
+            "name": "lime",
+            "description": "LIME (Local Interpretable Model-agnostic Explanations)",
+            "library": "lime"
+          },
+          {
+            "name": "integrated_gradients",
+            "description": "Integrated Gradients",
+            "library": "captum"
+          }
+        ],
+        "example_based": [
+          {
+            "name": "prototype",
+            "description": "Prototype-based explanations",
+            "library": "custom"
+          },
+          {
+            "name": "counterfactual",
+            "description": "Counterfactual explanations",
+            "library": "alibi"
+          }
+        ],
+        "concept_based": [
+          {
+            "name": "tcav",
+            "description": "TCAV (Testing with Concept Activation Vectors)",
+            "library": "custom"
+          },
+          {
+            "name": "concept_bottleneck",
+            "description": "Concept Bottleneck Models",
+            "library": "custom"
+          }
+        ],
+        "perturbation": [
+          {
+            "name": "occlusion",
+            "description": "Occlusion-based explanations",
+            "library": "captum"
+          },
+          {
+            "name": "feature_ablation",
+            "description": "Feature ablation explanations",
+            "library": "captum"
+          }
+        ]
+      },
+      "evaluation": {
+        "fidelity": [
+          {
+            "name": "faithfulness",
+            "description": "How well explanations reflect model behavior"
+          },
+          {
+            "name": "monotonicity",
+            "description": "Consistency of explanation with model predictions"
+          },
+          {
+            "name": "completeness",
+            "description": "Coverage of explanation across features"
+          }
+        ],
+        "time_complexity": [
+          {
+            "name": "explanation_time",
+            "description": "Time taken to generate explanations"
+          },
+          {
+            "name": "training_time",
+            "description": "Time taken to train the model"
+          }
+        ],
+        "stability": [
+          {
+            "name": "consistency",
+            "description": "Consistency of explanations across similar inputs"
+          },
+          {
+            "name": "robustness",
+            "description": "Robustness to small input perturbations"
+          }
+        ],
+        "comprehensibility": [
+          {
+            "name": "sparsity",
+            "description": "Sparsity of explanations"
+          },
+          {
+            "name": "simplicity",
+            "description": "Simplicity of explanation structure"
+          }
+        ]
+      },
+      "experiment": {
+        "preprocessing": {
+          "test_size": 0.2,
+          "random_state": 42,
+          "scale_features": true,
+          "handle_missing": true
+        },
+        "data_splitting": {
+          "default_strategy": "stratified",
+          "test_size": 0.2,
+          "validation_size": 0.1,
+          "random_state": 42,
+          "stratify": true,
+          "shuffle": true,
+          "n_splits": 5,
+          "n_repeats": 3,
+          "time_column": null,
+          "gap": 0,
+          "group_column": null,
+          "min_samples_per_class": 2,
+          "max_imbalance_ratio": 0.3,
+          "strategies": {
+            "stratified": {
+              "description": "Maintains class distribution across splits",
+              "supports_validation": true,
+              "supports_cv": true
+            },
+            "time_based": {
+              "description": "Time-based splits for temporal data",
+              "supports_validation": false,
+              "supports_cv": false,
+              "requires_time_column": true
+            },
+            "cross_validation": {
+              "description": "K-fold cross-validation",
+              "supports_validation": false,
+              "supports_cv": true,
+              "cv_types": [
+                "stratified_kfold",
+                "kfold",
+                "leave_one_out",
+                "stratified_shuffle_split"
+              ]
+            },
+            "group_based": {
+              "description": "Group-based splits (e.g., by patient, subject)",
+              "supports_validation": false,
+              "supports_cv": false,
+              "requires_group_column": true
+            },
+            "custom": {
+              "description": "Custom split strategies",
+              "supports_validation": true,
+              "supports_cv": true
+            },
+            "holdout": {
+              "description": "Simple holdout split",
+              "supports_validation": true,
+              "supports_cv": false
+            }
+          }
+        },
+        "training": {
+          "max_iter": 1000,
+          "early_stopping": true,
+          "validation_split": 0.1
+        },
+        "explanation": {
+          "num_samples": 100,
+          "max_features": 10,
+          "random_state": 42
+        },
+        "evaluation": {
+          "num_runs": 5,
+          "confidence_level": 0.95,
+          "significance_level": 0.05,
+          "multiple_comparison_correction": "bonferroni",
+          "statistical_tests": [
+            "t_test",
+            "mann_whitney",
+            "wilcoxon",
+            "anova",
+            "kruskal_wallis",
+            "friedman"
+          ],
+          "effect_size_calculation": true,
+          "power_analysis": true,
+          "correlation_analysis": true
+        }
+      },
+      "output": {
+        "results_dir": "results",
+        "save_models": true,
+        "save_explanations": true,
+        "generate_plots": true,
+        "save_reports": true
+      },
+      "logging": {
+        "level": "INFO",
+        "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        "file": "benchmark.log"
+      }
+    },
+    "benchmark_timestamp": "2025-08-11 20:13:07"
+  },
+  "result_data": {
+    "dataset": "compas",
+    "model": "gradient_boosting",
+    "explanation_method": "lime",
+    "evaluation_results": {
+      "time_complexity": 0.012746982574462891,
+      "faithfulness": 0.3239976460880559,
+      "monotonicity": 0.26448139757522676,
+      "completeness": 0.3999999999999999,
+      "stability": 0.2360086500792803,
+      "consistency": 0.6940261412929782,
+      "sparsity": 0.6000000000000001,
+      "simplicity": 0.49795645248344783
+    },
+    "explanation_results": {
+      "explanations": [
+        {
+          "instance_id": 0,
+          "feature_importance": "[0.04219918 0.14314412 0.8146567 ]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "0",
+          "true_label": "1"
+        },
+        {
+          "instance_id": 1,
+          "feature_importance": "[0.16139609 0.01268222 0.82592168]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "0",
+          "true_label": "0"
+        },
+        {
+          "instance_id": 2,
+          "feature_importance": "[0.08622336 0.26011534 0.6536613 ]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "1",
+          "true_label": "1"
+        },
+        {
+          "instance_id": 3,
+          "feature_importance": "[0.58446933 0.03157895 0.38395172]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "1",
+          "true_label": "1"
+        },
+        {
+          "instance_id": 4,
+          "feature_importance": "[0.6478333  0.27988779 0.07227891]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "1",
+          "true_label": "1"
+        },
+        {
+          "instance_id": 5,
+          "feature_importance": "[0.30079449 0.09219624 0.60700928]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "1",
+          "true_label": "0"
+        },
+        {
+          "instance_id": 6,
+          "feature_importance": "[0.06628208 0.1057675  0.82795041]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "0",
+          "true_label": "0"
+        },
+        {
+          "instance_id": 7,
+          "feature_importance": "[0. 0. 1.]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "0",
+          "true_label": "0"
+        },
+        {
+          "instance_id": 8,
+          "feature_importance": "[0.06325458 0.01937242 0.917373  ]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "0",
+          "true_label": "0"
+        },
+        {
+          "instance_id": 9,
+          "feature_importance": "[0. 0. 0.]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "1",
+          "true_label": "1"
+        },
+        {
+          "instance_id": 10,
+          "feature_importance": "[0.0804503  0.02459946 0.89495025]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "0",
+          "true_label": "1"
+        },
+        {
+          "instance_id": 11,
+          "feature_importance": "[0.5778772  0.1310229  0.29109991]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "1",
+          "true_label": "0"
+        },
+        {
+          "instance_id": 12,
+          "feature_importance": "[0.30369208 0.17933378 0.51697414]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "1",
+          "true_label": "0"
+        },
+        {
+          "instance_id": 13,
+          "feature_importance": "[0.07757285 0.87723261 0.04519454]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "0",
+          "true_label": "1"
+        },
+        {
+          "instance_id": 14,
+          "feature_importance": "[0.         0.00581535 0.99418465]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "0",
+          "true_label": "0"
+        },
+        {
+          "instance_id": 15,
+          "feature_importance": "[0.30974719 0.49869851 0.1915543 ]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "1",
+          "true_label": "0"
+        },
+        {
+          "instance_id": 16,
+          "feature_importance": "[0. 0. 1.]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "1",
+          "true_label": "0"
+        },
+        {
+          "instance_id": 17,
+          "feature_importance": "[0.23098514 0.05941595 0.70959891]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "0",
+          "true_label": "0"
+        },
+        {
+          "instance_id": 18,
+          "feature_importance": "[0.02021602 0.01511312 0.96467086]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "0",
+          "true_label": "0"
+        },
+        {
+          "instance_id": 19,
+          "feature_importance": "[0.10087619 0.07417922 0.8249446 ]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "1",
+          "true_label": "0"
+        },
+        {
+          "instance_id": 20,
+          "feature_importance": "[0. 0. 0.]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "1",
+          "true_label": "0"
+        },
+        {
+          "instance_id": 21,
+          "feature_importance": "[0.09562288 0.30845414 0.59592298]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "1",
+          "true_label": "1"
+        },
+        {
+          "instance_id": 22,
+          "feature_importance": "[0.05073556 0.28669534 0.6625691 ]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "1",
+          "true_label": "0"
+        },
+        {
+          "instance_id": 23,
+          "feature_importance": "[0.04367164 0.08477817 0.87155018]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "1",
+          "true_label": "1"
+        },
+        {
+          "instance_id": 24,
+          "feature_importance": "[0.15156571 0.64659295 0.20184134]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "1",
+          "true_label": "1"
+        },
+        {
+          "instance_id": 25,
+          "feature_importance": "[0.10758398 0.13282089 0.75959513]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "0",
+          "true_label": "0"
+        },
+        {
+          "instance_id": 26,
+          "feature_importance": "[0.50514406 0.49085158 0.00400436]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "0",
+          "true_label": "1"
+        },
+        {
+          "instance_id": 27,
+          "feature_importance": "[0.12690682 0.1026936  0.77039957]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "0",
+          "true_label": "0"
+        },
+        {
+          "instance_id": 28,
+          "feature_importance": "[0.14647028 0.15961916 0.69391056]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "1",
+          "true_label": "0"
+        },
+        {
+          "instance_id": 29,
+          "feature_importance": "[0.37786292 0.02516875 0.59696833]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "1",
+          "true_label": "1"
+        },
+        {
+          "instance_id": 30,
+          "feature_importance": "[0.00929791 0.03396393 0.95673816]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "1",
+          "true_label": "1"
+        },
+        {
+          "instance_id": 31,
+          "feature_importance": "[0.02323232 0.44466089 0.53210678]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "0",
+          "true_label": "0"
+        },
+        {
+          "instance_id": 32,
+          "feature_importance": "[0. 0. 0.]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "1",
+          "true_label": "1"
+        },
+        {
+          "instance_id": 33,
+          "feature_importance": "[0. 0. 0.]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "1",
+          "true_label": "1"
+        },
+        {
+          "instance_id": 34,
+          "feature_importance": "[0.16853681 0.05430398 0.77715921]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "0",
+          "true_label": "1"
+        },
+        {
+          "instance_id": 35,
+          "feature_importance": "[0.14994443 0.4936893  0.35636627]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "1",
+          "true_label": "0"
+        },
+        {
+          "instance_id": 36,
+          "feature_importance": "[0.08010381 0.30964038 0.61025582]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "1",
+          "true_label": "0"
+        },
+        {
+          "instance_id": 37,
+          "feature_importance": "[0.1268805  0.13576351 0.73735599]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "0",
+          "true_label": "0"
+        },
+        {
+          "instance_id": 38,
+          "feature_importance": "[0.08530382 0.07799412 0.83670206]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "0",
+          "true_label": "1"
+        },
+        {
+          "instance_id": 39,
+          "feature_importance": "[0.15973317 0.30662023 0.5336466 ]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "1",
+          "true_label": "1"
+        },
+        {
+          "instance_id": 40,
+          "feature_importance": "[0.38733413 0.04531191 0.56735396]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "1",
+          "true_label": "0"
+        },
+        {
+          "instance_id": 41,
+          "feature_importance": "[0.05153386 0.14577724 0.8026889 ]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "0",
+          "true_label": "0"
+        },
+        {
+          "instance_id": 42,
+          "feature_importance": "[0. 0. 0.]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "0",
+          "true_label": "1"
+        },
+        {
+          "instance_id": 43,
+          "feature_importance": "[0.03979562 0.20226515 0.75793923]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "0",
+          "true_label": "0"
+        },
+        {
+          "instance_id": 44,
+          "feature_importance": "[0.17137555 0.08753157 0.74109288]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "0",
+          "true_label": "0"
+        },
+        {
+          "instance_id": 45,
+          "feature_importance": "[0.17320393 0.07156241 0.75523366]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "0",
+          "true_label": "0"
+        },
+        {
+          "instance_id": 46,
+          "feature_importance": "[0.08050365 0.09656957 0.82292677]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "0",
+          "true_label": "0"
+        },
+        {
+          "instance_id": 47,
+          "feature_importance": "[0.61851789 0.03947368 0.34200843]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "1",
+          "true_label": "0"
+        },
+        {
+          "instance_id": 48,
+          "feature_importance": "[0.01594962 0.14233963 0.84171075]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "0",
+          "true_label": "1"
+        },
+        {
+          "instance_id": 49,
+          "feature_importance": "[0.6221195  0.01726719 0.36061331]",
+          "feature_names": [
+            "age",
+            "priors_count",
+            "days_b_screening_arrest"
+          ],
+          "prediction": "0",
+          "true_label": "0"
+        }
+      ],
+      "generation_time": 0.6373491287231445,
+      "method": "lime",
+      "info": {
+        "n_explanations": 50,
+        "feature_names": [
+          "age",
+          "priors_count",
+          "days_b_screening_arrest"
+        ]
+      }
+    },
+    "model_performance": {
+      "accuracy": 0.695079695079695,
+      "precision": 0.6940836658687988,
+      "recall": 0.695079695079695,
+      "f1_score": 0.6924033237575048
+    },
+    "validation_status": false,
+    "used_tuned_params": false
+  }
+}
