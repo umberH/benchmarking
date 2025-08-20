@@ -22,117 +22,134 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for Claude Artifacts-style layout
+# Claude Artifacts-style CSS
 st.markdown("""
 <style>
-    /* Main container and layout */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    
+    /* Main theme inspired by Claude Artifacts */
     .main-header {
-        font-size: 2.8rem;
-        color: #2c3e50;
-        text-align: center;
-        margin-bottom: 2rem;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        font-size: 3rem;
         font-weight: 700;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #1a1a1a;
+        text-align: center;
+        margin: 2rem 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
+        text-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
     }
     
-    /* Card-based layout */
+    /* Card components with Claude-style design */
     .metric-card {
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
         padding: 1.5rem;
-        border-radius: 12px;
-        border: none;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-        margin: 0.5rem 0;
-        transition: transform 0.2s;
+        border-radius: 16px;
+        border: 1px solid rgba(226, 232, 240, 0.6);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        margin: 0.75rem 0;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
     }
     
     .metric-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        border-color: rgba(102, 126, 234, 0.3);
     }
     
-    /* Status indicators */
-    .success-box {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    /* Status indicators with gradients */
+    .success-indicator {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         color: white;
-        border: none;
+        padding: 0.5rem 1rem;
         border-radius: 12px;
-        padding: 1.2rem;
-        margin: 1rem 0;
-        box-shadow: 0 4px 6px rgba(102, 126, 234, 0.25);
+        font-weight: 600;
+        box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
     }
     
-    .warning-box {
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    .warning-indicator {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
         color: white;
-        border: none;
+        padding: 0.5rem 1rem;
         border-radius: 12px;
-        padding: 1.2rem;
-        margin: 1rem 0;
-        box-shadow: 0 4px 6px rgba(245, 87, 108, 0.25);
+        font-weight: 600;
+        box-shadow: 0 4px 8px rgba(245, 158, 11, 0.3);
     }
     
-    .info-box {
-        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    .info-indicator {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
         color: white;
-        border: none;
+        padding: 0.5rem 1rem;
         border-radius: 12px;
-        padding: 1.2rem;
-        margin: 1rem 0;
-        box-shadow: 0 4px 6px rgba(79, 172, 254, 0.25);
+        font-weight: 600;
+        box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
     }
     
-    /* Tab styling */
+    /* Enhanced tab styling */
     .stTabs [data-baseweb="tab-list"] {
-        gap: 8px;
-        background-color: #f8f9fa;
-        border-radius: 12px;
-        padding: 4px;
+        gap: 4px;
+        background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+        border-radius: 16px;
+        padding: 8px;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
     }
     
     .stTabs [data-baseweb="tab"] {
-        border-radius: 8px;
-        padding: 8px 16px;
+        height: auto;
+        padding: 12px 20px;
+        border-radius: 12px;
+        font-family: 'Inter', sans-serif;
         font-weight: 500;
-        transition: all 0.2s;
+        font-size: 0.95rem;
+        border: none;
+        background: transparent;
+        color: #64748b;
+        transition: all 0.2s ease;
     }
     
     .stTabs [aria-selected="true"] {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        color: white !important;
+        box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+        transform: translateY(-1px);
     }
     
-    /* Sidebar styling */
+    /* Sidebar enhancements */
     .css-1d391kg {
-        background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
+        background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+        border-right: 1px solid rgba(226, 232, 240, 0.8);
     }
     
-    /* Button styling */
+    /* Button styling with Claude aesthetics */
     .stButton > button {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
         border: none;
-        border-radius: 8px;
-        padding: 0.5rem 1rem;
-        font-weight: 500;
-        transition: all 0.2s;
-        box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+        border-radius: 12px;
+        padding: 0.75rem 1.5rem;
+        font-family: 'Inter', sans-serif;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
     }
     
     .stButton > button:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
+        background: linear-gradient(135deg, #5a67d8 0%, #667eea 100%);
     }
     
-    /* Selectbox and input styling */
+    /* Input and select styling */
     .stSelectbox > div > div {
-        border-radius: 8px;
-        border: 2px solid #e9ecef;
-        transition: border-color 0.2s;
+        background: white;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        transition: all 0.2s ease;
+        font-family: 'Inter', sans-serif;
     }
     
     .stSelectbox > div > div:focus-within {
@@ -140,240 +157,202 @@ st.markdown("""
         box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
     }
     
-    /* Metrics styling */
+    /* Metric containers with modern design */
     [data-testid="metric-container"] {
-        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-        border: 1px solid #e9ecef;
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        border: 1px solid rgba(226, 232, 240, 0.6);
+        padding: 1.5rem;
+        border-radius: 16px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+        transition: all 0.2s ease;
+    }
+    
+    [data-testid="metric-container"]:hover {
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        transform: translateY(-1px);
+    }
+    
+    /* Chart containers with glass morphism */
+    .js-plotly-plot {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 16px;
+        border: 1px solid rgba(226, 232, 240, 0.5);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(10px);
+        overflow: hidden;
+        margin: 1rem 0;
+    }
+    
+    /* Custom alert styles */
+    .success-alert {
+        background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+        border: 1px solid #a7f3d0;
+        color: #065f46;
         padding: 1rem;
         border-radius: 12px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        margin: 1rem 0;
     }
     
-    /* Chart containers */
-    .js-plotly-plot {
+    .warning-alert {
+        background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+        border: 1px solid #fcd34d;
+        color: #92400e;
+        padding: 1rem;
         border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        margin: 1rem 0;
     }
     
-    /* Hide Streamlit branding */
+    .error-alert {
+        background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+        border: 1px solid #fca5a5;
+        color: #991b1b;
+        padding: 1rem;
+        border-radius: 12px;
+        margin: 1rem 0;
+    }
+    
+    /* Hide default Streamlit elements for cleaner look */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
-    .stDeployButton {display:none;}
+    .stDeployButton {display: none;}
     
-    /* Custom gradient backgrounds for different sections */
-    .overview-section {
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 8px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 2rem;
-        border-radius: 16px;
-        margin: 1rem 0;
+        border-radius: 8px;
     }
     
-    .analysis-section {
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        color: white;
-        padding: 2rem;
-        border-radius: 16px;
-        margin: 1rem 0;
+    ::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(135deg, #5a67d8 0%, #667eea 100%);
     }
     
-    .performance-section {
-        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        color: white;
-        padding: 2rem;
-        border-radius: 16px;
-        margin: 1rem 0;
+    /* Animation for loading states */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .fade-in {
+        animation: fadeIn 0.5s ease-out;
     }
 </style>
 """, unsafe_allow_html=True)
 
-def main():
-    # Header
-    st.markdown('<h1 class="main-header">📊 XAI Benchmarking Dashboard</h1>', unsafe_allow_html=True)
+def show_success(message: str):
+    """Display a success message with Claude Artifacts styling"""
+    st.markdown(f'<div class="success-alert">{message}</div>', unsafe_allow_html=True)
 
-@st.cache_data
-def load_benchmark_results(file_path: str = "results/benchmark_results.json") -> Dict[str, Any]:
-    """Load benchmark results from JSON file"""
-    try:
-        with open(file_path, "r") as f:
-            return json.load(f)
-    except Exception as e:
-        return {}
+def show_warning(message: str):
+    """Display a warning message with Claude Artifacts styling"""
+    st.markdown(f'<div class="warning-alert">{message}</div>', unsafe_allow_html=True)
 
-@st.cache_data
-def discover_available_runs() -> Dict[str, Dict[str, Any]]:
-    """Discover all available benchmark runs and data sources"""
-    available_runs = {}
+def show_error(message: str):
+    """Display an error message with Claude Artifacts styling"""
+    st.markdown(f'<div class="error-alert">{message}</div>', unsafe_allow_html=True)
+
+def show_info(message: str):
+    """Display an info message with Claude Artifacts styling"""
+    st.markdown(f'<div class="info-indicator">{message}</div>', unsafe_allow_html=True)
+
+def parse_feature_importance(importance_data):
+    """Parse feature importance from various formats"""
+    if importance_data is None:
+        return []
     
-    # Check new run-based structure first
-    runs_dir = Path("results/runs")
-    if runs_dir.exists():
-        for run_dir in runs_dir.iterdir():
-            if run_dir.is_dir() and run_dir.name.startswith('run_'):
-                # Try to load run metadata
-                metadata_file = run_dir / "run_metadata.json"
-                if metadata_file.exists():
-                    try:
-                        with open(metadata_file, "r") as f:
-                            metadata = json.load(f)
-                        
-                        # Load benchmark results from run
-                        results_file = run_dir / "benchmark_results.json"
-                        if results_file.exists():
-                            with open(results_file, "r") as f:
-                                data = json.load(f)
-                            
-                            run_display_name = f"{metadata['run_name']} ({metadata['run_type']})"
-                            available_runs[run_display_name] = {
-                                "path": str(results_file),
-                                "type": metadata['run_type'],
-                                "data": data,
-                                "timestamp": metadata['timestamp'],
-                                "combinations": len(data.get("comprehensive_results", [])),
-                                "description": f"{metadata['run_type'].title()} run from {metadata['timestamp'][:8]}",
-                                "run_metadata": metadata
-                            }
-                    except Exception as e:
-                        continue
-                
-                # Fallback: try to load benchmark results without metadata
-                else:
-                    results_file = run_dir / "benchmark_results.json"
-                    if results_file.exists():
-                        try:
-                            with open(results_file, "r") as f:
-                                data = json.load(f)
-                            
-                            run_display_name = f"{run_dir.name} (legacy)"
-                            available_runs[run_display_name] = {
-                                "path": str(results_file),
-                                "type": "unknown",
-                                "data": data,
-                                "timestamp": data.get("experiment_info", {}).get("timestamp", "Unknown"),
-                                "combinations": len(data.get("comprehensive_results", [])),
-                                "description": f"Legacy run in {run_dir.name}"
-                            }
-                        except Exception:
-                            continue
+    # If it's already a list
+    if isinstance(importance_data, list):
+        return importance_data
     
-    # Check main benchmark results (legacy location)
-    main_results_path = Path("results/benchmark_results.json")
-    if main_results_path.exists():
+    # If it's a numpy array
+    if hasattr(importance_data, 'tolist'):
+        return importance_data.tolist()
+    
+    # If it's a string representation
+    if isinstance(importance_data, str):
+        # Handle string representations like "[0. 1. 0. 0. 0.]"
         try:
-            with open(main_results_path, "r") as f:
-                data = json.load(f)
-                available_runs["Legacy Main Results"] = {
-                    "path": str(main_results_path),
-                    "type": "legacy",
-                    "data": data,
-                    "timestamp": data.get("experiment_info", {}).get("timestamp", "Unknown"),
-                    "combinations": len(data.get("comprehensive_results", [])),
-                    "description": "Legacy main benchmark results (pre-run organization)"
-                }
-        except Exception as e:
-            pass
-    
-    # Check comprehensive reports (additional sources)
-    results_dir = Path("results")
-    if results_dir.exists():
-        for results_file in results_dir.glob("*_results.json"):
-            if results_file.name != "benchmark_results.json":
+            import ast
+            import re
+            
+            # Clean the string
+            cleaned = importance_data.strip()
+            
+            # Remove extra brackets and whitespace
+            cleaned = re.sub(r'^\[|\]$', '', cleaned)
+            
+            # Split by whitespace and convert to floats
+            values = []
+            for val in cleaned.split():
                 try:
-                    with open(results_file, "r") as f:
+                    values.append(float(val))
+                except ValueError:
+                    continue
+            
+            if values:
+                return values
+            
+            # Try ast.literal_eval as fallback
+            return ast.literal_eval(importance_data)
+        
+        except Exception:
+            try:
+                # Last resort: eval (careful with security)
+                return eval(importance_data)
+            except:
+                return []
+    
+    # Try to convert single values
+    try:
+        return [float(importance_data)]
+    except:
+        return []
+
+@st.cache_data
+def discover_available_experiments() -> Dict[str, Dict[str, Any]]:
+    """Discover all available experiment folders"""
+    experiments = {}
+    results_dir = Path("results")
+    
+    # Look for experiment_* folders
+    for exp_dir in results_dir.glob("experiment_*"):
+        if exp_dir.is_dir():
+            # Try to load benchmark results from the experiment folder
+            benchmark_file = exp_dir / "benchmark_results.json"
+            if benchmark_file.exists():
+                try:
+                    with open(benchmark_file, "r", encoding='utf-8') as f:
                         data = json.load(f)
-                        run_name = results_file.stem.replace("_", " ").title()
-                        available_runs[run_name] = {
-                            "path": str(results_file),
-                            "type": "comprehensive",
-                            "data": data,
-                            "timestamp": data.get("experiment_info", {}).get("timestamp", "Unknown"),
-                            "combinations": len(data.get("evaluation_results", {})),
-                            "description": f"Results from {run_name.lower()}"
-                        }
-                except Exception:
+                    
+                    # Extract timestamp from folder name
+                    timestamp = exp_dir.name.replace("experiment_", "")
+                    
+                    experiments[exp_dir.name] = {
+                        "path": str(benchmark_file),
+                        "data": data,
+                        "timestamp": timestamp,
+                        "folder": str(exp_dir),
+                        "display_name": f"Experiment {timestamp[:8]} {timestamp[9:15]}",
+                        "comprehensive_results_count": len(data.get("comprehensive_results", [])),
+                        "description": f"Comprehensive experiment from {timestamp[:8]}"
+                    }
+                except Exception as e:
                     continue
     
-    # Check iteration files for additional runs
-    iteration_dir = Path("results/iterations")
-    if iteration_dir.exists():
-        iteration_files = sorted(iteration_dir.glob("*.json"))
-        
-        # Group iterations by experiment/timestamp
-        grouped_iterations = {}
-        for file in iteration_files:
-            try:
-                with open(file, "r") as f:
-                    data = json.load(f)
-                
-                # Extract timestamp from filename or data
-                filename_parts = file.stem.split("_")
-                if len(filename_parts) >= 3:
-                    timestamp = f"{filename_parts[1]}_{filename_parts[2]}"
-                    dataset = filename_parts[3] if len(filename_parts) > 3 else "unknown"
-                    model = filename_parts[4] if len(filename_parts) > 4 else "unknown"
-                    method = "_".join(filename_parts[5:]) if len(filename_parts) > 5 else "unknown"
-                    
-                    run_key = f"Experiment {timestamp}"
-                    
-                    if run_key not in grouped_iterations:
-                        grouped_iterations[run_key] = {
-                            "iterations": [],
-                            "timestamp": timestamp,
-                            "datasets": set(),
-                            "models": set(),
-                            "methods": set()
-                        }
-                    
-                    grouped_iterations[run_key]["iterations"].append({
-                        "file": file,
-                        "data": data,
-                        "dataset": dataset,
-                        "model": model,
-                        "method": method
-                    })
-                    grouped_iterations[run_key]["datasets"].add(dataset)
-                    grouped_iterations[run_key]["models"].add(model)
-                    grouped_iterations[run_key]["methods"].add(method)
-                    
-            except Exception:
-                continue
-        
-        # Add grouped iterations as run options
-        for run_name, run_info in grouped_iterations.items():
-            available_runs[run_name] = {
-                "path": "grouped_iterations",
-                "type": "iterations",
-                "data": run_info,
-                "timestamp": run_info["timestamp"],
-                "combinations": len(run_info["iterations"]),
-                "description": f"{len(run_info['iterations'])} iterations across {len(run_info['datasets'])} datasets"
-            }
-    
-    return available_runs
+    return experiments
 
 @st.cache_data
-def load_selected_run_data(run_info: Dict[str, Any]) -> Dict[str, Any]:
-    """Load and process data for selected run"""
-    if run_info["type"] == "comprehensive":
-        return run_info["data"]
-    elif run_info["type"] == "iterations":
-        # Aggregate iteration data into comprehensive format
-        combined_data = {
-            "evaluation_results": {},
-            "experiment_info": {
-                "timestamp": run_info["timestamp"],
-                "total_iterations": len(run_info["data"]["iterations"])
-            }
-        }
-        
-        for iteration in run_info["data"]["iterations"]:
-            key = f"{iteration['dataset']}_{iteration['model']}_{iteration['method']}"
-            combined_data["evaluation_results"][key] = iteration["data"]
-        
-        return combined_data
-    
-    return {}
+def load_experiment_data(experiment_info: Dict[str, Any]) -> Dict[str, Any]:
+    """Load data for selected experiment"""
+    return experiment_info["data"]
 
 def parse_result_key(key: str) -> Dict[str, str]:
     """Parse result key to extract dataset, model, and method"""
@@ -394,56 +373,72 @@ def parse_result_key(key: str) -> Dict[str, str]:
     return {'dataset': dataset, 'model': model, 'method': method}
 
 def create_metrics_dataframe(results: Dict[str, Any]) -> pd.DataFrame:
-    """Create a DataFrame from evaluation results"""
+    """Create a DataFrame from evaluation results (comprehensive format)"""
     metrics_data = []
     
-    # Check for comprehensive_results first (new format)
+    # Handle comprehensive_results format (new experiment format)
     if 'comprehensive_results' in results:
         comprehensive_results = results['comprehensive_results']
         
-        for result in comprehensive_results:
+        # Ensure comprehensive_results is a list
+        if not isinstance(comprehensive_results, list):
+            st.error(f"Expected comprehensive_results to be a list, got {type(comprehensive_results)}")
+            return pd.DataFrame()
+        
+        for i, result in enumerate(comprehensive_results):
+            # Ensure each result is a dictionary
+            if not isinstance(result, dict):
+                st.warning(f"Skipping result {i}: expected dict, got {type(result)}")
+                continue
+                
             evaluation = result.get('evaluations', {})
+            
+            # Ensure evaluation is a dictionary
+            if not isinstance(evaluation, dict):
+                evaluation = {}
             
             # Safely extract metrics with defaults
             row = {
                 'Dataset': result.get('dataset', 'unknown'),
                 'Model': result.get('model', 'unknown'), 
                 'Method': result.get('explanation_method', 'unknown'),
-                'Faithfulness': float(evaluation.get('faithfulness', 0.0)),
-                'Stability': float(evaluation.get('stability', 0.0)),
-                'Completeness': float(evaluation.get('completeness', 0.0)),
-                'Sparsity': float(evaluation.get('sparsity', 0.0)),
-                'Monotonicity': float(evaluation.get('monotonicity', 0.0)),
-                'Consistency': float(evaluation.get('consistency', 0.0)),
-                'Time_Complexity': float(evaluation.get('time_complexity', 0.0)),
-                'Simplicity': float(evaluation.get('simplicity', 0.0))
-            }
-            metrics_data.append(row)
-    
-    # Fallback to old format (evaluation_results)
-    elif 'evaluation_results' in results:
-        for key, metrics in results.get('evaluation_results', {}).items():
-            parsed = parse_result_key(key)
-            row = {
-                'Dataset': parsed['dataset'],
-                'Model': parsed['model'],
-                'Method': parsed['method'],
-                **metrics
+                'faithfulness': float(evaluation.get('faithfulness', 0.0)),
+                'stability': float(evaluation.get('stability', 0.0)),
+                'completeness': float(evaluation.get('completeness', 0.0)),
+                'sparsity': float(evaluation.get('sparsity', 0.0)),
+                'monotonicity': float(evaluation.get('monotonicity', 0.0)),
+                'consistency': float(evaluation.get('consistency', 0.0)),
+                'time_complexity': float(evaluation.get('time_complexity', 0.0)),
+                'simplicity': float(evaluation.get('simplicity', 0.0))
             }
             metrics_data.append(row)
     
     return pd.DataFrame(metrics_data)
 
 def create_explanation_dataframe(results: Dict[str, Any]) -> pd.DataFrame:
-    """Create a DataFrame from explanation results"""
+    """Create a DataFrame from explanation results (comprehensive format)"""
     explanation_data = []
     
-    # Check for comprehensive_results first (new format)
+    # Handle comprehensive_results format (new experiment format)
     if 'comprehensive_results' in results:
         comprehensive_results = results['comprehensive_results']
         
-        for result in comprehensive_results:
+        # Ensure comprehensive_results is a list
+        if not isinstance(comprehensive_results, list):
+            st.error(f"Expected comprehensive_results to be a list, got {type(comprehensive_results)}")
+            return pd.DataFrame()
+        
+        for i, result in enumerate(comprehensive_results):
+            # Ensure each result is a dictionary
+            if not isinstance(result, dict):
+                st.warning(f"Skipping result {i}: expected dict, got {type(result)}")
+                continue
+                
             explanation_info = result.get('explanation_info', {})
+            
+            # Ensure explanation_info is a dictionary
+            if not isinstance(explanation_info, dict):
+                explanation_info = {}
             
             row = {
                 'Dataset': result.get('dataset', 'unknown'),
@@ -455,159 +450,60 @@ def create_explanation_dataframe(results: Dict[str, Any]) -> pd.DataFrame:
             }
             explanation_data.append(row)
     
-    # Fallback to old format
-    elif 'explanation_results' in results:
-        for key, info in results.get('explanation_results', {}).items():
-            parsed = parse_result_key(key)
-            row = {
-                'Dataset': parsed['dataset'],
-                'Model': parsed['model'],
-                'Method': parsed['method'],
-                'Generation Time (s)': info.get('generation_time', 0),
-                'Number of Explanations': info.get('explanation_info', {}).get('n_explanations', 0),
-                'Number of Features': len(info.get('explanation_info', {}).get('feature_names', []))
-            }
-            explanation_data.append(row)
-    
     return pd.DataFrame(explanation_data)
 
 def main():
-    # Header
-    st.markdown('<h1 class="main-header">📊 XAI Benchmarking Dashboard</h1>', unsafe_allow_html=True)
+    # Header with Claude Artifacts styling
+    st.markdown('<h1 class="main-header">XAI Benchmarking Dashboard</h1>', unsafe_allow_html=True)
     
-    # Dashboard Introduction and Quick Actions
-    with st.expander("ℹ️ Dashboard Guide & Quick Actions", expanded=False):
-        col1, col2, col3 = st.columns(3)
-        
-        with col1:
-            st.markdown("### 🚀 Quick Start")
-            st.markdown("""
-            - **📈 Overview**: Experiment summary and key metrics
-            - **🎯 Model Performance**: Model accuracy and performance analysis
-            - **🔍 Explanation Metrics**: XAI method quality evaluation
-            - **📊 Comparative Analysis**: Side-by-side method comparison
-            """)
-        
-        with col2:
-            st.markdown("### 🎨 Advanced Features")
-            st.markdown("""
-            - **🧩 Explanation Visualizations**: Interactive explanation plots
-            - **📑 Detailed Reports**: Individual instance explanations
-            - **🔍 Individual Explanations**: Search and filter specific instances
-            - **📋 Raw Data**: Access to complete datasets
-            """)
-        
-        with col3:
-            st.markdown("### 💡 Tips")
-            st.markdown("""
-            - Use **sidebar filters** to focus on specific combinations
-            - **Export** individual explanations for further analysis
-            - **Compare methods** using the Comparative Analysis tab
-            - **Drill down** to individual instances for detailed insights
-            """)
-        
-        # Quick Status Check
-        st.markdown("---")
-        st.markdown("### 📊 Data Availability Status")
-        
-        # Check what data is available
-        status_cols = st.columns(4)
-        
-        # Check benchmark results
-        results_exists = Path("results/benchmark_results.json").exists()
-        with status_cols[0]:
-            status = "✅ Available" if results_exists else "❌ Missing"
-            st.metric("Benchmark Results", status)
-        
-        # Check iterations
-        iterations_dir = Path("results/iterations")
-        iterations_count = len(list(iterations_dir.glob("*.json"))) if iterations_dir.exists() else 0
-        with status_cols[1]:
-            st.metric("Iteration Files", f"{iterations_count} files")
-        
-        # Check detailed explanations
-        detailed_dir = Path("results/detailed_explanations")
-        detailed_combinations = 0
-        if detailed_dir.exists():
-            for dataset_dir in detailed_dir.iterdir():
-                if dataset_dir.is_dir():
-                    for model_dir in dataset_dir.iterdir():
-                        if model_dir.is_dir():
-                            detailed_combinations += len(list(model_dir.glob("*_detailed_explanations.json")))
-        
-        with status_cols[2]:
-            st.metric("Detailed Explanations", f"{detailed_combinations} combinations")
-        
-        # Check comprehensive report
-        comprehensive_exists = Path("results/comprehensive_report.md").exists()
-        with status_cols[3]:
-            status = "✅ Available" if comprehensive_exists else "❌ Missing"
-            st.metric("Comprehensive Report", status)
-        
-        if not any([results_exists, iterations_count > 0, detailed_combinations > 0]):
-            st.warning("⚠️ No benchmark data found. Please run benchmarking first with: `python main.py --comprehensive`")
+    # Welcome section with quick stats
+    col1, col2, col3 = st.columns(3)
+    with col2:
+        st.markdown("""
+        <div class="metric-card" style="text-align: center;">
+            <h3 style="color: #667eea; margin: 0;">Welcome to XAI Analysis</h3>
+            <p style="color: #64748b; margin: 0.5rem 0;">Explore explainable AI methods across datasets and models</p>
+        </div>
+        """, unsafe_allow_html=True)
     
-    # Sidebar for run selection and filters
-    st.sidebar.header("🎯 Run Selection")
+    # Sidebar for experiment selection
+    st.sidebar.header("Experiment Selection")
     
-    # Discover available runs
-    available_runs = discover_available_runs()
+    # Discover available experiments
+    available_experiments = discover_available_experiments()
     
-    if not available_runs:
-        st.sidebar.error("No benchmark data found!")
-        st.error("❌ No benchmark data available. Please run benchmarking first with: `python main.py --comprehensive`")
+    if not available_experiments:
+        st.sidebar.error("No experiment data found!")
+        show_error("No experiment data available. Please run benchmarking first with: `python main.py --comprehensive`")
         return
     
-    # Run selection dropdown
-    run_names = list(available_runs.keys())
-    selected_run_name = st.sidebar.selectbox(
-        "📂 Select Benchmark Run:",
-        run_names,
-        help="Choose which benchmark run to analyze"
+    # Experiment selection dropdown
+    experiment_names = list(available_experiments.keys())
+    selected_experiment_name = st.sidebar.selectbox(
+        "Select Experiment:",
+        experiment_names,
+        format_func=lambda x: available_experiments[x]["display_name"],
+        help="Choose which experiment to analyze"
     )
     
-    selected_run_info = available_runs[selected_run_name]
+    selected_experiment_info = available_experiments[selected_experiment_name]
     
-    # Display run information
-    with st.sidebar.expander("ℹ️ Run Information"):
-        st.write(f"**Timestamp:** {selected_run_info['timestamp']}")
-        st.write(f"**Combinations:** {selected_run_info['combinations']}")
-        st.write(f"**Type:** {selected_run_info['type'].title()}")
-        st.write(f"**Description:** {selected_run_info['description']}")
+    # Display experiment information
+    with st.sidebar.expander("Experiment Information"):
+        st.write(f"**Timestamp:** {selected_experiment_info['timestamp']}")
+        st.write(f"**Total Results:** {selected_experiment_info['comprehensive_results_count']}")
+        st.write(f"**Description:** {selected_experiment_info['description']}")
+        st.write(f"**Folder:** {selected_experiment_info['folder']}")
     
-    # Load selected run data
-    results = load_selected_run_data(selected_run_info)
+    # Load selected experiment data
+    results = load_experiment_data(selected_experiment_info)
     
     if not results:
-        st.error("Failed to load selected run data.")
+        show_error("Failed to load selected experiment data.")
         return
     
-    # Multi-run comparison option
-    if len(available_runs) > 1:
-        st.sidebar.header("🔄 Multi-Run Comparison")
-        
-        enable_comparison = st.sidebar.checkbox("Enable Multi-Run Comparison")
-        
-        if enable_comparison:
-            comparison_runs = st.sidebar.multiselect(
-                "Select Additional Runs to Compare:",
-                [name for name in run_names if name != selected_run_name],
-                help="Select other runs to compare with the main selected run"
-            )
-            
-            if comparison_runs:
-                st.sidebar.success(f"Comparing {len(comparison_runs) + 1} runs")
-                
-                # Load comparison data
-                comparison_data = {}
-                comparison_data[selected_run_name] = results
-                
-                for run_name in comparison_runs:
-                    comp_run_info = available_runs[run_name]
-                    comparison_data[run_name] = load_selected_run_data(comp_run_info)
-    
-    # Sidebar filters
-    st.sidebar.header("🔧 Filters & Controls")
+    # Sidebar for filters
+    st.sidebar.header("Filters & Controls")
     
     # Extract unique values for filters
     metrics_df = create_metrics_dataframe(results)
@@ -634,268 +530,1467 @@ def main():
         filtered_df = pd.DataFrame()
     
     # Main content with tabs
-    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
-        "📈 Overview", 
-        "🎯 Model Performance", 
-        "🔍 Explanation Metrics",
-        "⏱️ Performance Analysis",
-        "📊 Comparative Analysis",
-        "🧩 Explanation Visualizations",
-        "📑 Detailed Reports"
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+        "Overview", 
+        "Model Performance", 
+        "Explanation Metrics",
+        "Performance Analysis",
+        "Explanation Visualizations",
+        "Detailed Analysis"
     ])
-    # --- New Tab: Detailed Explanation Reports ---
-    with tab7:
-        st.header("📑 Detailed Explanation Reports")
-        # Load all iteration files
-        iteration_dir = Path("results/iterations")
-        iteration_files = sorted(iteration_dir.glob("*.json"))
-        if not iteration_files:
-            st.warning("No iteration files found in results/iterations/.")
+    # --- New Tab: Explanation Visualizations ---
+    with tab5:
+        st.header("Explanation Visualizations")
+        
+        # Load detailed explanations from selected experiment
+        detailed_explanations_dir = Path(selected_experiment_info['folder']) / "detailed_explanations"
+        
+        if not detailed_explanations_dir.exists():
+            show_warning("No detailed explanations found for this experiment.")
+            return
+        
+        # Get all available combinations
+        available_combinations = []
+        for dataset_dir in detailed_explanations_dir.iterdir():
+            if dataset_dir.is_dir():
+                for model_dir in dataset_dir.iterdir():
+                    if model_dir.is_dir():
+                        for explanation_file in model_dir.glob("*_detailed_explanations.json"):
+                            method_name = explanation_file.name.replace("_detailed_explanations.json", "")
+                            combination = f"{dataset_dir.name}_{model_dir.name}_{method_name}"
+                            available_combinations.append({
+                                "display_name": combination,
+                                "dataset": dataset_dir.name,
+                                "model": model_dir.name,
+                                "method": method_name,
+                                "file_path": explanation_file
+                            })
+        
+        if not available_combinations:
+            show_warning("No detailed explanation files found.")
+            return
+        
+        # Combination selection
+        combination_names = [combo["display_name"] for combo in available_combinations]
+        selected_combination_name = st.selectbox(
+            "Select Dataset-Model-Method Combination:",
+            combination_names,
+            help="Choose which combination to visualize"
+        )
+        
+        selected_combo = next(c for c in available_combinations if c["display_name"] == selected_combination_name)
+        
+        # Load the detailed explanation data
+        try:
+            with open(selected_combo["file_path"], "r", encoding='utf-8') as f:
+                explanation_data = json.load(f)
+        except Exception as e:
+            show_error(f"Failed to load explanation data: {e}")
+            return
+        
+        # Display basic information
+        show_info(f"**Dataset:** {selected_combo['dataset']} | **Model:** {selected_combo['model']} | **Method:** {selected_combo['method']}")
+        
+        # Method-specific visualizations
+        method = selected_combo['method']
+        
+        # Handle different data structures
+        if isinstance(explanation_data, dict):
+            explanations = explanation_data.get("explanations", [])
+        elif isinstance(explanation_data, list):
+            # If explanation_data is already a list of explanations
+            explanations = explanation_data
         else:
-            file_names = [f.name for f in iteration_files]
-            selected_file = st.selectbox("Select Iteration File", file_names)
-            st.info(f"Fetching file: {selected_file}")
-            with open(iteration_dir / selected_file, "r") as f:
-                iteration_data = json.load(f)
-            st.subheader("Iteration File Content (truncated)")
-            st.json({k: v if k != 'explanation_results' else '...omitted...' for k, v in iteration_data.items()})
-            explanation_results = iteration_data.get("explanation_results", {})
-            available_methods = list(explanation_results.keys())
-            if not available_methods:
-                st.warning("No explanation results in this iteration file.")
-            else:
-                selected_methods = st.multiselect("Select Explanation Methods", available_methods, default=available_methods)
-                # For each selected method, show all explanations (or allow multi-instance selection)
-                for selected_method in selected_methods:
-                    st.markdown(f"---\n### Method: `{selected_method}`")
-                    method_data = explanation_results[selected_method]
-                    explanations = method_data.get("explanations", [])
-                    if not explanations:
-                        st.warning(f"No explanations found for method {selected_method}.")
-                        continue
-                    instance_ids = [e.get("instance_id", i) for i, e in enumerate(explanations)]
-                    selected_instances = st.multiselect(f"Select Instances for {selected_method}", instance_ids, default=instance_ids[:5], key=f"{selected_method}_instances")
-                    for sid in selected_instances:
-                        explanation = explanations[instance_ids.index(sid)]
-                        st.markdown(f"#### Instance: {sid}")
-                        # Feature importance (SHAP, LIME, IG, Ablation)
-                        if "feature_importance" in explanation:
-                            st.subheader("Feature Importance (Bar Plot)")
-                            feature_names = explanation.get("feature_names")
-                            importances = explanation["feature_importance"]
+            show_error(f"Unexpected data format: expected dict or list, got {type(explanation_data)}")
+            return
+        
+        if not explanations:
+            show_warning("No explanations found in this file.")
+            return
+        
+        st.subheader(f"{method.upper()} Visualizations")
+        
+        # Create tabs for different types of analysis
+        viz_tab1, viz_tab2, viz_tab3, viz_tab4 = st.tabs([
+            "Overview", "Individual Predictions", "Feature Analysis", "Method-Specific"
+        ])
+        
+        with viz_tab1:
+            st.markdown("### 📋 Explanation Summary")
+            col1, col2, col3 = st.columns(3)
+            
+            with col1:
+                st.metric("Total Explanations", len(explanations))
+            with col2:
+                if explanations and "feature_names" in explanations[0]:
+                    st.metric("Number of Features", len(explanations[0]["feature_names"]))
+                else:
+                    st.metric("Number of Features", "N/A")
+            with col3:
+                st.metric("Method Type", method.replace("_", " ").title())
+            
+            # Show first few explanations as examples
+            st.markdown("### 🔍 Sample Explanations")
+            sample_size = min(3, len(explanations))
+            for i in range(sample_size):
+                with st.expander(f"Sample Explanation {i+1}"):
+                    st.json(explanations[i])
+        
+        with viz_tab2:
+            st.markdown("### 🎯 Individual Instance Analysis")
+            
+            # Instance selection
+            instance_ids = [str(i) for i in range(len(explanations))]
+            selected_instance_idx = st.selectbox(
+                "Select Instance to Analyze:",
+                range(len(explanations)),
+                format_func=lambda x: f"Instance {x}",
+                help="Choose an instance to analyze in detail"
+            )
+            
+            explanation = explanations[selected_instance_idx]
+            
+            # Feature importance visualization
+            if "feature_importance" in explanation and "feature_names" in explanation:
+                st.markdown("#### 📊 Feature Importance")
+                feature_names = explanation["feature_names"]
+                importances = explanation["feature_importance"]
+                
+                if hasattr(importances, 'tolist'):
+                    importances = importances.tolist()
+                
+                # Create DataFrame and sort by absolute importance
+                feature_df = pd.DataFrame({
+                    "Feature": feature_names,
+                    "Importance": importances,
+                    "Abs_Importance": [abs(x) for x in importances]
+                }).sort_values("Abs_Importance", ascending=True)
+                
+                # Bar plot
+                fig = px.bar(
+                    feature_df.tail(15),  # Top 15 features
+                    x="Importance",
+                    y="Feature",
+                    orientation='h',
+                    title=f"Top 15 Feature Importances (Instance {selected_instance_idx})",
+                    color="Importance",
+                    color_continuous_scale="RdBu_r"
+                )
+                fig.update_layout(height=500)
+                st.plotly_chart(fig, use_container_width=True)
+                
+                # Summary statistics
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.metric("Most Important Feature", feature_df.iloc[-1]["Feature"])
+                    st.metric("Max Importance", f"{max(importances):.4f}")
+                with col2:
+                    st.metric("Least Important Feature", feature_df.iloc[0]["Feature"])
+                    st.metric("Min Importance", f"{min(importances):.4f}")
+        
+        with viz_tab3:
+            st.markdown("### 📈 Feature Analysis Across All Instances")
+            
+            # Aggregate feature importance across all instances
+            if explanations and "feature_importance" in explanations[0] and "feature_names" in explanations[0]:
+                feature_names = explanations[0]["feature_names"]
+                all_importances = []
+                
+                for exp in explanations:
+                    if "feature_importance" in exp:
+                        importances = exp["feature_importance"]
+                        if hasattr(importances, 'tolist'):
+                            importances = importances.tolist()
+                        all_importances.append(importances)
+                
+                if all_importances:
+                    # Calculate statistics
+                    importance_array = np.array(all_importances)
+                    mean_importance = np.mean(importance_array, axis=0)
+                    std_importance = np.std(importance_array, axis=0)
+                    
+                    # Create summary DataFrame
+                    feature_summary = pd.DataFrame({
+                        "Feature": feature_names,
+                        "Mean_Importance": mean_importance,
+                        "Std_Importance": std_importance,
+                        "Abs_Mean": np.abs(mean_importance)
+                    }).sort_values("Abs_Mean", ascending=False)
+                    
+                    # Global feature importance plot
+                    fig = px.bar(
+                        feature_summary.head(20),
+                        x="Feature",
+                        y="Mean_Importance",
+                        error_y="Std_Importance",
+                        title="Global Feature Importance (Mean ± Std)",
+                        color="Mean_Importance",
+                        color_continuous_scale="RdBu_r"
+                    )
+                    fig.update_xaxes(tickangle=45)
+                    fig.update_layout(height=500)
+                    st.plotly_chart(fig, use_container_width=True)
+                    
+                    # Feature importance distribution
+                    st.markdown("#### 📊 Feature Importance Distribution")
+                    top_features = feature_summary.head(10)["Feature"].tolist()
+                    
+                    # Create distribution plots for top features
+                    selected_features = st.multiselect(
+                        "Select features to show distribution:",
+                        top_features,
+                        default=top_features[:5]
+                    )
+                    
+                    if selected_features:
+                        fig = go.Figure()
+                        for feature in selected_features:
+                            feature_idx = feature_names.index(feature)
+                            feature_values = importance_array[:, feature_idx]
+                            fig.add_trace(go.Box(
+                                y=feature_values,
+                                name=feature,
+                                boxpoints='outliers'
+                            ))
+                        
+                        fig.update_layout(
+                            title="Feature Importance Distributions",
+                            yaxis_title="Importance",
+                            height=400
+                        )
+                        st.plotly_chart(fig, use_container_width=True)
+        
+        with viz_tab4:
+            st.markdown(f"### 🔬 {method.upper()}-Specific Visualizations")
+            
+            # SHAP-specific visualizations
+            if "shap" in method.lower():
+                st.markdown("#### 🎯 SHAP Analysis")
+                
+                # Local vs Global SHAP plots
+                if explanations and "feature_importance" in explanations[0]:
+                    # Prepare data for SHAP-style plots
+                    feature_names = explanations[0].get("feature_names", [])
+                    shap_values = []
+                    
+                    for exp in explanations:
+                        if "feature_importance" in exp:
+                            importances = exp["feature_importance"]
                             if hasattr(importances, 'tolist'):
                                 importances = importances.tolist()
-                            df = pd.DataFrame({"Feature": feature_names, "Importance": importances})
-                            fig = px.bar(df, x="Feature", y="Importance", title=f"Feature Importances for Instance {sid}")
+                            shap_values.append(importances)
+                    
+                    if shap_values and feature_names:
+                        shap_array = np.array(shap_values)
+                        
+                        # Summary plot (global)
+                        st.markdown("##### 🌍 Global SHAP Summary")
+                        
+                        # Calculate feature importance ranking
+                        mean_abs_shap = np.mean(np.abs(shap_array), axis=0)
+                        feature_ranking = pd.DataFrame({
+                            "Feature": feature_names,
+                            "Mean_Abs_SHAP": mean_abs_shap
+                        }).sort_values("Mean_Abs_SHAP", ascending=True)
+                        
+                        # SHAP summary plot style
+                        fig = px.scatter(
+                            x=shap_array[:, :].flatten(),
+                            y=np.tile(range(len(feature_names)), len(shap_values)),
+                            color=shap_array[:, :].flatten(),
+                            color_continuous_scale="RdBu_r",
+                            title="SHAP Summary Plot",
+                            labels={"x": "SHAP Value", "y": "Feature Index", "color": "SHAP Value"}
+                        )
+                        fig.update_layout(
+                            yaxis=dict(
+                                tickmode="array",
+                                tickvals=list(range(len(feature_names))),
+                                ticktext=feature_names
+                            ),
+                            height=600
+                        )
+                        st.plotly_chart(fig, use_container_width=True)
+                        
+                        # Local SHAP plot
+                        st.markdown("##### 🎯 Local SHAP Analysis")
+                        instance_for_local = st.selectbox(
+                            "Select instance for local SHAP plot:",
+                            range(len(explanations)),
+                            format_func=lambda x: f"Instance {x}",
+                            key="local_shap_instance"
+                        )
+                        
+                        if instance_for_local < len(shap_values):
+                            local_shap = shap_values[instance_for_local]
+                            local_df = pd.DataFrame({
+                                "Feature": feature_names,
+                                "SHAP_Value": local_shap
+                            }).sort_values("SHAP_Value", key=abs, ascending=True)
+                            
+                            # Waterfall-style plot
+                            fig = px.bar(
+                                local_df.tail(15),
+                                x="SHAP_Value",
+                                y="Feature",
+                                orientation='h',
+                                title=f"Local SHAP Values (Instance {instance_for_local})",
+                                color="SHAP_Value",
+                                color_continuous_scale="RdBu_r"
+                            )
+                            fig.add_vline(x=0, line_dash="dash", line_color="black")
+                            fig.update_layout(height=500)
                             st.plotly_chart(fig, use_container_width=True)
-                        # Counterfactual
-                        if "counterfactual" in explanation:
-                            st.subheader("Counterfactual (Table)")
-                            orig = explanation.get("original")
-                            cf = explanation.get("counterfactual")
-                            if orig is not None and cf is not None:
-                                diff = [o != c for o, c in zip(orig, cf)]
-                                df = pd.DataFrame({"Original": orig, "Counterfactual": cf, "Changed": diff})
-                                st.dataframe(df)
-                        # Prototype
-                        if "prototype" in explanation:
-                            st.subheader("Prototype (Table)")
-                            orig = explanation.get("original")
-                            proto = explanation.get("prototype")
-                            if orig is not None and proto is not None:
-                                diff = [o != p for o, p in zip(orig, proto)]
-                                df = pd.DataFrame({"Original": orig, "Prototype": proto, "Changed": diff})
-                                st.dataframe(df)
-                        # Importance map (image)
-                        if "importance_map" in explanation:
-                            st.subheader("Importance Map (Heatmap)")
-                            imp_map = np.array(explanation["importance_map"])
-                            fig = px.imshow(imp_map, color_continuous_scale='RdBu', title=f"Importance Map for Instance {sid}")
-                            st.plotly_chart(fig, use_container_width=True)
-                        st.subheader("Raw Explanation Data")
-                        st.json(explanation)
+            
+            # LIME-specific visualizations
+            elif "lime" in method.lower():
+                st.markdown("#### 🍋 LIME Analysis")
+                st.info("LIME explanations show local linear approximations around instances.")
+                
+                if explanations and "feature_importance" in explanations[0]:
+                    # LIME typically shows fewer features
+                    instance_idx = st.selectbox(
+                        "Select instance for LIME analysis:",
+                        range(len(explanations)),
+                        format_func=lambda x: f"Instance {x}",
+                        key="lime_instance"
+                    )
+                    
+                    explanation = explanations[instance_idx]
+                    if "feature_importance" in explanation and "feature_names" in explanation:
+                        importances = explanation["feature_importance"]
+                        feature_names = explanation["feature_names"]
+                        
+                        if hasattr(importances, 'tolist'):
+                            importances = importances.tolist()
+                        
+                        # LIME usually shows top contributing features
+                        lime_df = pd.DataFrame({
+                            "Feature": feature_names,
+                            "Contribution": importances
+                        }).sort_values("Contribution", key=abs, ascending=False).head(10)
+                        
+                        fig = px.bar(
+                            lime_df,
+                            x="Contribution",
+                            y="Feature",
+                            orientation='h',
+                            title=f"LIME Local Explanation (Instance {instance_idx})",
+                            color="Contribution",
+                            color_continuous_scale="RdBu_r"
+                        )
+                        fig.add_vline(x=0, line_dash="dash", line_color="black")
+                        st.plotly_chart(fig, use_container_width=True)
+            
+            # Integrated Gradients
+            elif "integrated_gradients" in method.lower():
+                st.markdown("#### 🎯 Integrated Gradients Analysis")
+                st.info("Integrated Gradients shows attribution along the path from baseline to input.")
+                
+            # Add more method-specific visualizations as needed
+            else:
+                st.markdown(f"#### 🔧 {method.replace('_', ' ').title()} Analysis")
+                st.info(f"Method-specific visualizations for {method} will be displayed here.")
+                
+                # Generic feature importance for other methods
+                if explanations and "feature_importance" in explanations[0]:
+                    st.markdown("##### Feature Importance Analysis")
+                    instance_idx = st.selectbox(
+                        f"Select instance for {method} analysis:",
+                        range(len(explanations)),
+                        format_func=lambda x: f"Instance {x}",
+                        key=f"{method}_instance"
+                    )
+                    
+                    explanation = explanations[instance_idx]
+                    if "feature_importance" in explanation and "feature_names" in explanation:
+                        importances = explanation["feature_importance"]
+                        feature_names = explanation["feature_names"]
+                        
+                        if hasattr(importances, 'tolist'):
+                            importances = importances.tolist()
+                        
+                        method_df = pd.DataFrame({
+                            "Feature": feature_names,
+                            "Importance": importances
+                        }).sort_values("Importance", key=abs, ascending=False).head(15)
+                        
+                        fig = px.bar(
+                            method_df,
+                            x="Importance",
+                            y="Feature",
+                            orientation='h',
+                            title=f"{method.replace('_', ' ').title()} Feature Importance (Instance {instance_idx})",
+                            color="Importance",
+                            color_continuous_scale="Viridis"
+                        )
+                        st.plotly_chart(fig, use_container_width=True)
+    
+    # --- New Tab: Detailed Analysis ---
+    with tab6:
+        st.header("Detailed Analysis")
+        
+        # Load detailed explanations directory
+        detailed_explanations_dir = Path(selected_experiment_info['folder']) / "detailed_explanations"
+        
+        if not detailed_explanations_dir.exists():
+            show_warning("No detailed explanations found for this experiment. Detailed analysis requires detailed explanation data.")
+            return
+        
+        # Analysis type selection
+        analysis_type = st.selectbox(
+            "Select Analysis Type:",
+            ["Dataset Level Analysis", "Model Level Analysis", "Explanation Method Deep Dive", "Feature Importance Analysis", "Individual Instance Analysis"],
+            help="Choose the type of detailed analysis to perform"
+        )
+        
+        if analysis_type == "Dataset Level Analysis":
+            st.subheader("Dataset Level Analysis")
+            
+            # Get available datasets from detailed explanations
+            available_datasets = []
+            for dataset_dir in detailed_explanations_dir.iterdir():
+                if dataset_dir.is_dir():
+                    available_datasets.append(dataset_dir.name)
+            
+            if not available_datasets:
+                show_warning("No datasets found in detailed explanations.")
+                return
+            
+            selected_dataset = st.selectbox("Select Dataset:", available_datasets)
+            dataset_path = detailed_explanations_dir / selected_dataset
+            
+            # Get all models and methods for this dataset
+            models_methods = {}
+            total_explanations = 0
+            
+            for model_dir in dataset_path.iterdir():
+                if model_dir.is_dir():
+                    model_name = model_dir.name
+                    methods = []
+                    for explanation_file in model_dir.glob("*_detailed_explanations.json"):
+                        method_name = explanation_file.name.replace("_detailed_explanations.json", "")
+                        methods.append(method_name)
+                        
+                        # Count explanations in this file
+                        try:
+                            with open(explanation_file, "r", encoding='utf-8') as f:
+                                data = json.load(f)
+                                if isinstance(data, dict):
+                                    explanations = data.get("explanations", [])
+                                elif isinstance(data, list):
+                                    explanations = data
+                                else:
+                                    explanations = []
+                                total_explanations += len(explanations)
+                        except:
+                            continue
+                    
+                    if methods:
+                        models_methods[model_name] = methods
+            
+            # Dataset overview
+            col1, col2, col3, col4 = st.columns(4)
+            
+            with col1:
+                st.metric("Models Available", len(models_methods))
+            with col2:
+                all_methods = set()
+                for methods in models_methods.values():
+                    all_methods.update(methods)
+                st.metric("Unique Methods", len(all_methods))
+            with col3:
+                total_combinations = sum(len(methods) for methods in models_methods.values())
+                st.metric("Total Combinations", total_combinations)
+            with col4:
+                st.metric("Total Explanations", total_explanations)
+            
+            # Show available combinations
+            st.markdown("#### 🔍 Available Model-Method Combinations")
+            
+            combinations_data = []
+            for model, methods in models_methods.items():
+                for method in methods:
+                    # Try to load explanation file to get more details
+                    explanation_file = dataset_path / model / f"{method}_detailed_explanations.json"
+                    explanation_count = 0
+                    avg_generation_time = 0
+                    
+                    try:
+                        with open(explanation_file, "r", encoding='utf-8') as f:
+                            data = json.load(f)
+                            if isinstance(data, dict):
+                                explanations = data.get("explanations", [])
+                                generation_times = [exp.get("generation_time", 0) for exp in explanations if isinstance(exp, dict)]
+                                explanation_count = len(explanations)
+                                avg_generation_time = np.mean(generation_times) if generation_times else 0
+                            elif isinstance(data, list):
+                                explanation_count = len(data)
+                    except:
+                        pass
+                    
+                    combinations_data.append({
+                        "Model": model,
+                        "Method": method,
+                        "Explanations": explanation_count,
+                        "Avg Generation Time": f"{avg_generation_time:.3f}s" if avg_generation_time > 0 else "N/A"
+                    })
+            
+            combinations_df = pd.DataFrame(combinations_data)
+            st.dataframe(combinations_df, use_container_width=True)
+            
+            # Model-Method heatmap
+            if not combinations_df.empty:
+                st.markdown("#### 🔥 Explanation Count Heatmap")
+                
+                # Create pivot table for heatmap
+                pivot_data = combinations_df.pivot_table(
+                    values='Explanations',
+                    index='Model',
+                    columns='Method',
+                    aggfunc='sum',
+                    fill_value=0
+                )
+                
+                fig = px.imshow(
+                    pivot_data.values,
+                    x=pivot_data.columns,
+                    y=pivot_data.index,
+                    color_continuous_scale='Blues',
+                    title=f"Number of Explanations for {selected_dataset}",
+                    labels=dict(color="Explanation Count")
+                )
+                fig.update_layout(height=400)
+                st.plotly_chart(fig, use_container_width=True)
+            
+        elif analysis_type == "🤖 Model Level Analysis":
+            st.subheader("🤖 Model Level Analysis")
+            
+            # Get available models from detailed explanations
+            available_models = set()
+            for dataset_dir in detailed_explanations_dir.iterdir():
+                if dataset_dir.is_dir():
+                    for model_dir in dataset_dir.iterdir():
+                        if model_dir.is_dir():
+                            available_models.add(model_dir.name)
+            
+            available_models = sorted(list(available_models))
+            
+            if not available_models:
+                show_warning("No models found in detailed explanations.")
+                return
+            
+            selected_model = st.selectbox("Select Model:", available_models)
+            
+            # Collect model data from detailed explanations
+            model_data = {}
+            total_explanations = 0
+            
+            for dataset_dir in detailed_explanations_dir.iterdir():
+                if dataset_dir.is_dir():
+                    dataset_name = dataset_dir.name
+                    model_dir = dataset_dir / selected_model
+                    
+                    if model_dir.exists():
+                        methods = []
+                        for explanation_file in model_dir.glob("*_detailed_explanations.json"):
+                            method_name = explanation_file.name.replace("_detailed_explanations.json", "")
+                            
+                            # Load explanation data
+                            try:
+                                with open(explanation_file, "r", encoding='utf-8') as f:
+                                    data = json.load(f)
+                                    if isinstance(data, dict):
+                                        explanations = data.get("explanations", [])
+                                    elif isinstance(data, list):
+                                        explanations = data
+                                    else:
+                                        explanations = []
+                                    
+                                    methods.append({
+                                        "method": method_name,
+                                        "explanations": explanations,
+                                        "count": len(explanations)
+                                    })
+                                    total_explanations += len(explanations)
+                            except:
+                                continue
+                        
+                        if methods:
+                            model_data[dataset_name] = methods
+            
+            if not model_data:
+                show_warning(f"No data found for model {selected_model}")
+                return
+            
+            # Model overview
+            col1, col2, col3, col4 = st.columns(4)
+            
+            with col1:
+                st.metric("Datasets", len(model_data))
+            with col2:
+                all_methods = set()
+                for dataset_methods in model_data.values():
+                    for method_info in dataset_methods:
+                        all_methods.add(method_info["method"])
+                st.metric("Unique Methods", len(all_methods))
+            with col3:
+                total_combinations = sum(len(methods) for methods in model_data.values())
+                st.metric("Total Combinations", total_combinations)
+            with col4:
+                st.metric("Total Explanations", total_explanations)
+            
+            # Dataset-Method analysis
+            st.markdown("#### 📊 Dataset-Method Analysis")
+            
+            analysis_data = []
+            for dataset, methods in model_data.items():
+                for method_info in methods:
+                    method = method_info["method"]
+                    explanations = method_info["explanations"]
+                    
+                    # Calculate statistics from explanations
+                    if explanations and isinstance(explanations[0], dict):
+                        generation_times = [exp.get("generation_time", 0) for exp in explanations]
+                        feature_counts = [len(exp.get("feature_names", [])) for exp in explanations if "feature_names" in exp]
+                        
+                        analysis_data.append({
+                            "Dataset": dataset,
+                            "Method": method,
+                            "Explanations": len(explanations),
+                            "Avg Generation Time": np.mean(generation_times) if generation_times else 0,
+                            "Avg Feature Count": np.mean(feature_counts) if feature_counts else 0
+                        })
+                    else:
+                        analysis_data.append({
+                            "Dataset": dataset,
+                            "Method": method,
+                            "Explanations": len(explanations),
+                            "Avg Generation Time": 0,
+                            "Avg Feature Count": 0
+                        })
+            
+            analysis_df = pd.DataFrame(analysis_data)
+            st.dataframe(analysis_df, use_container_width=True)
+            
+            # Method performance comparison
+            if not analysis_df.empty:
+                st.markdown("#### 🔥 Method Performance Heatmap")
+                
+                # Create heatmap based on explanation count
+                pivot_data = analysis_df.pivot_table(
+                    values='Explanations',
+                    index='Dataset',
+                    columns='Method',
+                    aggfunc='sum',
+                    fill_value=0
+                )
+                
+                fig = px.imshow(
+                    pivot_data.values,
+                    x=pivot_data.columns,
+                    y=pivot_data.index,
+                    color_continuous_scale='Viridis',
+                    title=f"Explanation Coverage for {selected_model}",
+                    labels=dict(color="Explanation Count")
+                )
+                fig.update_layout(height=400)
+                st.plotly_chart(fig, use_container_width=True)
+                
+                # Generation time comparison
+                st.markdown("#### ⏱️ Generation Time Analysis")
+                
+                time_data = analysis_df[analysis_df['Avg Generation Time'] > 0]
+                if not time_data.empty:
+                    fig = px.bar(
+                        time_data,
+                        x='Method',
+                        y='Avg Generation Time',
+                        color='Dataset',
+                        title=f"Average Generation Time by Method for {selected_model}",
+                        barmode='group'
+                    )
+                    fig.update_xaxes(tickangle=45)
+                    st.plotly_chart(fig, use_container_width=True)
+                else:
+                    show_info("No generation time data available for analysis.")
+            
+        elif analysis_type == "🔍 Explanation Method Deep Dive":
+            st.subheader("🔍 Explanation Method Deep Dive")
+            
+            # Get all available methods from detailed explanations
+            available_methods = set()
+            for dataset_dir in detailed_explanations_dir.iterdir():
+                if dataset_dir.is_dir():
+                    for model_dir in dataset_dir.iterdir():
+                        if model_dir.is_dir():
+                            for explanation_file in model_dir.glob("*_detailed_explanations.json"):
+                                method_name = explanation_file.name.replace("_detailed_explanations.json", "")
+                                available_methods.add(method_name)
+            
+            available_methods = sorted(list(available_methods))
+            
+            if not available_methods:
+                show_warning("No explanation methods found in detailed explanations.")
+                return
+            
+            selected_method = st.selectbox("Select Explanation Method:", available_methods)
+            
+            # Collect method data across all datasets and models
+            method_data = []
+            total_explanations = 0
+            
+            for dataset_dir in detailed_explanations_dir.iterdir():
+                if dataset_dir.is_dir():
+                    dataset_name = dataset_dir.name
+                    for model_dir in dataset_dir.iterdir():
+                        if model_dir.is_dir():
+                            model_name = model_dir.name
+                            explanation_file = model_dir / f"{selected_method}_detailed_explanations.json"
+                            
+                            if explanation_file.exists():
+                                try:
+                                    with open(explanation_file, "r", encoding='utf-8') as f:
+                                        data = json.load(f)
+                                        if isinstance(data, dict):
+                                            explanations = data.get("explanations", [])
+                                        elif isinstance(data, list):
+                                            explanations = data
+                                        else:
+                                            explanations = []
+                                        
+                                        if explanations:
+                                            # Calculate statistics
+                                            generation_times = [exp.get("generation_time", 0) for exp in explanations if isinstance(exp, dict)]
+                                            feature_counts = [len(exp.get("feature_names", [])) for exp in explanations if isinstance(exp, dict) and "feature_names" in exp]
+                                            
+                                            method_data.append({
+                                                "Dataset": dataset_name,
+                                                "Model": model_name,
+                                                "Explanations": len(explanations),
+                                                "Avg Generation Time": np.mean(generation_times) if generation_times else 0,
+                                                "Avg Feature Count": np.mean(feature_counts) if feature_counts else 0,
+                                                "Total Generation Time": np.sum(generation_times) if generation_times else 0
+                                            })
+                                            total_explanations += len(explanations)
+                                except:
+                                    continue
+            
+            if not method_data:
+                show_warning(f"No data found for method {selected_method}")
+                return
+            
+            method_df = pd.DataFrame(method_data)
+            
+            # Method overview
+            col1, col2, col3, col4 = st.columns(4)
+            
+            with col1:
+                st.metric("Total Explanations", total_explanations)
+            with col2:
+                st.metric("Dataset Coverage", len(method_df['Dataset'].unique()))
+            with col3:
+                st.metric("Model Coverage", len(method_df['Model'].unique()))
+            with col4:
+                avg_time = method_df['Avg Generation Time'].mean()
+                st.metric("Avg Generation Time", f"{avg_time:.3f}s")
+            
+            # Performance analysis
+            st.markdown(f"#### 📊 {selected_method.title()} Performance Analysis")
+            st.dataframe(method_df, use_container_width=True)
+            
+            # Visualizations
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                # Generation time by dataset
+                fig = px.bar(
+                    method_df,
+                    x='Dataset',
+                    y='Avg Generation Time',
+                    color='Model',
+                    title=f"Generation Time by Dataset for {selected_method}",
+                    barmode='group'
+                )
+                fig.update_xaxes(tickangle=45)
+                st.plotly_chart(fig, use_container_width=True)
+            
+            with col2:
+                # Explanation count by model
+                fig = px.bar(
+                    method_df,
+                    x='Model',
+                    y='Explanations',
+                    color='Dataset',
+                    title=f"Explanation Count by Model for {selected_method}",
+                    barmode='group'
+                )
+                fig.update_xaxes(tickangle=45)
+                st.plotly_chart(fig, use_container_width=True)
+        
+        elif analysis_type == "📈 Feature Importance Analysis":
+            st.subheader("📈 Feature Importance Analysis")
+            
+            # Get all combinations with feature importance data
+            combinations_with_features = []
+            
+            for dataset_dir in detailed_explanations_dir.iterdir():
+                if dataset_dir.is_dir():
+                    dataset_name = dataset_dir.name
+                    for model_dir in dataset_dir.iterdir():
+                        if model_dir.is_dir():
+                            model_name = model_dir.name
+                            for explanation_file in model_dir.glob("*_detailed_explanations.json"):
+                                method_name = explanation_file.name.replace("_detailed_explanations.json", "")
+                                
+                                try:
+                                    with open(explanation_file, "r", encoding='utf-8') as f:
+                                        data = json.load(f)
+                                        if isinstance(data, dict):
+                                            explanations = data.get("explanations", [])
+                                        elif isinstance(data, list):
+                                            explanations = data
+                                        else:
+                                            explanations = []
+                                        
+                                        # Check if this method has feature importance data
+                                        has_feature_importance = False
+                                        if explanations and isinstance(explanations[0], dict):
+                                            if "feature_importance" in explanations[0] and "feature_names" in explanations[0]:
+                                                has_feature_importance = True
+                                        
+                                        if has_feature_importance:
+                                            combinations_with_features.append({
+                                                "display_name": f"{dataset_name}_{model_name}_{method_name}",
+                                                "dataset": dataset_name,
+                                                "model": model_name,
+                                                "method": method_name,
+                                                "file_path": explanation_file,
+                                                "explanations": explanations
+                                            })
+                                except:
+                                    continue
+            
+            if not combinations_with_features:
+                show_warning("No combinations with feature importance data found.")
+                return
+            
+            # Selection
+            combination_names = [combo["display_name"] for combo in combinations_with_features]
+            selected_combination = st.selectbox(
+                "Select Dataset-Model-Method Combination:",
+                combination_names,
+                help="Choose combination for feature importance analysis"
+            )
+            
+            selected_combo = next(c for c in combinations_with_features if c["display_name"] == selected_combination)
+            explanations = selected_combo["explanations"]
+            
+            show_info(f"**Dataset:** {selected_combo['dataset']} | **Model:** {selected_combo['model']} | **Method:** {selected_combo['method']}")
+            
+            # Feature importance analysis
+            if explanations and "feature_names" in explanations[0]:
+                feature_names = explanations[0]["feature_names"]
+                
+                # Collect all feature importances
+                all_importances = []
+                for exp in explanations:
+                    if "feature_importance" in exp:
+                        importance = exp["feature_importance"]
+                        if hasattr(importance, 'tolist'):
+                            importance = importance.tolist()
+                        all_importances.append(importance)
+                
+                if all_importances:
+                    importance_array = np.array(all_importances)
+                    
+                    # Statistics
+                    col1, col2, col3, col4 = st.columns(4)
+                    
+                    with col1:
+                        st.metric("Total Instances", len(all_importances))
+                    with col2:
+                        st.metric("Features", len(feature_names))
+                    with col3:
+                        st.metric("Avg Importance Range", f"{np.mean(np.max(importance_array, axis=1) - np.min(importance_array, axis=1)):.3f}")
+                    with col4:
+                        st.metric("Most Important Feature", feature_names[np.argmax(np.mean(np.abs(importance_array), axis=0))])
+                    
+                    # Global feature importance
+                    st.markdown("#### 🌍 Global Feature Importance")
+                    
+                    mean_importance = np.mean(importance_array, axis=0)
+                    std_importance = np.std(importance_array, axis=0)
+                    
+                    feature_df = pd.DataFrame({
+                        "Feature": feature_names,
+                        "Mean Importance": mean_importance,
+                        "Std Importance": std_importance,
+                        "Abs Mean Importance": np.abs(mean_importance)
+                    }).sort_values("Abs Mean Importance", ascending=False)
+                    
+                    # Top features bar chart
+                    fig = px.bar(
+                        feature_df.head(20),
+                        x="Mean Importance",
+                        y="Feature",
+                        error_x="Std Importance",
+                        orientation='h',
+                        title="Top 20 Most Important Features (Global Average)",
+                        color="Mean Importance",
+                        color_continuous_scale="RdBu_r"
+                    )
+                    fig.update_layout(height=600)
+                    st.plotly_chart(fig, use_container_width=True)
+                    
+                    # Feature importance distribution
+                    st.markdown("#### 📊 Feature Importance Distribution")
+                    
+                    top_features = feature_df.head(10)["Feature"].tolist()
+                    selected_features = st.multiselect(
+                        "Select features to show distribution:",
+                        top_features,
+                        default=top_features[:5]
+                    )
+                    
+                    if selected_features:
+                        fig = go.Figure()
+                        for feature in selected_features:
+                            feature_idx = feature_names.index(feature)
+                            feature_values = importance_array[:, feature_idx]
+                            fig.add_trace(go.Box(
+                                y=feature_values,
+                                name=feature,
+                                boxpoints='outliers'
+                            ))
+                        
+                        fig.update_layout(
+                            title="Feature Importance Distributions",
+                            yaxis_title="Importance Value",
+                            height=400
+                        )
+                        st.plotly_chart(fig, use_container_width=True)
+                    
+                    # Feature correlation heatmap
+                    st.markdown("#### 🔗 Feature Importance Correlation")
+                    
+                    if len(feature_names) <= 50:  # Only for manageable number of features
+                        corr_matrix = np.corrcoef(importance_array.T)
+                        
+                        fig = px.imshow(
+                            corr_matrix,
+                            x=feature_names,
+                            y=feature_names,
+                            color_continuous_scale="RdBu",
+                            title="Feature Importance Correlation Matrix",
+                            aspect="auto"
+                        )
+                        fig.update_layout(height=600)
+                        st.plotly_chart(fig, use_container_width=True)
+                    else:
+                        show_info(f"Too many features ({len(feature_names)}) for correlation matrix. Showing top 20 features only.")
+                        
+                        top_20_indices = np.argsort(np.mean(np.abs(importance_array), axis=0))[-20:]
+                        top_20_corr = np.corrcoef(importance_array[:, top_20_indices].T)
+                        top_20_names = [feature_names[i] for i in top_20_indices]
+                        
+                        fig = px.imshow(
+                            top_20_corr,
+                            x=top_20_names,
+                            y=top_20_names,
+                            color_continuous_scale="RdBu",
+                            title="Top 20 Features Importance Correlation Matrix",
+                            aspect="auto"
+                        )
+                        fig.update_layout(height=600)
+                        st.plotly_chart(fig, use_container_width=True)
+        
+        elif analysis_type == "🔬 Individual Instance Analysis":
+            st.subheader("🔬 Individual Instance Analysis")
+            
+            # Get all combinations with explanations
+            combinations_with_explanations = []
+            
+            for dataset_dir in detailed_explanations_dir.iterdir():
+                if dataset_dir.is_dir():
+                    dataset_name = dataset_dir.name
+                    for model_dir in dataset_dir.iterdir():
+                        if model_dir.is_dir():
+                            model_name = model_dir.name
+                            for explanation_file in model_dir.glob("*_detailed_explanations.json"):
+                                method_name = explanation_file.name.replace("_detailed_explanations.json", "")
+                                
+                                try:
+                                    with open(explanation_file, "r", encoding='utf-8') as f:
+                                        data = json.load(f)
+                                        if isinstance(data, dict):
+                                            explanations = data.get("explanations", [])
+                                        elif isinstance(data, list):
+                                            explanations = data
+                                        else:
+                                            explanations = []
+                                        
+                                        if explanations:
+                                            combinations_with_explanations.append({
+                                                "display_name": f"{dataset_name}_{model_name}_{method_name}",
+                                                "dataset": dataset_name,
+                                                "model": model_name,
+                                                "method": method_name,
+                                                "file_path": explanation_file,
+                                                "explanations": explanations,
+                                                "count": len(explanations)
+                                            })
+                                except:
+                                    continue
+            
+            if not combinations_with_explanations:
+                show_warning("No combinations with individual explanations found.")
+                return
+            
+            # Combination selection
+            combination_names = [f"{combo['display_name']} ({combo['count']} instances)" for combo in combinations_with_explanations]
+            selected_combination_idx = st.selectbox(
+                "Select Dataset-Model-Method Combination:",
+                range(len(combination_names)),
+                format_func=lambda x: combination_names[x],
+                help="Choose combination for individual instance analysis"
+            )
+            
+            selected_combo = combinations_with_explanations[selected_combination_idx]
+            explanations = selected_combo["explanations"]
+            
+            # Get feature names from benchmark results for this combination
+            feature_names = None
+            for result in results.get('comprehensive_results', []):
+                if (result.get('dataset') == selected_combo['dataset'] and 
+                    result.get('model') == selected_combo['model'] and 
+                    result.get('explanation_method') == selected_combo['method']):
+                    feature_names = result.get('explanation_info', {}).get('feature_names', [])
+                    break
+            
+            if not feature_names:
+                # Fallback to generic names if not found
+                max_features = 0
+                for exp in explanations:
+                    if isinstance(exp, dict) and 'feature_importance' in exp:
+                        importance = exp['feature_importance']
+                        if isinstance(importance, str):
+                            try:
+                                import ast
+                                importance = ast.literal_eval(importance.replace('[', '').replace(']', '').split())
+                            except:
+                                try:
+                                    importance = eval(importance)
+                                except:
+                                    importance = []
+                        if hasattr(importance, '__len__'):
+                            max_features = max(max_features, len(importance))
+                
+                feature_names = [f"Feature_{i}" for i in range(max_features)] if max_features > 0 else []
+            
+            show_info(f"**Dataset:** {selected_combo['dataset']} | **Model:** {selected_combo['model']} | **Method:** {selected_combo['method']} | **Instances:** {len(explanations)} | **Features:** {len(feature_names)}")
+            
+            # Instance selection
+            if explanations:
+                # Instance selection with preview
+                col1, col2 = st.columns([1, 3])
+                
+                with col1:
+                    st.markdown("#### 📋 Instance Selection")
+                    
+                    # Show instance list with basic info
+                    instance_options = []
+                    for i, exp in enumerate(explanations):
+                        if isinstance(exp, dict):
+                            prediction = exp.get("prediction", "N/A")
+                            true_label = exp.get("true_label", "N/A")
+                            confidence = exp.get("confidence", exp.get("prediction_confidence", "N/A"))
+                            
+                            # Format confidence
+                            if isinstance(confidence, (int, float)):
+                                confidence_str = f"{confidence:.3f}"
+                            else:
+                                confidence_str = str(confidence)
+                            
+                            instance_options.append(f"Instance {i}: Pred={prediction}, True={true_label}, Conf={confidence_str}")
+                        else:
+                            instance_options.append(f"Instance {i}")
+                    
+                    selected_instance_idx = st.selectbox(
+                        "Select Instance:",
+                        range(len(instance_options)),
+                        format_func=lambda x: instance_options[x],
+                        help="Choose an instance to analyze in detail"
+                    )
+                
+                with col2:
+                    st.markdown("#### 🔍 Instance Details")
+                    
+                    selected_explanation = explanations[selected_instance_idx]
+                    
+                    if isinstance(selected_explanation, dict):
+                        # Create tabs for different aspects of the explanation
+                        inst_tab1, inst_tab2, inst_tab3, inst_tab4 = st.tabs([
+                            "📊 Overview", "🎯 Prediction", "📈 Features", "🧩 Method-Specific"
+                        ])
+                        
+                        with inst_tab1:
+                            st.markdown("##### 📋 Instance Overview")
+                            
+                            # Basic information
+                            col_a, col_b, col_c = st.columns(3)
+                            
+                            with col_a:
+                                prediction = selected_explanation.get("prediction", "N/A")
+                                st.metric("Prediction", str(prediction))
+                            
+                            with col_b:
+                                true_label = selected_explanation.get("true_label", "N/A")
+                                st.metric("True Label", str(true_label))
+                            
+                            with col_c:
+                                confidence = selected_explanation.get("confidence", selected_explanation.get("prediction_confidence", "N/A"))
+                                if isinstance(confidence, (int, float)):
+                                    st.metric("Confidence", f"{confidence:.3f}")
+                                else:
+                                    st.metric("Confidence", str(confidence))
+                            
+                            # Additional metadata
+                            if "instance_id" in selected_explanation:
+                                st.write(f"**Instance ID:** {selected_explanation['instance_id']}")
+                            
+                            if "generation_time" in selected_explanation:
+                                gen_time = selected_explanation['generation_time']
+                                st.write(f"**Generation Time:** {gen_time:.4f}s" if isinstance(gen_time, (int, float)) else f"**Generation Time:** {gen_time}")
+                            
+                            # Show original instance data if available
+                            if "original_instance" in selected_explanation:
+                                st.markdown("##### 📄 Original Instance Data")
+                                original = selected_explanation["original_instance"]
+                                
+                                if isinstance(original, dict):
+                                    # Show as a nice table
+                                    original_df = pd.DataFrame([original]).T
+                                    original_df.columns = ["Value"]
+                                    st.dataframe(original_df, use_container_width=True)
+                                elif isinstance(original, list):
+                                    # Show as numbered list
+                                    original_df = pd.DataFrame({"Feature Index": range(len(original)), "Value": original})
+                                    st.dataframe(original_df, use_container_width=True)
+                                else:
+                                    st.write(f"**Original Instance:** {original}")
+                        
+                        with inst_tab2:
+                            st.markdown("##### 🎯 Prediction Analysis")
+                            
+                            # Show prediction breakdown if available
+                            if "prediction_probabilities" in selected_explanation:
+                                probs = selected_explanation["prediction_probabilities"]
+                                if isinstance(probs, dict):
+                                    prob_df = pd.DataFrame(list(probs.items()), columns=["Class", "Probability"])
+                                    prob_df = prob_df.sort_values("Probability", ascending=False)
+                                    
+                                    # Bar chart of probabilities
+                                    fig = px.bar(
+                                        prob_df,
+                                        x="Class",
+                                        y="Probability",
+                                        title="Prediction Probabilities",
+                                        color="Probability",
+                                        color_continuous_scale="Viridis"
+                                    )
+                                    st.plotly_chart(fig, use_container_width=True)
+                                    
+                                    # Show as table
+                                    st.dataframe(prob_df, use_container_width=True)
+                                else:
+                                    st.write(f"**Prediction Probabilities:** {probs}")
+                            
+                            # Prediction correctness
+                            prediction = selected_explanation.get("prediction", None)
+                            true_label = selected_explanation.get("true_label", None)
+                            
+                            if prediction is not None and true_label is not None:
+                                is_correct = str(prediction) == str(true_label)
+                                if is_correct:
+                                    st.success("✅ **Prediction is CORRECT**")
+                                else:
+                                    st.error("❌ **Prediction is INCORRECT**")
+                            
+                            # Show decision boundary or model confidence if available
+                            if "decision_score" in selected_explanation:
+                                decision_score = selected_explanation["decision_score"]
+                                st.write(f"**Decision Score:** {decision_score}")
+                        
+                        with inst_tab3:
+                            st.markdown("##### 📈 Feature Analysis")
+                            
+                            # Parse feature importance using our helper function
+                            importance_raw = selected_explanation.get("feature_importance", [])
+                            importance = parse_feature_importance(importance_raw)
+                            
+                            if importance and len(importance) > 0 and feature_names and len(feature_names) >= len(importance):
+                                # Create feature importance DataFrame
+                                feature_df = pd.DataFrame({
+                                    "Feature": feature_names[:len(importance)],
+                                    "Importance": importance,
+                                    "Abs_Importance": [abs(x) for x in importance]
+                                }).sort_values("Abs_Importance", ascending=False)
+                                
+                                # Show non-zero features only
+                                non_zero_features = feature_df[feature_df["Abs_Importance"] > 0]
+                                
+                                if not non_zero_features.empty:
+                                    # Top features chart
+                                    top_features = non_zero_features.head(15)
+                                    fig = px.bar(
+                                        top_features,
+                                        x="Importance",
+                                        y="Feature",
+                                        orientation='h',
+                                        title=f"Feature Importances (Instance {selected_instance_idx}) - Non-Zero Only",
+                                        color="Importance",
+                                        color_continuous_scale="RdBu_r"
+                                    )
+                                    fig.update_layout(height=max(300, len(top_features) * 25))
+                                    st.plotly_chart(fig, use_container_width=True)
+                                    
+                                    # Feature importance table
+                                    st.markdown("##### 📊 Feature Importance Details")
+                                    st.dataframe(feature_df, use_container_width=True)
+                                    
+                                    # Summary statistics
+                                    col_a, col_b, col_c = st.columns(3)
+                                    with col_a:
+                                        st.metric("Non-zero Features", len(non_zero_features))
+                                    with col_b:
+                                        st.metric("Max Importance", f"{feature_df['Abs_Importance'].max():.4f}")
+                                    with col_c:
+                                        top_feature = feature_df.iloc[0]['Feature']
+                                        st.metric("Most Important", top_feature)
+                                
+                                else:
+                                    st.warning("All feature importances are zero for this instance.")
+                                    st.dataframe(feature_df, use_container_width=True)
+                            
+                            # Show top_features if available (alternative format)
+                            elif "top_features" in selected_explanation and selected_explanation["top_features"]:
+                                top_features_data = selected_explanation["top_features"]
+                                if isinstance(top_features_data, list) and len(top_features_data) > 0:
+                                    st.markdown("##### 🔝 Top Features (From Explanation)")
+                                    
+                                    # Parse top features format
+                                    top_features_list = []
+                                    for feat in top_features_data:
+                                        if isinstance(feat, dict):
+                                            feature_idx = feat.get("feature_index", 0)
+                                            importance_val = feat.get("importance", 0)
+                                            feature_name = feature_names[feature_idx] if feature_names and feature_idx < len(feature_names) else f"Feature_{feature_idx}"
+                                            
+                                            top_features_list.append({
+                                                "Feature": feature_name,
+                                                "Importance": importance_val,
+                                                "Abs_Importance": abs(importance_val)
+                                            })
+                                    
+                                    if top_features_list:
+                                        top_features_df = pd.DataFrame(top_features_list)
+                                        
+                                        # Filter non-zero features
+                                        non_zero_top = top_features_df[top_features_df["Abs_Importance"] > 0]
+                                        
+                                        if not non_zero_top.empty:
+                                            fig = px.bar(
+                                                non_zero_top,
+                                                x="Importance",
+                                                y="Feature",
+                                                orientation='h',
+                                                title=f"Top Features (Instance {selected_instance_idx})",
+                                                color="Importance",
+                                                color_continuous_scale="RdBu_r"
+                                            )
+                                            fig.update_layout(height=max(300, len(non_zero_top) * 30))
+                                            st.plotly_chart(fig, use_container_width=True)
+                                        
+                                        st.dataframe(top_features_df, use_container_width=True)
+                            
+                            # Show raw importance data for debugging
+                            elif importance_raw:
+                                st.info("Raw feature importance data detected but couldn't parse properly.")
+                                st.write(f"**Raw data type:** {type(importance_raw)}")
+                                st.write(f"**Raw data:** {importance_raw}")
+                                
+                                if feature_names:
+                                    st.write(f"**Available feature names:** {feature_names}")
+                            
+                            else:
+                                st.info("No feature importance data available for this instance.")
+                                if feature_names:
+                                    st.write(f"**Available features:** {len(feature_names)} features")
+                                    with st.expander("📋 Feature Names"):
+                                        for i, name in enumerate(feature_names):
+                                            st.write(f"{i}: {name}")
+                        
+                        with inst_tab4:
+                            st.markdown(f"##### 🧩 {selected_combo['method'].title()} Specific Analysis")
+                            
+                            method = selected_combo['method'].lower()
+                            
+                            # SHAP-specific analysis
+                            if "shap" in method:
+                                st.markdown("**SHAP Value Analysis**")
+                                
+                                shap_values = parse_feature_importance(selected_explanation.get("feature_importance", []))
+                                
+                                if shap_values and feature_names and len(feature_names) >= len(shap_values):
+                                    # Create waterfall effect
+                                    baseline = selected_explanation.get("baseline_prediction", 0)
+                                    
+                                    shap_df = pd.DataFrame({
+                                        "Feature": feature_names[:len(shap_values)],
+                                        "SHAP_Value": shap_values
+                                    }).sort_values("SHAP_Value", key=abs, ascending=False).head(15)
+                                        
+                                        fig = px.bar(
+                                            shap_df,
+                                            x="SHAP_Value",
+                                            y="Feature",
+                                            orientation='h',
+                                            title="SHAP Values (Waterfall Style)",
+                                            color="SHAP_Value",
+                                            color_continuous_scale="RdBu_r"
+                                        )
+                                        fig.add_vline(x=0, line_dash="dash", line_color="black", line_width=2)
+                                        fig.update_layout(height=500)
+                                        st.plotly_chart(fig, use_container_width=True)
+                                        
+                                        # Show cumulative effect
+                                        cumulative_effect = baseline + sum(shap_values)
+                                        st.write(f"**Baseline Prediction:** {baseline:.4f}")
+                                        st.write(f"**Final Prediction:** {cumulative_effect:.4f}")
+                                        st.write(f"**Total SHAP Effect:** {sum(shap_values):.4f}")
+                            
+                            # LIME-specific analysis
+                            elif "lime" in method:
+                                st.markdown("**LIME Local Explanation**")
+                                st.info("LIME provides local linear approximations around this instance.")
+                                
+                                lime_explanation = parse_feature_importance(selected_explanation.get("feature_importance", []))
+                                
+                                if lime_explanation and feature_names and len(feature_names) >= len(lime_explanation):
+                                    # LIME typically shows fewer features
+                                    lime_df = pd.DataFrame({
+                                        "Feature": feature_names[:len(lime_explanation)],
+                                        "LIME_Weight": lime_explanation
+                                    }).sort_values("LIME_Weight", key=abs, ascending=False).head(10)
+                                        
+                                        fig = px.bar(
+                                            lime_df,
+                                            x="LIME_Weight",
+                                            y="Feature",
+                                            orientation='h',
+                                            title="LIME Feature Weights",
+                                            color="LIME_Weight",
+                                            color_continuous_scale="RdBu_r"
+                                        )
+                                        fig.add_vline(x=0, line_dash="dash", line_color="black")
+                                        st.plotly_chart(fig, use_container_width=True)
+                            
+                            # Counterfactual-specific analysis
+                            elif "counterfactual" in method:
+                                st.markdown("**Counterfactual Analysis**")
+                                
+                                if "counterfactual" in selected_explanation:
+                                    original = selected_explanation.get("original_instance", [])
+                                    counterfactual = selected_explanation["counterfactual"]
+                                    
+                                    if len(original) == len(counterfactual):
+                                        # Show changes
+                                        feature_names = selected_explanation.get("feature_names", [f"Feature_{i}" for i in range(len(original))])
+                                        
+                                        changes_df = pd.DataFrame({
+                                            "Feature": feature_names,
+                                            "Original": original,
+                                            "Counterfactual": counterfactual,
+                                            "Changed": [orig != cf for orig, cf in zip(original, counterfactual)]
+                                        })
+                                        
+                                        # Highlight changed features
+                                        changed_features = changes_df[changes_df["Changed"]]
+                                        
+                                        if not changed_features.empty:
+                                            st.markdown("**Features that need to change:**")
+                                            st.dataframe(changed_features, use_container_width=True)
+                                        else:
+                                            st.info("No feature changes required for counterfactual.")
+                                        
+                                        # Show all features
+                                        st.markdown("**All Features Comparison:**")
+                                        st.dataframe(changes_df, use_container_width=True)
+                            
+                            # Prototype-specific analysis
+                            elif "prototype" in method:
+                                st.markdown("**Prototype Analysis**")
+                                
+                                if "prototype" in selected_explanation:
+                                    prototype = selected_explanation["prototype"]
+                                    original = selected_explanation.get("original_instance", [])
+                                    
+                                    if len(original) == len(prototype):
+                                        feature_names = selected_explanation.get("feature_names", [f"Feature_{i}" for i in range(len(original))])
+                                        
+                                        proto_df = pd.DataFrame({
+                                            "Feature": feature_names,
+                                            "Original": original,
+                                            "Prototype": prototype,
+                                            "Difference": [abs(orig - proto) if isinstance(orig, (int, float)) and isinstance(proto, (int, float)) else "N/A" for orig, proto in zip(original, prototype)]
+                                        })
+                                        
+                                        st.dataframe(proto_df, use_container_width=True)
+                                
+                                if "prototype_similarity" in selected_explanation:
+                                    similarity = selected_explanation["prototype_similarity"]
+                                    st.write(f"**Prototype Similarity:** {similarity:.4f}")
+                            
+                            # Generic method analysis
+                            else:
+                                st.markdown(f"**{selected_combo['method'].title()} Analysis**")
+                                
+                                # Show any method-specific fields
+                                method_specific_fields = []
+                                for key, value in selected_explanation.items():
+                                    if key not in ["prediction", "true_label", "confidence", "feature_names", "feature_importance", "original_instance", "generation_time", "instance_id"]:
+                                        method_specific_fields.append((key, value))
+                                
+                                if method_specific_fields:
+                                    for key, value in method_specific_fields:
+                                        st.write(f"**{key.replace('_', ' ').title()}:** {value}")
+                                else:
+                                    st.info(f"No specific analysis available for {selected_combo['method']} method.")
+                            
+                            # Raw explanation data
+                            with st.expander("🔍 Raw Explanation Data"):
+                                st.json(selected_explanation)
+                    
+                    else:
+                        st.warning("Selected explanation is not in the expected format.")
+                        st.json(selected_explanation)
     
     with tab1:
         st.header("📈 Experiment Overview")
         
-        # High-level experiment summary
+        # Experiment info
         exp_info = results.get('experiment_info', {})
-        
-        # Key metrics at the top
-        col1, col2, col3, col4, col5 = st.columns(5)
+        col1, col2, col3, col4 = st.columns(4)
         
         with col1:
-            st.metric("📅 Run Date", exp_info.get('timestamp', 'N/A')[:10] if exp_info.get('timestamp') else 'N/A')
+            st.metric("Timestamp", exp_info.get('timestamp', 'N/A'))
         with col2:
-            st.metric("🔗 Total Combinations", len(results.get('evaluation_results', {})))
+            st.metric("Total Combinations", len(results.get('comprehensive_results', [])))
         with col3:
-            st.metric("📊 Datasets", len(set(metrics_df['Dataset']) if not metrics_df.empty else []))
+            st.metric("Datasets", len(set(metrics_df['Dataset']) if not metrics_df.empty else []))
         with col4:
-            st.metric("🤖 Models", len(set(metrics_df['Model']) if not metrics_df.empty else []))
-        with col5:
-            st.metric("🔍 XAI Methods", len(set(metrics_df['Method']) if not metrics_df.empty else []))
-        
-        st.markdown("---")
-        
-        # Experiment composition breakdown
-        if not metrics_df.empty:
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                st.subheader("🏗️ Experiment Composition")
-                
-                # Dataset distribution
-                dataset_counts = metrics_df['Dataset'].value_counts()
-                fig_datasets = px.bar(
-                    x=dataset_counts.index, 
-                    y=dataset_counts.values,
-                    title="Distribution by Dataset",
-                    color=dataset_counts.index,
-                    color_discrete_sequence=px.colors.qualitative.Set3
-                )
-                fig_datasets.update_layout(xaxis_title="Dataset", yaxis_title="Count")
-                st.plotly_chart(fig_datasets, use_container_width=True)
-                
-                # Model distribution  
-                model_counts = metrics_df['Model'].value_counts()
-                fig_models = px.bar(
-                    x=model_counts.index, 
-                    y=model_counts.values,
-                    title="Distribution by Model Type",
-                    color=model_counts.index,
-                    color_discrete_sequence=px.colors.qualitative.Pastel
-                )
-                fig_models.update_layout(xaxis_title="Model", yaxis_title="Count")
-                st.plotly_chart(fig_models, use_container_width=True)
-            
-            with col2:
-                st.subheader("📊 Performance Overview")
-                
-                # Success rate analysis
-                success_rates = []
-                for _, row in metrics_df.iterrows():
-                    # Calculate overall success based on multiple metrics
-                    faithfulness = row.get('Faithfulness', 0)
-                    stability = row.get('Stability', 0)
-                    completeness = row.get('Completeness', 0)
-                    overall_score = (faithfulness + stability + completeness) / 3
-                    success_rates.append({
-                        'Combination': f"{row['Dataset']}-{row['Model']}-{row['Method'][:10]}",
-                        'Overall Score': overall_score,
-                        'Dataset': row['Dataset'],
-                        'Model': row['Model'],
-                        'Method': row['Method']
-                    })
-                
-                if success_rates:
-                    success_df = pd.DataFrame(success_rates)
-                    
-                    # Top performing combinations
-                    top_combinations = success_df.nlargest(10, 'Overall Score')
-                    fig_top = px.bar(
-                        top_combinations, 
-                        x='Overall Score', 
-                        y='Combination',
-                        color='Dataset',
-                        title="Top 10 Performing Combinations",
-                        orientation='h'
-                    )
-                    fig_top.update_layout(height=400)
-                    st.plotly_chart(fig_top, use_container_width=True)
-                    
-                    # Method performance comparison
-                    method_performance = success_df.groupby('Method')['Overall Score'].agg(['mean', 'std', 'count']).reset_index()
-                    method_performance.columns = ['Method', 'Average Score', 'Std Dev', 'Count']
-                    method_performance = method_performance.sort_values('Average Score', ascending=False)
-                    
-                    fig_methods = px.bar(
-                        method_performance.head(10), 
-                        x='Method', 
-                        y='Average Score',
-                        error_y='Std Dev',
-                        title="Average Performance by XAI Method",
-                        color='Average Score',
-                        color_continuous_scale='viridis'
-                    )
-                    fig_methods.update_xaxes(tickangle=45)
-                    st.plotly_chart(fig_methods, use_container_width=True)
-            
-            st.markdown("---")
-            
-            # Detailed breakdown tables
-            st.subheader("📋 Detailed Breakdown")
-            
-            tab_datasets, tab_models, tab_methods = st.tabs(["📊 By Dataset", "🤖 By Model", "🔍 By Method"])
-            
-            with tab_datasets:
-                dataset_summary = metrics_df.groupby('Dataset').agg({
-                    'Faithfulness': ['mean', 'std', 'count'],
-                    'Stability': ['mean', 'std'],
-                    'Completeness': ['mean', 'std'],
-                    'Sparsity': ['mean', 'std']
-                }).round(3)
-                dataset_summary.columns = [f'{col[0]} {col[1].title()}' for col in dataset_summary.columns]
-                st.dataframe(dataset_summary, use_container_width=True)
-                
-                # Dataset performance heatmap
-                dataset_metrics = metrics_df.groupby('Dataset')[['Faithfulness', 'Stability', 'Completeness', 'Sparsity']].mean()
-                fig_heatmap = px.imshow(
-                    dataset_metrics.T, 
-                    labels=dict(x="Dataset", y="Metric", color="Score"),
-                    title="Performance Heatmap by Dataset",
-                    color_continuous_scale='RdYlBu_r'
-                )
-                st.plotly_chart(fig_heatmap, use_container_width=True)
-            
-            with tab_models:
-                model_summary = metrics_df.groupby('Model').agg({
-                    'Faithfulness': ['mean', 'std', 'count'],
-                    'Stability': ['mean', 'std'],
-                    'Completeness': ['mean', 'std'],
-                    'Sparsity': ['mean', 'std']
-                }).round(3)
-                model_summary.columns = [f'{col[0]} {col[1].title()}' for col in model_summary.columns]
-                st.dataframe(model_summary, use_container_width=True)
-                
-                # Model comparison radar chart
-                model_metrics = metrics_df.groupby('Model')[['Faithfulness', 'Stability', 'Completeness', 'Sparsity']].mean()
-                fig_radar = go.Figure()
-                
-                for model in model_metrics.index:
-                    fig_radar.add_trace(go.Scatterpolar(
-                        r=model_metrics.loc[model].values.tolist() + [model_metrics.loc[model].values[0]],
-                        theta=list(model_metrics.columns) + [model_metrics.columns[0]],
-                        fill='toself',
-                        name=model
-                    ))
-                
-                fig_radar.update_layout(
-                    polar=dict(radialaxis=dict(visible=True, range=[0, 1])),
-                    title="Model Performance Comparison (Radar Chart)",
-                    height=500
-                )
-                st.plotly_chart(fig_radar, use_container_width=True)
-            
-            with tab_methods:
-                method_summary = metrics_df.groupby('Method').agg({
-                    'Faithfulness': ['mean', 'std', 'count'],
-                    'Stability': ['mean', 'std'],
-                    'Completeness': ['mean', 'std'],
-                    'Sparsity': ['mean', 'std']
-                }).round(3)
-                method_summary.columns = [f'{col[0]} {col[1].title()}' for col in method_summary.columns]
-                st.dataframe(method_summary, use_container_width=True)
-                
-                # Method correlation analysis
-                method_correlations = metrics_df[['Faithfulness', 'Stability', 'Completeness', 'Sparsity']].corr()
-                fig_corr = px.imshow(
-                    method_correlations, 
-                    labels=dict(color="Correlation"),
-                    title="Metric Correlation Analysis",
-                    color_continuous_scale='RdBu',
-                    zmin=-1, zmax=1
-                )
-                st.plotly_chart(fig_corr, use_container_width=True)
+            st.metric("Methods", len(set(metrics_df['Method']) if not metrics_df.empty else []))
         
         # Summary statistics
         if not filtered_df.empty:
@@ -914,227 +2009,20 @@ def main():
             with col2:
                 # Top performers
                 st.write("**Top Performers by Faithfulness:**")
-                top_faithful = filtered_df.nlargest(5, 'Faithfulness')[['Dataset', 'Model', 'Method', 'Faithfulness']]
+                top_faithful = filtered_df.nlargest(5, 'faithfulness')[['Dataset', 'Model', 'Method', 'faithfulness']]
                 st.dataframe(top_faithful, use_container_width=True)
     
     with tab2:
         st.header("🎯 Model Performance Analysis")
         
         if not filtered_df.empty:
-            # Model performance overview
-            st.subheader("📊 Model Performance Overview")
-            
-            # Performance metrics by model
-            model_performance = filtered_df.groupby('Model').agg({
-                'Faithfulness': ['mean', 'std', 'min', 'max'],
-                'Stability': ['mean', 'std', 'min', 'max'],
-                'Completeness': ['mean', 'std', 'min', 'max'],
-                'Sparsity': ['mean', 'std', 'min', 'max']
-            }).round(3)
-            
-            # Flatten column names
-            model_performance.columns = [f'{col[0]} {col[1].title()}' for col in model_performance.columns]
-            
-            # Display performance table
-            st.dataframe(model_performance, use_container_width=True)
-            
-            # Performance comparison visualizations
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                st.subheader("🏆 Model Ranking")
-                
-                # Calculate composite performance score
-                model_scores = filtered_df.groupby('Model')[['Faithfulness', 'Stability', 'Completeness']].mean()
-                model_scores['Composite Score'] = model_scores.mean(axis=1)
-                model_scores = model_scores.sort_values('Composite Score', ascending=False)
-                
-                # Ranking chart
-                fig_ranking = px.bar(
-                    x=model_scores['Composite Score'],
-                    y=model_scores.index,
-                    orientation='h',
-                    title="Model Ranking by Composite Performance",
-                    labels={'x': 'Composite Score', 'y': 'Model'},
-                    color=model_scores['Composite Score'],
-                    color_continuous_scale='viridis'
-                )
-                fig_ranking.update_layout(height=400)
-                st.plotly_chart(fig_ranking, use_container_width=True)
-                
-                # Performance distribution
-                st.subheader("📈 Performance Distribution")
-                metric_to_plot = st.selectbox("Select Metric:", ['Faithfulness', 'Stability', 'Completeness', 'Sparsity'])
-                
-                fig_dist = px.box(
-                    filtered_df, 
-                    x='Model', 
-                    y=metric_to_plot,
-                    title=f"{metric_to_plot} Distribution by Model",
-                    color='Model'
-                )
-                fig_dist.update_xaxes(tickangle=45)
-                st.plotly_chart(fig_dist, use_container_width=True)
-            
-            with col2:
-                st.subheader("🔥 Performance Heatmap")
-                
-                # Model performance heatmap
-                model_metrics = filtered_df.groupby('Model')[['Faithfulness', 'Stability', 'Completeness', 'Sparsity']].mean()
-                
-                fig_heatmap = px.imshow(
-                    model_metrics.T,
-                    labels=dict(x="Model", y="Metric", color="Score"),
-                    title="Model Performance Heatmap",
-                    color_continuous_scale='RdYlBu_r',
-                    aspect='auto'
-                )
-                st.plotly_chart(fig_heatmap, use_container_width=True)
-                
-                # Radar chart comparison
-                st.subheader("🎯 Multi-Metric Comparison")
-                
-                fig_radar = go.Figure()
-                colors = px.colors.qualitative.Set1
-                
-                for i, model in enumerate(model_metrics.index):
-                    values = model_metrics.loc[model].tolist()
-                    values.append(values[0])  # Close the radar chart
-                    
-                    fig_radar.add_trace(go.Scatterpolar(
-                        r=values,
-                        theta=list(model_metrics.columns) + [model_metrics.columns[0]],
-                        fill='toself',
-                        name=model,
-                        line_color=colors[i % len(colors)]
-                    ))
-                
-                fig_radar.update_layout(
-                    polar=dict(radialaxis=dict(visible=True, range=[0, 1])),
-                    title="Model Performance Radar Chart",
-                    height=400
-                )
-                st.plotly_chart(fig_radar, use_container_width=True)
-            
-            st.markdown("---")
-            
-            # Detailed model analysis
-            st.subheader("🔬 Detailed Model Analysis")
-            
-            # Model selection for detailed view
-            selected_models = st.multiselect(
-                "Select Models for Detailed Analysis:", 
-                options=filtered_df['Model'].unique(),
-                default=filtered_df['Model'].unique()[:3] if len(filtered_df['Model'].unique()) > 3 else filtered_df['Model'].unique()
-            )
-            
-            if selected_models:
-                detailed_df = filtered_df[filtered_df['Model'].isin(selected_models)]
-                
-                # Performance trends and patterns
-                tab_trends, tab_datasets, tab_methods = st.tabs(["📈 Performance Trends", "📊 By Dataset", "🔍 By Method"])
-                
-                with tab_trends:
-                    # Performance trend analysis
-                    if 'Timestamp' in detailed_df.columns:
-                        # Time-based performance trends
-                        trend_data = detailed_df.groupby(['Model', 'Timestamp'])[['Faithfulness', 'Stability', 'Completeness']].mean().reset_index()
-                        
-                        for metric in ['Faithfulness', 'Stability', 'Completeness']:
-                            fig_trend = px.line(
-                                trend_data, 
-                                x='Timestamp', 
-                                y=metric, 
-                                color='Model',
-                                title=f"{metric} Trends Over Time"
-                            )
-                            st.plotly_chart(fig_trend, use_container_width=True)
-                    else:
-                        # Performance variability analysis
-                        variability_data = []
-                        for model in selected_models:
-                            model_data = detailed_df[detailed_df['Model'] == model]
-                            for metric in ['Faithfulness', 'Stability', 'Completeness', 'Sparsity']:
-                                variability_data.append({
-                                    'Model': model,
-                                    'Metric': metric,
-                                    'Mean': model_data[metric].mean(),
-                                    'Std': model_data[metric].std(),
-                                    'Coefficient of Variation': model_data[metric].std() / model_data[metric].mean() if model_data[metric].mean() > 0 else 0
-                                })
-                        
-                        var_df = pd.DataFrame(variability_data)
-                        
-                        fig_var = px.bar(
-                            var_df, 
-                            x='Model', 
-                            y='Coefficient of Variation', 
-                            color='Metric',
-                            title="Performance Variability (Coefficient of Variation)",
-                            barmode='group'
-                        )
-                        st.plotly_chart(fig_var, use_container_width=True)
-                        
-                        st.dataframe(var_df.pivot(index='Model', columns='Metric', values=['Mean', 'Std', 'Coefficient of Variation']), 
-                                   use_container_width=True)
-                
-                with tab_datasets:
-                    # Performance by dataset
-                    dataset_performance = detailed_df.groupby(['Model', 'Dataset'])[['Faithfulness', 'Stability', 'Completeness']].mean().reset_index()
-                    
-                    fig_dataset = px.box(
-                        detailed_df, 
-                        x='Dataset', 
-                        y='Faithfulness', 
-                        color='Model',
-                        title="Model Performance Across Datasets"
-                    )
-                    st.plotly_chart(fig_dataset, use_container_width=True)
-                    
-                    # Dataset-specific model ranking
-                    for dataset in detailed_df['Dataset'].unique():
-                        st.write(f"**{dataset.title()} Dataset Performance:**")
-                        dataset_subset = detailed_df[detailed_df['Dataset'] == dataset]
-                        dataset_ranking = dataset_subset.groupby('Model')[['Faithfulness', 'Stability', 'Completeness']].mean()
-                        dataset_ranking['Composite'] = dataset_ranking.mean(axis=1)
-                        dataset_ranking = dataset_ranking.sort_values('Composite', ascending=False)
-                        st.dataframe(dataset_ranking.round(3), use_container_width=True)
-                
-                with tab_methods:
-                    # Performance by XAI method
-                    method_performance = detailed_df.groupby(['Model', 'Method'])[['Faithfulness', 'Stability', 'Completeness']].mean().reset_index()
-                    
-                    fig_method = px.scatter(
-                        method_performance, 
-                        x='Faithfulness', 
-                        y='Stability', 
-                        color='Model',
-                        size='Completeness',
-                        hover_data=['Method'],
-                        title="Model Performance by XAI Method (Faithfulness vs Stability)"
-                    )
-                    st.plotly_chart(fig_method, use_container_width=True)
-                    
-                    # Method compatibility analysis
-                    compatibility_matrix = detailed_df.pivot_table(
-                        index='Model', 
-                        columns='Method', 
-                        values='Faithfulness', 
-                        aggfunc='mean'
-                    ).fillna(0)
-                    
-                    fig_compat = px.imshow(
-                        compatibility_matrix,
-                        labels=dict(x="XAI Method", y="Model", color="Faithfulness"),
-                        title="",
-                        color_continuous_scale='viridis'
-                    )
-                    st.plotly_chart(fig_compat, use_container_width=True)
+            # Model comparison heatmap
+            st.subheader("🔥 Model Performance Heatmap")
             
             # Select metric for heatmap
             heatmap_metric = st.selectbox(
                 "Select Metric for Heatmap:",
-                ['Faithfulness', 'Monotonicity', 'Completeness', 'Stability', 'Consistency', 'Sparsity', 'Simplicity'],
+                ['faithfulness', 'monotonicity', 'completeness', 'stability', 'consistency', 'sparsity', 'simplicity'],
                 key='heatmap_metric'
             )
             
@@ -1162,6 +2050,24 @@ def main():
             )
             st.plotly_chart(fig, use_container_width=True)
             
+            # Model comparison bar chart
+            st.subheader("📊 Model Comparison")
+            
+            metric_to_plot = st.selectbox(
+                "Select Metric to Compare:",
+                ['faithfulness', 'monotonicity', 'completeness', 'stability', 'consistency', 'sparsity', 'simplicity']
+            )
+            
+            if metric_to_plot in filtered_df.columns:
+                fig = px.bar(
+                    filtered_df.groupby(['Dataset', 'Model'])[metric_to_plot].mean().reset_index(),
+                    x='Model',
+                    y=metric_to_plot,
+                    color='Dataset',
+                    title=f"Average {metric_to_plot.title()} by Model and Dataset",
+                    barmode='group'
+                )
+                st.plotly_chart(fig, use_container_width=True)
     
     with tab3:
         st.header("🔍 Explanation Method Analysis")
@@ -1171,7 +2077,7 @@ def main():
             st.subheader("📊 Explanation Method Comparison")
             
             # Radar chart for method comparison
-            method_metrics = ['Faithfulness', 'Monotonicity', 'Completeness', 'Stability', 'Consistency', 'Sparsity', 'Simplicity']
+            method_metrics = ['faithfulness', 'monotonicity', 'completeness', 'stability', 'consistency', 'sparsity', 'simplicity']
             
             selected_methods = st.multiselect(
                 "Select methods to compare:",
@@ -1220,16 +2126,9 @@ def main():
             # Time complexity analysis
             st.subheader("⏱️ Time Complexity Analysis")
             
-            # Check if required columns exist before merging
-            explanation_cols = ['Dataset', 'Model', 'Method']
-            if 'Generation Time (s)' in explanation_df.columns:
-                explanation_cols.append('Generation Time (s)')
-            if 'Number of Explanations' in explanation_df.columns:
-                explanation_cols.append('Number of Explanations')
-            
             # Merge metrics with explanation data
             merged_df = filtered_df.merge(
-                explanation_df[explanation_cols],
+                explanation_df[['Dataset', 'Model', 'Method', 'Generation Time (s)', 'Number of Explanations']],
                 on=['Dataset', 'Model', 'Method'],
                 how='left'
             )
@@ -1238,813 +2137,45 @@ def main():
             
             with col1:
                 # Time vs Performance scatter plot
-                if 'Generation Time (s)' in merged_df.columns:
-                    scatter_kwargs = {
-                        'x': 'Generation Time (s)',
-                        'y': 'Faithfulness',
-                        'color': 'Method',
-                        'hover_data': ['Dataset', 'Model'],
-                        'title': "Time Complexity vs Faithfulness"
-                    }
-                    
-                    # Add size parameter only if the column exists
-                    if 'Number of Explanations' in merged_df.columns:
-                        scatter_kwargs['size'] = 'Number of Explanations'
-                    
-                    fig = px.scatter(merged_df, **scatter_kwargs)
-                    st.plotly_chart(fig, use_container_width=True)
-                else:
-                    st.info("⚠️ Generation time data not available for current selection")
+                scatter_kwargs = {
+                    'x': 'Generation Time (s)',
+                    'y': 'faithfulness',
+                    'color': 'Method',
+                    'hover_data': ['Dataset', 'Model'],
+                    'title': "Time Complexity vs Faithfulness"
+                }
+                
+                # Add size parameter only if the column exists
+                if 'Number of Explanations' in merged_df.columns:
+                    scatter_kwargs['size'] = 'Number of Explanations'
+                
+                fig = px.scatter(merged_df, **scatter_kwargs)
+                st.plotly_chart(fig, use_container_width=True)
             
             with col2:
                 # Time distribution by method
-                if 'Generation Time (s)' in merged_df.columns:
-                    # Convert to milliseconds for better readability when values are very small
-                    max_time = merged_df['Generation Time (s)'].max()
-                    
-                    if max_time < 0.1:  # If max time is less than 100ms
-                        # Convert to milliseconds
-                        merged_df['Generation Time (ms)'] = merged_df['Generation Time (s)'] * 1000
-                        
-                        fig = px.box(
-                            merged_df,
-                            x='Method',
-                            y='Generation Time (ms)',
-                            title="Generation Time Distribution by Method (milliseconds)"
-                        )
-                        
-                        # Set appropriate y-axis range for millisecond values
-                        max_time_ms = merged_df['Generation Time (ms)'].max()
-                        if max_time_ms > 0:
-                            fig.update_yaxes(range=[0, max_time_ms * 1.2])
-                        
-                        # Show mean values as annotations
-                        method_means = merged_df.groupby('Method')['Generation Time (ms)'].mean()
-                        for i, (method, mean_val) in enumerate(method_means.items()):
-                            fig.add_annotation(
-                                x=i,
-                                y=mean_val,
-                                text=f"μ={mean_val:.2f}ms",
-                                showarrow=True,
-                                arrowhead=2,
-                                arrowsize=1,
-                                arrowwidth=2,
-                                arrowcolor="red",
-                                font=dict(size=10, color="red")
-                            )
-                    
-                    else:
-                        # Use original seconds for larger values
-                        fig = px.box(
-                            merged_df,
-                            x='Method',
-                            y='Generation Time (s)',
-                            title="Generation Time Distribution by Method (seconds)"
-                        )
-                        
-                        # Show mean values as annotations
-                        method_means = merged_df.groupby('Method')['Generation Time (s)'].mean()
-                        for i, (method, mean_val) in enumerate(method_means.items()):
-                            fig.add_annotation(
-                                x=i,
-                                y=mean_val,
-                                text=f"μ={mean_val:.3f}s",
-                                showarrow=True,
-                                arrowhead=2,
-                                arrowsize=1,
-                                arrowwidth=2,
-                                arrowcolor="red",
-                                font=dict(size=10, color="red")
-                            )
-                    
-                    # Rotate x-axis labels for better readability
-                    fig.update_xaxes(tickangle=45)
-                    
-                    # Add grid for better readability
-                    fig.update_layout(
-                        showlegend=False,
-                        yaxis=dict(gridcolor='lightgray', gridwidth=1),
-                        xaxis=dict(gridcolor='lightgray', gridwidth=1)
-                    )
-                    
-                    st.plotly_chart(fig, use_container_width=True)
-                    
-                    # Show summary statistics
-                    time_stats = merged_df.groupby('Method')['Generation Time (s)'].agg(['mean', 'std', 'min', 'max']).round(4)
-                    st.subheader("📊 Time Statistics by Method")
-                    st.dataframe(time_stats, use_container_width=True)
-                    
-                else:
-                    st.info("⚠️ Generation time data not available for current selection")
+                fig = px.box(
+                    merged_df,
+                    x='Method',
+                    y='Generation Time (s)',
+                    title="Generation Time Distribution by Method"
+                )
+                st.plotly_chart(fig, use_container_width=True)
             
             # Performance vs Time efficiency
             st.subheader("⚡ Efficiency Analysis")
             
-            if 'Generation Time (s)' in merged_df.columns:
-                # Calculate efficiency score (faithfulness / time)
-                merged_df['efficiency'] = merged_df['Faithfulness'] / (merged_df['Generation Time (s)'] + 1e-6)
-                
-                fig = px.bar(
-                    merged_df.groupby('Method')['efficiency'].mean().reset_index(),
-                    x='Method',
-                    y='efficiency',
-                    title="Efficiency Score (Faithfulness / Time) by Method"
-                )
-                st.plotly_chart(fig, use_container_width=True)
-            else:
-                st.info("⚠️ Efficiency analysis requires generation time data")
-    
-    with tab5:
-        st.header("📊 Comparative Analysis")
-        
-        if not filtered_df.empty:
-            # Correlation analysis
-            st.subheader("🔗 Metric Correlations")
+            # Calculate efficiency score (faithfulness / time)
+            merged_df['efficiency'] = merged_df['faithfulness'] / (merged_df['Generation Time (s)'] + 1e-6)
             
-            numeric_cols = filtered_df.select_dtypes(include=[np.number]).columns
-            correlation_matrix = filtered_df[numeric_cols].corr()
-            
-            fig = px.imshow(
-                correlation_matrix,
-                color_continuous_scale='RdBu',
-                aspect='auto',
-                title="Metric Correlation Matrix"
+            fig = px.bar(
+                merged_df.groupby('Method')['efficiency'].mean().reset_index(),
+                x='Method',
+                y='efficiency',
+                title="Efficiency Score (Faithfulness / Time) by Method"
             )
             st.plotly_chart(fig, use_container_width=True)
-            
-            # Multi-dimensional analysis
-            st.subheader("🎯 Multi-dimensional Analysis")
-            
-            # Create multiple visualizations in columns
-            col1, col2 = st.columns(2)
-            
-            # PCA-like visualization using top metrics
-            top_metrics = ['Faithfulness', 'Monotonicity', 'Completeness', 'Stability']
-            
-            with col1:
-                if len(top_metrics) >= 2:
-                    fig = px.scatter(
-                        filtered_df,
-                        x=top_metrics[0],
-                        y=top_metrics[1],
-                        color='Method',
-                        size='Consistency',
-                        hover_data=['Dataset', 'Model'],
-                        title=f"{top_metrics[0].title()} vs {top_metrics[1].title()}"
-                    )
-                    st.plotly_chart(fig, use_container_width=True)
-                
-                # Performance vs Robustness scatter
-                st.subheader("🔄 Performance vs Robustness")
-                fig_robust = px.scatter(
-                    filtered_df,
-                    x='Faithfulness',
-                    y='Stability',
-                    color='Dataset',
-                    size='Completeness',
-                    hover_data=['Method', 'Model'],
-                    title="Performance vs Robustness Analysis"
-                )
-                st.plotly_chart(fig_robust, use_container_width=True)
-            
-            with col2:
-                # 3D visualization
-                st.subheader("🎯 3D Performance Space")
-                fig_3d = px.scatter_3d(
-                    filtered_df,
-                    x='Faithfulness',
-                    y='Stability', 
-                    z='Completeness',
-                    color='Method',
-                    size='Consistency',
-                    hover_data=['Dataset', 'Model'],
-                    title="3D Performance Analysis"
-                )
-                st.plotly_chart(fig_3d, use_container_width=True)
-                
-                # Parallel coordinates plot
-                st.subheader("🌐 Parallel Coordinates")
-                parallel_metrics = ['Faithfulness', 'Stability', 'Completeness', 'Sparsity', 'Consistency']
-                fig_parallel = px.parallel_coordinates(
-                    filtered_df,
-                    dimensions=parallel_metrics,
-                    color='Faithfulness',
-                    title="Multi-metric Parallel Coordinates"
-                )
-                st.plotly_chart(fig_parallel, use_container_width=True)
     
-    # --- Tab 6: Explanation Visualizations ---
-    with tab6:
-        st.header("🧩 Explanation Visualizations")
-        
-        # Check if detailed explanations exist
-        detailed_dir = Path("results/detailed_explanations")
-        
-        if not detailed_dir.exists():
-            st.warning("No detailed explanation reports found. Run comprehensive benchmarking with `--comprehensive` flag to generate detailed reports.")
-            return
-        
-        # Add view mode selector at the top
-        view_mode = st.radio("Select View Mode:", 
-                           ["📄 Summary Reports", "🔍 Individual Explanations"],
-                           horizontal=True)
-        
-        # Get available combinations - filter based on view mode
-        combinations = []
-        for dataset_dir in detailed_dir.iterdir():
-            if dataset_dir.is_dir():
-                dataset_name = dataset_dir.name
-                for model_dir in dataset_dir.iterdir():
-                    if model_dir.is_dir():
-                        model_name = model_dir.name
-                        # For visualization, only include combinations with individual explanation files
-                        if view_mode == "🔍 Individual Explanations":
-                            for method_file in model_dir.glob("*_detailed_explanations.json"):
-                                method_name = method_file.stem.replace("_detailed_explanations", "")
-                                combinations.append((dataset_name, model_name, method_name))
-                        else:
-                            # For reports, use the report files
-                            for method_file in model_dir.glob("*_detailed_report.md"):
-                                method_name = method_file.stem.replace("_detailed_report", "")
-                                combinations.append((dataset_name, model_name, method_name))
-        
-        if not combinations:
-            st.warning("No detailed explanation reports found in the results directory.")
-            return
-        
-        # Selection interface
-        st.subheader("🔍 Select Report to View")
-        
-        col1, col2, col3 = st.columns(3)
-        
-        datasets = sorted(set(combo[0] for combo in combinations))
-        with col1:
-            selected_dataset = st.selectbox("Select Dataset", ["All"] + datasets, key="detailed_dataset")
-        
-        # Filter models based on dataset
-        if selected_dataset == "All":
-            filtered_combos = combinations
-        else:
-            filtered_combos = [combo for combo in combinations if combo[0] == selected_dataset]
-        
-        models = sorted(set(combo[1] for combo in filtered_combos))
-        with col2:
-            selected_model = st.selectbox("Select Model", ["All"] + models, key="detailed_model")
-        
-        # Filter methods based on dataset and model
-        if selected_model == "All":
-            final_combos = filtered_combos
-        else:
-            final_combos = [combo for combo in filtered_combos if combo[1] == selected_model]
-        
-        methods = sorted(set(combo[2] for combo in final_combos))
-        with col3:
-            selected_method = st.selectbox("Select Method", ["All"] + methods, key="detailed_method")
-        
-        # Apply final filter
-        if selected_method != "All":
-            final_combos = [combo for combo in final_combos if combo[2] == selected_method]
-        
-        # Display reports
-        if final_combos:
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                st.subheader("📊 Evaluation Metrics")
-                if not filtered_df.empty:
-                    st.dataframe(filtered_df, use_container_width=True)
-                    
-                    # Download button
-                    csv = filtered_df.to_csv(index=False)
-                    st.download_button(
-                        label="📥 Download Metrics CSV",
-                        data=csv,
-                        file_name="xai_benchmark_metrics.csv",
-                        mime="text/csv"
-                    )
-            
-            with col2:
-                st.subheader("⏱️ Explanation Performance")
-                if not explanation_df.empty:
-                    st.dataframe(explanation_df, use_container_width=True)
-                    
-                    # Download button
-                    csv = explanation_df.to_csv(index=False)
-                    st.download_button(
-                        label="📥 Download Performance CSV",
-                        data=csv,
-                        file_name="xai_benchmark_performance.csv",
-                        mime="text/csv"
-                    )
-            
-            # Configuration info
-            st.subheader("⚙️ Experiment Configuration")
-            config = results.get('experiment_info', {}).get('config', {})
-            st.json(config)
-    
-    # --- New Tab: Detailed Explanation Reports ---
-    with tab7:
-        st.header("📑 Detailed Explanation Reports")
-        
-        # Check if detailed explanations exist
-        detailed_dir = Path("results/detailed_explanations")
-        
-        if not detailed_dir.exists():
-            st.warning("No detailed explanation reports found. Run comprehensive benchmarking with `--comprehensive` flag to generate detailed reports.")
-            return
-        
-        # Add view mode selector at the top
-        view_mode = st.radio("Select View Mode:", 
-                           ["📄 Summary Reports", "🔍 Individual Explanations"],
-                           horizontal=True)
-        
-        # Get available combinations - filter based on view mode
-        combinations = []
-        for dataset_dir in detailed_dir.iterdir():
-            if dataset_dir.is_dir():
-                dataset_name = dataset_dir.name
-                for model_dir in dataset_dir.iterdir():
-                    if model_dir.is_dir():
-                        model_name = model_dir.name
-                        # For visualization, only include combinations with individual explanation files
-                        if view_mode == "🔍 Individual Explanations":
-                            for method_file in model_dir.glob("*_detailed_explanations.json"):
-                                method_name = method_file.stem.replace("_detailed_explanations", "")
-                                combinations.append((dataset_name, model_name, method_name))
-                        else:
-                            # For reports, use the report files
-                            for method_file in model_dir.glob("*_detailed_report.md"):
-                                method_name = method_file.stem.replace("_detailed_report", "")
-                                combinations.append((dataset_name, model_name, method_name))
-        
-        if not combinations:
-            st.warning("No detailed explanation reports found in the results directory.")
-            return
-        
-        # Selection interface
-        st.subheader("🔍 Select Report to View")
-        
-        col1, col2, col3 = st.columns(3)
-        
-        datasets = sorted(set(combo[0] for combo in combinations))
-        with col1:
-            selected_dataset = st.selectbox("Select Dataset", ["All"] + datasets, key="detailed_dataset")
-        
-        # Filter models based on dataset
-        if selected_dataset == "All":
-            filtered_combos = combinations
-        else:
-            filtered_combos = [combo for combo in combinations if combo[0] == selected_dataset]
-        
-        models = sorted(set(combo[1] for combo in filtered_combos))
-        with col2:
-            selected_model = st.selectbox("Select Model", ["All"] + models, key="detailed_model")
-        
-        # Filter methods based on dataset and model
-        if selected_model == "All":
-            final_combos = filtered_combos
-        else:
-            final_combos = [combo for combo in filtered_combos if combo[1] == selected_model]
-        
-        methods = sorted(set(combo[2] for combo in final_combos))
-        with col3:
-            selected_method = st.selectbox("Select Method", ["All"] + methods, key="detailed_method")
-        
-        # Apply final filter
-        if selected_method != "All":
-            final_combos = [combo for combo in final_combos if combo[2] == selected_method]
-        
-        # Display reports
-        if final_combos:
-            # Overview table
-            st.subheader("📊 Reports Overview")
-            
-            overview_data = []
-            for dataset, model, method in final_combos:
-                report_path = detailed_dir / dataset / model / f"{method}_detailed_report.md"
-                if report_path.exists():
-                    try:
-                        with open(report_path, 'r', encoding='utf-8') as f:
-                            content = f.read()
-                        
-                        # Extract summary stats
-                        total_instances = "N/A"
-                        valid_explanations = "N/A"
-                        errors = "N/A"
-                        accuracy = "N/A"
-                        
-                        # Parse summary statistics
-                        import re
-                        total_match = re.search(r'\*\*Total Instances:\*\*\s*(\d+)', content)
-                        if total_match:
-                            total_instances = int(total_match.group(1))
-                        
-                        valid_match = re.search(r'\*\*Valid Explanations:\*\*\s*(\d+)', content)
-                        if valid_match:
-                            valid_explanations = int(valid_match.group(1))
-                        
-                        error_match = re.search(r'\*\*Errors:\*\*\s*(\d+)', content)
-                        if error_match:
-                            errors = int(error_match.group(1))
-                        
-                        acc_match = re.search(r'\*\*Model Accuracy:\*\*\s*([\d.]+)', content)
-                        if acc_match:
-                            accuracy = float(acc_match.group(1))
-                        
-                        overview_data.append({
-                            'Dataset': dataset,
-                            'Model': model,
-                            'Method': method,
-                            'Total Instances': total_instances,
-                            'Valid Explanations': valid_explanations,
-                            'Errors': errors,
-                            'Model Accuracy': accuracy
-                        })
-                    except Exception as e:
-                        st.error(f"Error reading {report_path}: {e}")
-            
-            if overview_data:
-                overview_df = pd.DataFrame(overview_data)
-                st.dataframe(overview_df, use_container_width=True)
-                
-                # Visualizations
-                col1, col2 = st.columns(2)
-                
-                with col1:
-                    # Success rate chart
-                    overview_df['Success Rate'] = (overview_df['Valid Explanations'].astype(float) / 
-                                                 overview_df['Total Instances'].astype(float) * 100).round(2)
-                    fig = px.bar(overview_df, x='Method', y='Success Rate', color='Dataset',
-                               title="Explanation Success Rate by Method")
-                    st.plotly_chart(fig, use_container_width=True)
-                
-                with col2:
-                    # Model accuracy vs explanation success
-                    fig = px.scatter(overview_df, x='Model Accuracy', y='Success Rate', 
-                                   color='Method', size='Valid Explanations',
-                                   hover_data=['Dataset', 'Model'],
-                                   title="Model Accuracy vs Explanation Success")
-                    st.plotly_chart(fig, use_container_width=True)
-            
-            # Individual explanation viewer - Fix 3
-            st.subheader("🔍 Individual Explanation Viewer")
-            
-            if view_mode == "🔍 Individual Explanations":
-                # Individual explanation browser with enhanced visualization
-                if len(final_combos) > 0:
-                    # Create formatted labels in the style you requested
-                    combo_labels = []
-                    combo_keys = []
-                    for combo in final_combos:
-                        dataset, model, method = combo
-                        # Format: adult_income_decision_tree_bayesian_rule_list
-                        formatted_key = f"{dataset}_{model}_{method}"
-                        combo_keys.append(formatted_key)
-                        # Display label: Adult Income → Decision Tree → Bayesian Rule List
-                        display_label = f"{dataset.replace('_', ' ').title()} → {model.replace('_', ' ').title()} → {method.replace('_', ' ').title()}"
-                        combo_labels.append(display_label)
-                    
-                    selected_idx = st.selectbox("Select Explanation Method Combination:", 
-                                              range(len(combo_labels)), 
-                                              format_func=lambda x: f"📊 {combo_labels[x]}",
-                                              key="individual_combo")
-                    
-                    if selected_idx is not None:
-                        selected_combo_key = combo_keys[selected_idx]
-                        st.info(f"🔍 **Selected:** `{selected_combo_key}`")
-                    
-                    if selected_idx is not None:
-                        dataset, model, method = final_combos[selected_idx]
-                        json_path = detailed_dir / dataset / model / f"{method}_detailed_explanations.json"
-                        
-                        if json_path.exists():
-                            try:
-                                with open(json_path, 'r', encoding='utf-8') as f:
-                                    explanations_data = json.load(f)
-                                
-                                # Enhanced analysis and visualization
-                                st.success(f"📊 **Loaded {len(explanations_data)} individual explanations** for `{selected_combo_key}`")
-                                
-                                # Create overview statistics
-                                col1, col2, col3, col4 = st.columns(4)
-                                
-                                # Calculate statistics
-                                total_instances = len(explanations_data)
-                                correct_predictions = sum(1 for exp in explanations_data if exp.get('correct_prediction', False))
-                                has_importance = sum(1 for exp in explanations_data if exp.get('feature_importance') and len(exp['feature_importance']) > 0)
-                                avg_confidence = np.mean([exp.get('explanation_confidence', 0) for exp in explanations_data])
-                                
-                                with col1:
-                                    st.metric("📋 Total Instances", total_instances)
-                                with col2:
-                                    accuracy = (correct_predictions / total_instances) * 100 if total_instances > 0 else 0
-                                    st.metric("🎯 Model Accuracy", f"{accuracy:.1f}%")
-                                with col3:
-                                    feature_coverage = (has_importance / total_instances) * 100 if total_instances > 0 else 0
-                                    st.metric("📊 Feature Coverage", f"{feature_coverage:.1f}%")
-                                with col4:
-                                    st.metric("⭐ Avg Confidence", f"{avg_confidence:.3f}")
-                                
-                                # Visualization tabs for different analysis
-                                viz_tab1, viz_tab2, viz_tab3, viz_tab4 = st.tabs(["📈 Overview", "🎯 Predictions", "📊 Features", "🔍 Individual"])
-                                
-                                with viz_tab1:
-                                    # Overview Analysis
-                                    st.subheader("📈 Explanation Method Overview")
-                                    
-                                    # Create overview charts
-                                    col1, col2 = st.columns(2)
-                                    
-                                    with col1:
-                                        # Prediction accuracy distribution
-                                        accuracy_data = []
-                                        for exp in explanations_data:
-                                            accuracy_data.append({
-                                                'Instance': exp.get('instance_id', 0),
-                                                'Correct': 'Correct' if exp.get('correct_prediction', False) else 'Incorrect',
-                                                'Confidence': exp.get('explanation_confidence', 0)
-                                            })
-                                        
-                                        if accuracy_data:
-                                            acc_df = pd.DataFrame(accuracy_data)
-                                            fig_acc = px.histogram(acc_df, x='Correct', color='Correct',
-                                                                 title=f"Prediction Accuracy Distribution ({selected_combo_key})")
-                                            st.plotly_chart(fig_acc, use_container_width=True)
-                                    
-                                    with col2:
-                                        # Confidence distribution
-                                        if accuracy_data:
-                                            fig_conf = px.histogram(acc_df, x='Confidence', color='Correct',
-                                                                  title="Explanation Confidence Distribution",
-                                                                  nbins=20)
-                                            st.plotly_chart(fig_conf, use_container_width=True)
-                                    
-                                    # Method-specific insights
-                                    method_lower = method.lower()
-                                    if any(rule_method in method_lower for rule_method in ['bayesian_rule_list', 'corels']):
-                                        st.info("📋 **Rule-based Method**: This method generates logical rules for decision making.")
-                                    elif 'shap' in method_lower:
-                                        st.info("🎯 **SHAP Method**: Shows feature contributions to individual predictions.")
-                                    elif 'lime' in method_lower:
-                                        st.info("🔍 **LIME Method**: Local interpretable model-agnostic explanations.")
-                                
-                                with viz_tab2:
-                                    # Prediction Analysis
-                                    st.subheader("🎯 Prediction Analysis")
-                                    
-                                    # Prediction vs True Label Analysis
-                                    pred_data = []
-                                    for exp in explanations_data:
-                                        pred_data.append({
-                                            'Instance_ID': exp.get('instance_id', 0),
-                                            'True_Label': exp.get('true_label', 0),
-                                            'Prediction': exp.get('prediction', 0),
-                                            'Correct': exp.get('correct_prediction', False),
-                                            'Prob_Class_0': exp.get('prediction_proba', [0, 0])[0] if len(exp.get('prediction_proba', [])) > 0 else 0,
-                                            'Prob_Class_1': exp.get('prediction_proba', [0, 0])[1] if len(exp.get('prediction_proba', [])) > 1 else 0
-                                        })
-                                    
-                                    if pred_data:
-                                        pred_df = pd.DataFrame(pred_data)
-                                        
-                                        col1, col2 = st.columns(2)
-                                        
-                                        with col1:
-                                            # Confusion matrix style
-                                            fig_conf_matrix = px.scatter(pred_df, x='True_Label', y='Prediction', 
-                                                                        color='Correct', size='Prob_Class_1',
-                                                                        title="Predictions vs True Labels")
-                                            st.plotly_chart(fig_conf_matrix, use_container_width=True)
-                                        
-                                        with col2:
-                                            # Probability distribution
-                                            fig_prob = px.scatter(pred_df, x='Prob_Class_0', y='Prob_Class_1',
-                                                                color='Correct', hover_data=['Instance_ID'],
-                                                                title="Prediction Probability Space")
-                                            st.plotly_chart(fig_prob, use_container_width=True)
-                                        
-                                        # Summary statistics
-                                        st.subheader("📊 Prediction Statistics")
-                                        summary_col1, summary_col2, summary_col3 = st.columns(3)
-                                        
-                                        with summary_col1:
-                                            st.metric("True Positives", len(pred_df[(pred_df['True_Label'] == 1) & (pred_df['Prediction'] == 1)]))
-                                        with summary_col2:
-                                            st.metric("False Positives", len(pred_df[(pred_df['True_Label'] == 0) & (pred_df['Prediction'] == 1)]))
-                                        with summary_col3:
-                                            st.metric("False Negatives", len(pred_df[(pred_df['True_Label'] == 1) & (pred_df['Prediction'] == 0)]))
-                                
-                                with viz_tab3:
-                                    # Feature Analysis
-                                    st.subheader("📊 Feature Importance Analysis")
-                                    
-                                    # Aggregate feature importance across all instances
-                                    all_importance = []
-                                    feature_stats = {}
-                                    
-                                    for exp in explanations_data:
-                                        importance = exp.get('feature_importance', [])
-                                        if importance:
-                                            for i, imp_val in enumerate(importance):
-                                                feature_name = f'Feature_{i}'
-                                                if feature_name not in feature_stats:
-                                                    feature_stats[feature_name] = []
-                                                feature_stats[feature_name].append(imp_val)
-                                                all_importance.append({
-                                                    'Instance': exp.get('instance_id', 0),
-                                                    'Feature': feature_name,
-                                                    'Importance': imp_val,
-                                                    'Correct': exp.get('correct_prediction', False)
-                                                })
-                                    
-                                    if all_importance:
-                                        imp_df = pd.DataFrame(all_importance)
-                                        
-                                        col1, col2 = st.columns(2)
-                                        
-                                        with col1:
-                                            # Feature importance distribution
-                                            avg_importance = imp_df.groupby('Feature')['Importance'].mean().sort_values(ascending=False)
-                                            fig_feat = px.bar(x=avg_importance.index[:10], y=avg_importance.values[:10],
-                                                            title="Top 10 Features by Average Importance")
-                                            st.plotly_chart(fig_feat, use_container_width=True)
-                                        
-                                        with col2:
-                                            # Feature importance by prediction correctness
-                                            fig_feat_correct = px.box(imp_df, x='Feature', y='Importance', color='Correct',
-                                                                    title="Feature Importance by Prediction Accuracy")
-                                            fig_feat_correct.update_xaxes(tickangle=45)
-                                            st.plotly_chart(fig_feat_correct, use_container_width=True)
-                                        
-                                        # Feature statistics table
-                                        st.subheader("📋 Feature Statistics")
-                                        if feature_stats:
-                                            stats_data = []
-                                            for feature, values in feature_stats.items():
-                                                stats_data.append({
-                                                    'Feature': feature,
-                                                    'Mean': np.mean(values),
-                                                    'Std': np.std(values),
-                                                    'Min': np.min(values),
-                                                    'Max': np.max(values),
-                                                    'Count': len(values)
-                                                })
-                                            stats_df = pd.DataFrame(stats_data)
-                                            st.dataframe(stats_df.round(4), use_container_width=True)
-                                    else:
-                                        st.warning("⚠️ No feature importance data available for this explanation method.")
-                                        
-                                        # Show method-specific information
-                                        method_lower = method.lower()
-                                        if any(rule_method in method_lower for rule_method in ['bayesian_rule_list', 'corels']):
-                                            st.info("📋 This is a rule-based method. It generates decision rules rather than feature importance scores.")
-                                        elif any(concept_method in method_lower for concept_method in ['tcav', 'concept']):
-                                            st.info("🔗 This is a concept-based method. It works with high-level concepts rather than individual features.")
-                                
-                                with viz_tab4:
-                                    # Individual Explanation Viewer
-                                    st.subheader("🔍 Individual Explanation Details")
-                                    
-                                    # Simple instance selector
-                                    instance_ids = [exp.get('instance_id', i) for i, exp in enumerate(explanations_data)]
-                                    selected_instance_id = st.selectbox("Select Instance:", instance_ids, 
-                                                                      format_func=lambda x: f"Instance {x}")
-                                    
-                                    # Find selected explanation
-                                    selected_explanation = None
-                                    for exp in explanations_data:
-                                        if exp.get('instance_id') == selected_instance_id:
-                                            selected_explanation = exp
-                                            break
-                                    
-                                    if selected_explanation:
-                                        # Display instance details
-                                        col1, col2, col3, col4 = st.columns(4)
-                                        with col1:
-                                            st.metric("Instance ID", selected_explanation.get('instance_id', 'N/A'))
-                                        with col2:
-                                            st.metric("True Label", selected_explanation.get('true_label', 'N/A'))
-                                        with col3:
-                                            pred_val = selected_explanation.get('prediction', 'N/A')
-                                            is_correct = selected_explanation.get('correct_prediction', False)
-                                            status = "✅" if is_correct else "❌"
-                                            st.metric("Prediction", f"{pred_val} {status}")
-                                        with col4:
-                                            conf_val = selected_explanation.get('explanation_confidence', 0)
-                                            st.metric("Confidence", f"{conf_val:.3f}")
-                                        
-                                        # Prediction probabilities
-                                        proba = selected_explanation.get('prediction_proba', [])
-                                        if proba and len(proba) >= 2:
-                                            st.subheader("📊 Prediction Probabilities")
-                                            prob_col1, prob_col2 = st.columns(2)
-                                            with prob_col1:
-                                                st.metric("Class 0 Probability", f"{proba[0]:.3f}")
-                                            with prob_col2:
-                                                st.metric("Class 1 Probability", f"{proba[1]:.3f}")
-                                            
-                                            # Probability bar chart
-                                            prob_df = pd.DataFrame({
-                                                'Class': ['Class 0', 'Class 1'],
-                                                'Probability': proba[:2]
-                                            })
-                                            fig_prob_bar = px.bar(prob_df, x='Class', y='Probability', 
-                                                                title=f"Prediction Probabilities - Instance {selected_instance_id}")
-                                            st.plotly_chart(fig_prob_bar, use_container_width=True)
-                                        
-                                        # Feature importance for this instance
-                                        importance = selected_explanation.get('feature_importance', [])
-                                        if importance and len(importance) > 0:
-                                            st.subheader("🎯 Feature Importance")
-                                            
-                                            # Create feature importance chart
-                                            feat_df = pd.DataFrame({
-                                                'Feature': [f'Feature_{i}' for i in range(len(importance))],
-                                                'Importance': importance
-                                            })
-                                            feat_df = feat_df.sort_values('Importance', key=abs, ascending=False)
-                                            
-                                            fig_feat_instance = px.bar(feat_df.head(10), x='Feature', y='Importance',
-                                                                     title=f"Top 10 Feature Importance - Instance {selected_instance_id}",
-                                                                     color='Importance',
-                                                                     color_continuous_scale='RdBu')
-                                            fig_feat_instance.update_xaxes(tickangle=45)
-                                            st.plotly_chart(fig_feat_instance, use_container_width=True)
-                                        
-                                        # Show explanation metadata if available
-                                        metadata = selected_explanation.get('explanation_metadata', {})
-                                        if metadata:
-                                            st.subheader("📖 Explanation Metadata")
-                                            st.json(metadata)
-                                        
-                                        # Download individual explanation
-                                        explanation_json = json.dumps(selected_explanation, indent=2)
-                                        st.download_button(
-                                            label=f"📥 Download Instance {selected_instance_id} Explanation",
-                                            data=explanation_json,
-                                            file_name=f"{selected_combo_key}_instance_{selected_instance_id}.json",
-                                            mime="application/json"
-                                        )
-                                            
-                            except Exception as e:
-                                st.error(f"Error loading explanations: {e}")
-                        else:
-                            st.warning(f"Individual explanations file not found: {json_path}")
-                else:
-                    st.info("Please select a dataset, model, and method combination to view individual explanations.")
-            
-            else:  # Summary Reports mode
-                # Detailed report viewer
-                st.subheader("📄 Detailed Report Viewer")
-            
-            if len(final_combos) == 1:
-                # Single report - show directly
-                dataset, model, method = final_combos[0]
-                report_path = detailed_dir / dataset / model / f"{method}_detailed_report.md"
-                
-                if report_path.exists():
-                    with open(report_path, 'r', encoding='utf-8') as f:
-                        content = f.read()
-                    
-                    st.markdown("---")
-                    st.markdown(content)
-                    
-                    # Download button
-                    st.download_button(
-                        label=f"📥 Download {method} Report",
-                        data=content,
-                        file_name=f"{dataset}_{model}_{method}_report.md",
-                        mime="text/markdown"
-                    )
-            
-            elif len(final_combos) > 1:
-                # Multiple reports - show selector
-                combo_labels = [f"{combo[0]} → {combo[1]} → {combo[2]}" for combo in final_combos]
-                selected_combo_idx = st.selectbox("Select specific report to view:", 
-                                                range(len(combo_labels)), 
-                                                format_func=lambda x: combo_labels[x])
-                
-                if selected_combo_idx is not None:
-                    dataset, model, method = final_combos[selected_combo_idx]
-                    report_path = detailed_dir / dataset / model / f"{method}_detailed_report.md"
-                    
-                    if report_path.exists():
-                        with open(report_path, 'r', encoding='utf-8') as f:
-                            content = f.read()
-                        
-                        st.markdown("---")
-                        st.markdown(content)
-                        
-                        # Download button
-                        st.download_button(
-                            label=f"📥 Download {method} Report",
-                            data=content,
-                            file_name=f"{dataset}_{model}_{method}_report.md",
-                            mime="text/markdown"
-                        )
-        else:
-            st.info("No reports match the selected criteria.")
 
 if __name__ == "__main__":
-    main()
-
+    main() 

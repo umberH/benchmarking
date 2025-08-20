@@ -26,6 +26,22 @@ data:
       source: "sklearn"
       description: "Diabetes prediction dataset"
       mandatory: false
+    - name: "heart_disease"
+      source: "uci"
+      description: "Heart Disease UCI - Medical classification with mixed feature types"
+      mandatory: false
+    - name: "german_credit"
+      source: "uci"
+      description: "German Credit Risk - Financial fairness dataset with categorical features"
+      mandatory: false
+    - name: "wine_quality"
+      source: "uci"
+      description: "Wine Quality - Multi-class classification (quality ratings 3-9)"
+      mandatory: false
+    - name: "synthetic_tabular"
+      source: "sklearn"
+      description: "Synthetic Tabular with Known Ground Truth - Test explanation accuracy"
+      mandatory: false
   
   image_datasets:
     # Mandatory datasets
@@ -38,6 +54,22 @@ data:
       source: "torchvision"
       description: "Color image classification dataset"
       mandatory: false
+    - name: "fashion_mnist"
+      source: "torchvision"
+      description: "Fashion-MNIST - Complex grayscale patterns, clothing categories"
+      mandatory: false
+    - name: "cifar100"
+      source: "torchvision"
+      description: "CIFAR-100 - Fine-grained classification with 100 classes"
+      mandatory: false
+    - name: "imagenette"
+      source: "custom"
+      description: "ImageNette - Real-world images, 10 classes from ImageNet"
+      mandatory: false
+    - name: "chest_xray"
+      source: "custom"
+      description: "ChestX-ray subset - Medical imaging for high-stakes explanation testing"
+      mandatory: false
   
   text_datasets:
     # Mandatory datasets
@@ -49,6 +81,18 @@ data:
     - name: "20newsgroups"
       source: "sklearn"
       description: "News article classification dataset"
+      mandatory: false
+    - name: "ag_news"
+      source: "huggingface"
+      description: "AG News - 4-class news categorization dataset"
+      mandatory: false
+    - name: "yelp_reviews"
+      source: "huggingface"
+      description: "Yelp Reviews - 5-class sentiment analysis (1-5 stars)"
+      mandatory: false
+    - name: "reuters21578"
+      source: "custom"
+      description: "Reuters-21578 - Multi-label news classification"
       mandatory: false
 
 # Data validation configuration

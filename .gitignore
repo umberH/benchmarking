@@ -138,24 +138,36 @@ dmypy.json
 .DS_Store
 Thumbs.db
 
-# Project specific - Exclude large result files for cloud deployment
-results/
-!results/.gitkeep
-results/iterations/
-*.json
-*.md
-!README.md
-!*.md
+# Project specific - Streamlit deployment optimization
+# Exclude large result files but keep essential files for dashboard
+
+# Keep experiment structure but exclude large files
+results
+results/detailed_explanations/*/*/*.json
+results/iterations/*.json
+
+
+results/experiment_*/benchmark_results.json
+results/experiment_*/comprehensive_report.md
+results/.gitkeep
+
+# Keep config files
 !configs/*.yaml
 !configs/*.json
 
-# Large data files
-*.csv
+# Keep markdown files
+!README.md
+!*.md
+
+# Large data files (exclude these but keep small result files)
 *.pkl
 *.pickle
 *.h5
 *.hdf5
 *.npz
+
+# Streamlit deployment additions
+.streamlit/secrets.toml
 
 # Temporary files
 temp/

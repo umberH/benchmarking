@@ -21,7 +21,9 @@ def parse_args():
     parser.add_argument("--config", type=str, default="configs/default_config.yaml",
                        help="Path to configuration file")
     parser.add_argument("--output-dir", type=str, default="results",
-                       help="Output directory for results")
+                       help="Base output directory for results (experiments will be organized in subdirectories)")
+    parser.add_argument("--experiment-name", type=str, default=None,
+                       help="Custom experiment name (will be combined with timestamp)")
     
     # Run modes
     parser.add_argument("--interactive", action="store_true",
@@ -67,9 +69,20 @@ def main():
         config = load_config(args.config)
         validate_config(config)
         
-        # Create output directory
-        output_dir = Path(args.output_dir)
+        # Create timestamped experiment directory for separation
+        from datetime import datetime
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        
+        # Create experiment-specific subdirectory
+        experiment_name = f"experiment_{timestamp}"
+        if args.experiment_name:
+            experiment_name = f"{args.experiment_name}_{timestamp}"
+        
+        base_output_dir = Path(args.output_dir)
+        output_dir = base_output_dir / experiment_name
         output_dir.mkdir(parents=True, exist_ok=True)
+        
+        logger.info(f"✅ Results will be saved to: {output_dir}")
         
         # Initialize benchmark
         benchmark = XAIBenchmark(config, output_dir)
@@ -127,14 +140,21 @@ def main():
             logger.info("Running full pipeline")
             benchmark.run_full_pipeline(use_tuned_params=args.use_tuned_params)
         
-        logger.info("Benchmarking completed successfully!")
+        logger.info(f"Benchmarking completed successfully! Results saved to: {output_dir}")
         
-        # Print summary
+        # Print summary with experiment organization
         print(f"\n🎉 Benchmarking completed!")
-        print(f"📁 Results saved to: {args.output_dir}")
+        print(f"📁 Results saved to: {output_dir}")
+        print(f"📊 Experiment: {experiment_name}")
         
         if args.comprehensive:
-            print(f"📄 Comprehensive markdown report: {args.output_dir}/comprehensive_report.md")
+            print(f"📄 Comprehensive markdown report: {output_dir}/comprehensive_report.md")
+        
+        # Show experiment organization info
+        print(f"\n📂 Experiment Organization:")
+        print(f"   Base directory: {base_output_dir}")
+        print(f"   This experiment: {output_dir}")
+        print(f"   💡 Each run creates a separate timestamped folder for easy experiment tracking!")
         
         if args.use_tuned_params:
             print(f"🔧 Used tuned hyperparameters for model training")

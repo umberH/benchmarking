@@ -457,7 +457,7 @@ class BayesianRuleListExplainer(BaseExplainer):
     def _generate_rule_list(self, X_train: np.ndarray, y_train: np.ndarray) -> List[Dict[str, Any]]:
         """Generate Bayesian rule list from training data"""
         # Handle empty training data
-        if X_train.size == 0 or len(X_train.shape) < 2 or X_train.shape[0] == 0:
+        if X_train.size == 0 or X_train.shape[0] == 0:
             # Return a default rule list when no training data is available
             return [{
                 'rule_id': 0,
@@ -488,7 +488,7 @@ class BayesianRuleListExplainer(BaseExplainer):
     def _discretize_features(self, X: np.ndarray) -> np.ndarray:
         """Discretize continuous features into bins for rule generation"""
         # Handle empty arrays
-        if X.size == 0 or len(X.shape) < 2 or X.shape[0] == 0:
+        if X.size == 0 or X.shape[0] == 0:
             return X.copy()
         
         X_discretized = np.zeros_like(X)
