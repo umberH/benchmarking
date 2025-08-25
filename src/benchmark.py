@@ -867,6 +867,15 @@ class XAIBenchmark:
         print("Interactive run completed successfully!")
         print(f"{'='*60}")
 
+        # Save summary results for dashboard detection
+        import json
+        try:
+            with open(self.summary_file, 'w', encoding='utf-8') as f:
+                json.dump(self.results, f, indent=2, ensure_ascii=False)
+            self.logger.info(f"Results saved to {self.summary_file}")
+        except Exception as e:
+            self.logger.error(f"Failed to save results: {e}")
+
     def run_all(self, use_tuned_params: bool = False):
         """Run all datasets x compatible models x compatible explanation methods with incremental saving."""
         self.logger.info("Starting run_all across datasets x models x methods")

@@ -153,14 +153,46 @@ class DataManager:
         dataset_type = dataset_config['type']
         source = dataset_config['source']
         
+        # Binary tabular datasets
         if dataset_name == 'adult_income':
             return self._load_adult_income_dataset()
         elif dataset_name == 'compas':
             return self._load_compas_dataset()
+        elif dataset_name == 'breast_cancer':
+            return self._load_breast_cancer_dataset()
+        elif dataset_name == 'heart_disease':
+            return self._load_heart_disease_dataset()
+        elif dataset_name == 'german_credit':
+            return self._load_german_credit_dataset()
+        
+        # Multi-class tabular datasets
+        elif dataset_name == 'iris':
+            return self._load_iris_dataset()
+        elif dataset_name == 'wine_quality':
+            return self._load_wine_quality_dataset()
+        elif dataset_name == 'diabetes':
+            return self._load_diabetes_dataset()
+        elif dataset_name == 'wine_classification':
+            return self._load_wine_classification_dataset()
+        elif dataset_name == 'digits':
+            return self._load_digits_dataset()
+        
+        # Image datasets
         elif dataset_name == 'mnist':
             return self._load_mnist_dataset()
+        elif dataset_name == 'cifar10':
+            return self._load_cifar10_dataset()
+        elif dataset_name == 'fashion_mnist':
+            return self._load_fashion_mnist_dataset()
+        
+        # Text datasets
         elif dataset_name == 'imdb':
             return self._load_imdb_dataset()
+        elif dataset_name == '20newsgroups':
+            return self._load_20newsgroups_dataset()
+        elif dataset_name == 'ag_news':
+            return self._load_ag_news_dataset()
+        
         else:
             raise ValueError(f"Unknown mandatory dataset: {dataset_name}")
     
@@ -491,6 +523,518 @@ class DataManager:
             
         except Exception as e:
             self.logger.error(f"Could not load IMDB dataset: {e}")
+            raise
+    
+    # ===== BINARY TABULAR DATASETS =====
+    
+    def _load_breast_cancer_dataset(self) -> TabularDataset:
+        """Load Breast Cancer Wisconsin dataset from sklearn"""
+        try:
+            from sklearn.datasets import load_breast_cancer
+            
+            self.logger.info("Loading Breast Cancer Wisconsin dataset from sklearn...")
+            
+            data = load_breast_cancer()
+            X = pd.DataFrame(data.data, columns=data.feature_names)
+            y = pd.Series(data.target)
+            
+            # Split data
+            X_train, X_test, y_train, y_test = train_test_split(
+                X, y, test_size=0.2, random_state=42, stratify=y
+            )
+            
+            self.logger.info(f"Breast Cancer dataset loaded: {len(X_train)} train, {len(X_test)} test samples")
+            
+            return TabularDataset(
+                name='breast_cancer',
+                X_train=X_train,
+                X_test=X_test,
+                y_train=y_train,
+                y_test=y_test,
+                feature_names=list(data.feature_names),
+                config={'source': 'sklearn', 'description': 'Breast Cancer Wisconsin dataset'}
+            )
+            
+        except Exception as e:
+            self.logger.error(f"Could not load Breast Cancer dataset: {e}")
+            raise
+    
+    def _load_heart_disease_dataset(self) -> TabularDataset:
+        """Load Heart Disease dataset from UCI"""
+        try:
+            # Load Heart Disease dataset from UCI
+            url = "https://archive.ics.uci.edu/ml/machine-learning-databases/heart-disease/processed.cleveland.data"
+            column_names = [
+                'age', 'sex', 'cp', 'trestbps', 'chol', 'fbs', 'restecg', 'thalach',
+                'exang', 'oldpeak', 'slope', 'ca', 'thal', 'target'
+            ]
+            
+            self.logger.info("Loading Heart Disease dataset from UCI...")
+            df = pd.read_csv(url, names=column_names, na_values='?')
+            
+            # Clean the data
+            df = df.dropna()
+            
+            # Convert target to binary (0: no disease, 1-4: disease)
+            df['target'] = (df['target'] > 0).astype(int)
+            
+            # Select numerical features for simplicity
+            feature_columns = ['age', 'trestbps', 'chol', 'thalach', 'oldpeak']
+            X = df[feature_columns]
+            y = df['target']
+            
+            # Split data
+            X_train, X_test, y_train, y_test = train_test_split(
+                X, y, test_size=0.2, random_state=42, stratify=y
+            )
+            
+            self.logger.info(f"Heart Disease dataset loaded: {len(X_train)} train, {len(X_test)} test samples")
+            
+            return TabularDataset(
+                name='heart_disease',
+                X_train=X_train,
+                X_test=X_test,
+                y_train=y_train,
+                y_test=y_test,
+                feature_names=feature_columns,
+                config={'source': 'uci', 'description': 'Heart Disease UCI dataset'}
+            )
+            
+        except Exception as e:
+            self.logger.error(f"Could not load Heart Disease dataset: {e}")
+            raise
+    
+    def _load_german_credit_dataset(self) -> TabularDataset:
+        """Load German Credit Risk dataset from UCI"""
+        try:
+            # Load German Credit dataset from UCI
+            url = "https://archive.ics.uci.edu/ml/machine-learning-databases/statlog/german/german.data"
+            
+            self.logger.info("Loading German Credit dataset from UCI...")
+            df = pd.read_csv(url, delim_whitespace=True, header=None)
+            
+            # The German Credit dataset has 20 features + 1 target
+            # For simplicity, we'll use numerical features
+            numerical_features = [1, 4, 7, 10, 12, 15, 17]  # Indices of numerical features
+            feature_names = [f'feature_{i}' for i in numerical_features]
+            
+            X = df.iloc[:, numerical_features]
+            X.columns = feature_names
+            y = df.iloc[:, 20] - 1  # Convert from {1,2} to {0,1}
+            
+            # Split data
+            X_train, X_test, y_train, y_test = train_test_split(
+                X, y, test_size=0.2, random_state=42, stratify=y
+            )
+            
+            self.logger.info(f"German Credit dataset loaded: {len(X_train)} train, {len(X_test)} test samples")
+            
+            return TabularDataset(
+                name='german_credit',
+                X_train=X_train,
+                X_test=X_test,
+                y_train=y_train,
+                y_test=y_test,
+                feature_names=feature_names,
+                config={'source': 'uci', 'description': 'German Credit Risk dataset'}
+            )
+            
+        except Exception as e:
+            self.logger.error(f"Could not load German Credit dataset: {e}")
+            raise
+    
+    # ===== MULTI-CLASS TABULAR DATASETS =====
+    
+    def _load_iris_dataset(self) -> TabularDataset:
+        """Load Iris dataset from sklearn"""
+        try:
+            from sklearn.datasets import load_iris
+            
+            self.logger.info("Loading Iris dataset from sklearn...")
+            
+            data = load_iris()
+            X = pd.DataFrame(data.data, columns=data.feature_names)
+            y = pd.Series(data.target)
+            
+            # Split data
+            X_train, X_test, y_train, y_test = train_test_split(
+                X, y, test_size=0.2, random_state=42, stratify=y
+            )
+            
+            self.logger.info(f"Iris dataset loaded: {len(X_train)} train, {len(X_test)} test samples")
+            
+            return TabularDataset(
+                name='iris',
+                X_train=X_train,
+                X_test=X_test,
+                y_train=y_train,
+                y_test=y_test,
+                feature_names=list(data.feature_names),
+                config={'source': 'sklearn', 'description': 'Iris flower classification dataset'}
+            )
+            
+        except Exception as e:
+            self.logger.error(f"Could not load Iris dataset: {e}")
+            raise
+    
+    def _load_wine_quality_dataset(self) -> TabularDataset:
+        """Load Wine Quality dataset from UCI"""
+        try:
+            # Load Wine Quality dataset (red wine)
+            url = "https://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-red.csv"
+            
+            self.logger.info("Loading Wine Quality dataset from UCI...")
+            df = pd.read_csv(url, sep=';')
+            
+            # Use all features except quality
+            feature_columns = [col for col in df.columns if col != 'quality']
+            X = df[feature_columns]
+            y = df['quality']
+            
+            # Convert to 3-class problem: low (3-5), medium (6), high (7-8)
+            y = y.apply(lambda x: 0 if x <= 5 else 1 if x == 6 else 2)
+            
+            # Split data
+            X_train, X_test, y_train, y_test = train_test_split(
+                X, y, test_size=0.2, random_state=42, stratify=y
+            )
+            
+            self.logger.info(f"Wine Quality dataset loaded: {len(X_train)} train, {len(X_test)} test samples")
+            
+            return TabularDataset(
+                name='wine_quality',
+                X_train=X_train,
+                X_test=X_test,
+                y_train=y_train,
+                y_test=y_test,
+                feature_names=feature_columns,
+                config={'source': 'uci', 'description': 'Wine Quality dataset'}
+            )
+            
+        except Exception as e:
+            self.logger.error(f"Could not load Wine Quality dataset: {e}")
+            raise
+    
+    def _load_diabetes_dataset(self) -> TabularDataset:
+        """Load Diabetes dataset from sklearn (converted to classification)"""
+        try:
+            from sklearn.datasets import load_diabetes
+            
+            self.logger.info("Loading Diabetes dataset from sklearn...")
+            
+            data = load_diabetes()
+            X = pd.DataFrame(data.data, columns=data.feature_names)
+            y_continuous = data.target
+            
+            # Convert to 3-class classification based on diabetes progression
+            y = pd.cut(y_continuous, bins=3, labels=[0, 1, 2])
+            y = y.astype(int)
+            
+            # Split data
+            X_train, X_test, y_train, y_test = train_test_split(
+                X, y, test_size=0.2, random_state=42, stratify=y
+            )
+            
+            self.logger.info(f"Diabetes dataset loaded: {len(X_train)} train, {len(X_test)} test samples")
+            
+            return TabularDataset(
+                name='diabetes',
+                X_train=X_train,
+                X_test=X_test,
+                y_train=y_train,
+                y_test=y_test,
+                feature_names=list(data.feature_names),
+                config={'source': 'sklearn', 'description': 'Diabetes progression dataset (3-class)'}
+            )
+            
+        except Exception as e:
+            self.logger.error(f"Could not load Diabetes dataset: {e}")
+            raise
+    
+    def _load_wine_classification_dataset(self) -> TabularDataset:
+        """Load Wine classification dataset from sklearn"""
+        try:
+            from sklearn.datasets import load_wine
+            
+            self.logger.info("Loading Wine classification dataset from sklearn...")
+            
+            data = load_wine()
+            X = pd.DataFrame(data.data, columns=data.feature_names)
+            y = pd.Series(data.target)
+            
+            # Split data
+            X_train, X_test, y_train, y_test = train_test_split(
+                X, y, test_size=0.2, random_state=42, stratify=y
+            )
+            
+            self.logger.info(f"Wine classification dataset loaded: {len(X_train)} train, {len(X_test)} test samples")
+            
+            return TabularDataset(
+                name='wine_classification',
+                X_train=X_train,
+                X_test=X_test,
+                y_train=y_train,
+                y_test=y_test,
+                feature_names=list(data.feature_names),
+                config={'source': 'sklearn', 'description': 'Wine classification dataset'}
+            )
+            
+        except Exception as e:
+            self.logger.error(f"Could not load Wine classification dataset: {e}")
+            raise
+    
+    def _load_digits_dataset(self) -> TabularDataset:
+        """Load Digits dataset from sklearn"""
+        try:
+            from sklearn.datasets import load_digits
+            
+            self.logger.info("Loading Digits dataset from sklearn...")
+            
+            data = load_digits()
+            X = pd.DataFrame(data.data)
+            y = pd.Series(data.target)
+            
+            # Split data
+            X_train, X_test, y_train, y_test = train_test_split(
+                X, y, test_size=0.2, random_state=42, stratify=y
+            )
+            
+            self.logger.info(f"Digits dataset loaded: {len(X_train)} train, {len(X_test)} test samples")
+            
+            return TabularDataset(
+                name='digits',
+                X_train=X_train,
+                X_test=X_test,
+                y_train=y_train,
+                y_test=y_test,
+                feature_names=[f'pixel_{i}' for i in range(64)],
+                config={'source': 'sklearn', 'description': 'Digits classification dataset (8x8 images as tabular)'}
+            )
+            
+        except Exception as e:
+            self.logger.error(f"Could not load Digits dataset: {e}")
+            raise
+    
+    # ===== IMAGE DATASETS =====
+    
+    def _load_cifar10_dataset(self) -> ImageDataset:
+        """Load CIFAR-10 dataset from torchvision"""
+        try:
+            import torchvision
+            from torchvision import transforms
+            
+            self.logger.info("Loading CIFAR-10 dataset from torchvision...")
+            
+            # Define transforms
+            transform = transforms.Compose([
+                transforms.ToTensor(),
+                transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))  # CIFAR-10 normalization
+            ])
+            
+            # Load CIFAR-10
+            train_dataset = torchvision.datasets.CIFAR10(
+                root='./data', train=True, download=True, transform=transform
+            )
+            test_dataset = torchvision.datasets.CIFAR10(
+                root='./data', train=False, download=True, transform=transform
+            )
+            
+            # Convert to numpy arrays (limited size for memory)
+            X_train = []
+            y_train = []
+            for i in range(min(2000, len(train_dataset))):
+                img, label = train_dataset[i]
+                X_train.append(img.numpy())
+                y_train.append(label)
+            
+            X_test = []
+            y_test = []
+            for i in range(min(400, len(test_dataset))):
+                img, label = test_dataset[i]
+                X_test.append(img.numpy())
+                y_test.append(label)
+            
+            X_train = np.array(X_train)
+            X_test = np.array(X_test)
+            y_train = np.array(y_train)
+            y_test = np.array(y_test)
+            
+            self.logger.info(f"CIFAR-10 dataset loaded: {len(X_train)} train, {len(X_test)} test samples")
+            
+            return ImageDataset(
+                name='cifar10',
+                X_train=X_train,
+                X_test=X_test,
+                y_train=y_train,
+                y_test=y_test,
+                config={'source': 'torchvision', 'description': 'CIFAR-10 dataset (10 classes)'}
+            )
+            
+        except Exception as e:
+            self.logger.error(f"Could not load CIFAR-10 dataset: {e}")
+            raise
+    
+    def _load_fashion_mnist_dataset(self) -> ImageDataset:
+        """Load Fashion-MNIST dataset from torchvision"""
+        try:
+            import torchvision
+            from torchvision import transforms
+            
+            self.logger.info("Loading Fashion-MNIST dataset from torchvision...")
+            
+            # Define transforms
+            transform = transforms.Compose([
+                transforms.ToTensor(),
+                transforms.Normalize((0.5,), (0.5,))  # Fashion-MNIST normalization
+            ])
+            
+            # Load Fashion-MNIST
+            train_dataset = torchvision.datasets.FashionMNIST(
+                root='./data', train=True, download=True, transform=transform
+            )
+            test_dataset = torchvision.datasets.FashionMNIST(
+                root='./data', train=False, download=True, transform=transform
+            )
+            
+            # Convert to numpy arrays (limited size for memory)
+            X_train = []
+            y_train = []
+            for i in range(min(2000, len(train_dataset))):
+                img, label = train_dataset[i]
+                X_train.append(img.numpy())
+                y_train.append(label)
+            
+            X_test = []
+            y_test = []
+            for i in range(min(400, len(test_dataset))):
+                img, label = test_dataset[i]
+                X_test.append(img.numpy())
+                y_test.append(label)
+            
+            X_train = np.array(X_train)
+            X_test = np.array(X_test)
+            y_train = np.array(y_train)
+            y_test = np.array(y_test)
+            
+            self.logger.info(f"Fashion-MNIST dataset loaded: {len(X_train)} train, {len(X_test)} test samples")
+            
+            return ImageDataset(
+                name='fashion_mnist',
+                X_train=X_train,
+                X_test=X_test,
+                y_train=y_train,
+                y_test=y_test,
+                config={'source': 'torchvision', 'description': 'Fashion-MNIST dataset (10 clothing classes)'}
+            )
+            
+        except Exception as e:
+            self.logger.error(f"Could not load Fashion-MNIST dataset: {e}")
+            raise
+    
+    # ===== TEXT DATASETS =====
+    
+    def _load_20newsgroups_dataset(self) -> TextDataset:
+        """Load 20 Newsgroups dataset from sklearn"""
+        try:
+            from sklearn.datasets import fetch_20newsgroups
+            
+            self.logger.info("Loading 20 Newsgroups dataset from sklearn...")
+            
+            # Load subset of categories for manageability
+            categories = ['alt.atheism', 'comp.graphics', 'sci.med', 'soc.religion.christian']
+            
+            # Load train and test data
+            train_data = fetch_20newsgroups(
+                subset='train',
+                categories=categories,
+                remove=('headers', 'footers', 'quotes'),
+                shuffle=True,
+                random_state=42
+            )
+            
+            test_data = fetch_20newsgroups(
+                subset='test',
+                categories=categories,
+                remove=('headers', 'footers', 'quotes'),
+                shuffle=True,
+                random_state=42
+            )
+            
+            # Limit size for manageability
+            train_texts = train_data.data[:1000]
+            train_targets = train_data.target[:1000].tolist()
+            test_texts = test_data.data[:200]
+            test_targets = test_data.target[:200].tolist()
+            
+            self.logger.info(f"20 Newsgroups dataset loaded: {len(train_texts)} train, {len(test_texts)} test samples")
+            
+            return TextDataset(
+                name='20newsgroups',
+                train_texts=train_texts,
+                test_texts=test_texts,
+                train_targets=train_targets,
+                test_targets=test_targets,
+                config={'source': 'sklearn', 'description': '20 Newsgroups dataset (4 categories)'}
+            )
+            
+        except Exception as e:
+            self.logger.error(f"Could not load 20 Newsgroups dataset: {e}")
+            raise
+    
+    def _load_ag_news_dataset(self) -> TextDataset:
+        """Load AG News dataset from Hugging Face"""
+        try:
+            from datasets import load_dataset
+            
+            self.logger.info("Loading AG News dataset from Hugging Face...")
+            
+            # Load AG News dataset from Hugging Face
+            dataset = load_dataset('ag_news')
+            
+            # Extract train and test data
+            train_data = dataset['train']
+            test_data = dataset['test']
+            
+            # Build balanced subsets
+            def build_balanced_subset(split, total_per_class=250, seed=42):
+                import random
+                rng = random.Random(seed)
+                
+                texts = split['text']
+                labels = split['label']
+                
+                # Group by labels (4 classes: 0, 1, 2, 3)
+                class_indices = {i: [] for i in range(4)}
+                for idx, label in enumerate(labels):
+                    class_indices[label].append(idx)
+                
+                # Sample from each class
+                selected_indices = []
+                for class_idx in range(4):
+                    indices = class_indices[class_idx]
+                    rng.shuffle(indices)
+                    selected_indices.extend(indices[:total_per_class])
+                
+                rng.shuffle(selected_indices)
+                
+                return [texts[i] for i in selected_indices], [labels[i] for i in selected_indices]
+            
+            train_texts, train_targets = build_balanced_subset(train_data, total_per_class=250)
+            test_texts, test_targets = build_balanced_subset(test_data, total_per_class=50)
+            
+            self.logger.info(f"AG News dataset loaded: {len(train_texts)} train, {len(test_texts)} test samples")
+            
+            return TextDataset(
+                name='ag_news',
+                train_texts=train_texts,
+                test_texts=test_texts,
+                train_targets=train_targets,
+                test_targets=test_targets,
+                config={'source': 'huggingface', 'description': 'AG News dataset (4-class news categorization)'}
+            )
+            
+        except Exception as e:
+            self.logger.error(f"Could not load AG News dataset: {e}")
             raise
     
  

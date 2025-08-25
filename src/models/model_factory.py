@@ -6,9 +6,9 @@ import logging
 from typing import Dict, Any, List
 
 from .base_model import BaseModel
-from .tabular_models import DecisionTreeModel, RandomForestModel, GradientBoostingModel, MLPModel
-from .image_models import CNNModel, ViTModel
-from .text_models import BERTModel, LSTMModel
+from .tabular_models import DecisionTreeModel, RandomForestModel, GradientBoostingModel, MLPModel, LinearRegressionModel, LogisticRegressionModel
+from .image_models import CNNModel, ViTModel, ResNetModel
+from .text_models import BERTModel, LSTMModel, RoBERTaModel, NaiveBayesTextModel, SVMTextModel, XGBoostTextModel
 
 
 class ModelFactory:
@@ -33,14 +33,21 @@ class ModelFactory:
             'random_forest': RandomForestModel,
             'gradient_boosting': GradientBoostingModel,
             'mlp': MLPModel,
+            'linear_regression': LinearRegressionModel,
+            'logistic_regression': LogisticRegressionModel,
             
             # Image models
             'cnn': CNNModel,
             'vit': ViTModel,
+            'resnet': ResNetModel,
             
             # Text models
             'bert': BERTModel,
             'lstm': LSTMModel,
+            'roberta': RoBERTaModel,
+            'naive_bayes_text': NaiveBayesTextModel,
+            'svm_text': SVMTextModel,
+            'xgboost_text': XGBoostTextModel,
         }
     
     def get_available_models(self) -> List[Dict[str, Any]]:

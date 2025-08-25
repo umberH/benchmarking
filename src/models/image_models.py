@@ -6,6 +6,8 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import torchvision.models as models
+import torch.nn.functional as F
 from typing import Dict, Any
 from torch.utils.data import DataLoader, TensorDataset
 
@@ -227,6 +229,129 @@ class CNNModel(BaseModel):
         return probabilities.numpy()
 
 
+class ResNetModel(BaseModel):
+    """ResNet model for image classification"""
+    
+    supported_data_types = ['image']
+    
+    def _create_model(self) -> nn.Module:
+        """Create ResNet model with appropriate architecture for dataset"""
+        dataset_info = self.dataset.get_info()
+        num_classes = dataset_info['n_classes']
+        
+        # Get model configuration
+        params = self.config.get('params', {})
+        resnet_variant = params.get('variant', 'resnet18')
+        pretrained = params.get('pretrained', False)
+        
+        # Create ResNet model
+        if resnet_variant == 'resnet18':
+            model = models.resnet18(pretrained=pretrained)
+        elif resnet_variant == 'resnet34':
+            model = models.resnet34(pretrained=pretrained)
+        elif resnet_variant == 'resnet50':
+            model = models.resnet50(pretrained=pretrained)
+        else:
+            model = models.resnet18(pretrained=pretrained)
+        
+        # Modify first layer for grayscale if needed
+        try:
+            X_train, _, _, _ = self.dataset.get_data()
+            if X_train.ndim == 4 and X_train.shape[1] == 1:  # Grayscale
+                model.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
+                if pretrained:
+                    with torch.no_grad():
+                        original_weights = models.resnet18(pretrained=True).conv1.weight
+                        model.conv1.weight = nn.Parameter(original_weights.mean(dim=1, keepdim=True))
+        except:
+            pass
+        
+        # Modify final layer for correct number of classes
+        in_features = model.fc.in_features
+        model.fc = nn.Linear(in_features, num_classes)
+        
+        return model
+    
+    def _train_model(self, X_train: np.ndarray, y_train: np.ndarray):
+        """Train the ResNet model"""
+        X_train_tensor = self._prepare_image_tensor(X_train)
+        y_train_tensor = torch.LongTensor(y_train)
+        
+        train_dataset = TensorDataset(X_train_tensor, y_train_tensor)
+        batch_size = min(32, len(X_train))
+        train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+        
+        criterion = nn.CrossEntropyLoss()
+        params = self.config.get('params', {})
+        learning_rate = params.get('learning_rate', 0.001)
+        epochs = params.get('epochs', 10)
+        
+        optimizer = optim.Adam(self.model.parameters(), lr=learning_rate)
+        
+        self.model.train()
+        for epoch in range(epochs):
+            running_loss = 0.0
+            for batch_X, batch_y in train_loader:
+                optimizer.zero_grad()
+                outputs = self.model(batch_X)
+                loss = criterion(outputs, batch_y)
+                loss.backward()
+                optimizer.step()
+                running_loss += loss.item()
+    
+    def _prepare_image_tensor(self, X: np.ndarray) -> torch.Tensor:
+        """Prepare image data as tensor with correct format"""
+        if not isinstance(X, np.ndarray):
+            X = np.array(X)
+        
+        if X.ndim == 2:  # Flattened data
+            if X.shape[1] == 784:  # MNIST
+                X_tensor = torch.FloatTensor(X.reshape(X.shape[0], 1, 28, 28))
+            elif X.shape[1] == 3072:  # CIFAR-10
+                X_tensor = torch.FloatTensor(X.reshape(X.shape[0], 3, 32, 32))
+            else:
+                raise ValueError(f"Cannot infer image shape from {X.shape[1]} features")
+        elif X.ndim == 3:  # Grayscale
+            X_tensor = torch.FloatTensor(X).unsqueeze(1)
+        elif X.ndim == 4:
+            if X.shape[1] in [1, 3]:  # (N, C, H, W)
+                X_tensor = torch.FloatTensor(X)
+            elif X.shape[-1] in [1, 3]:  # (N, H, W, C)
+                X_tensor = torch.FloatTensor(X).permute(0, 3, 1, 2)
+            else:
+                raise ValueError(f"Cannot interpret shape {X.shape}")
+        else:
+            raise ValueError(f"Cannot handle {X.ndim} dimensions")
+        
+        # Normalize if needed
+        if X_tensor.max() > 1.0:
+            X_tensor = X_tensor / 255.0
+        
+        return X_tensor
+    
+    def _predict(self, X: np.ndarray) -> np.ndarray:
+        """Make predictions"""
+        self.model.eval()
+        X_tensor = self._prepare_image_tensor(X)
+        
+        with torch.no_grad():
+            outputs = self.model(X_tensor)
+            _, predicted = torch.max(outputs, 1)
+        
+        return predicted.numpy()
+    
+    def predict_proba(self, X: np.ndarray) -> np.ndarray:
+        """Make probability predictions"""
+        self.model.eval()
+        X_tensor = self._prepare_image_tensor(X)
+        
+        with torch.no_grad():
+            outputs = self.model(X_tensor)
+            probabilities = torch.softmax(outputs, dim=1)
+        
+        return probabilities.numpy()
+
+
 class SimpleViT(nn.Module):
     """Simple Vision Transformer architecture"""
     
@@ -394,6 +519,129 @@ class ViTModel(BaseModel):
             X_tensor = torch.FloatTensor(X).permute(0, 3, 1, 2)
         else:
             X_tensor = torch.FloatTensor(X)
+        
+        with torch.no_grad():
+            outputs = self.model(X_tensor)
+            probabilities = torch.softmax(outputs, dim=1)
+        
+        return probabilities.numpy()
+
+
+class ResNetModel(BaseModel):
+    """ResNet model for image classification"""
+    
+    supported_data_types = ['image']
+    
+    def _create_model(self) -> nn.Module:
+        """Create ResNet model with appropriate architecture for dataset"""
+        dataset_info = self.dataset.get_info()
+        num_classes = dataset_info['n_classes']
+        
+        # Get model configuration
+        params = self.config.get('params', {})
+        resnet_variant = params.get('variant', 'resnet18')
+        pretrained = params.get('pretrained', False)
+        
+        # Create ResNet model
+        if resnet_variant == 'resnet18':
+            model = models.resnet18(pretrained=pretrained)
+        elif resnet_variant == 'resnet34':
+            model = models.resnet34(pretrained=pretrained)
+        elif resnet_variant == 'resnet50':
+            model = models.resnet50(pretrained=pretrained)
+        else:
+            model = models.resnet18(pretrained=pretrained)
+        
+        # Modify first layer for grayscale if needed
+        try:
+            X_train, _, _, _ = self.dataset.get_data()
+            if X_train.ndim == 4 and X_train.shape[1] == 1:  # Grayscale
+                model.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
+                if pretrained:
+                    with torch.no_grad():
+                        original_weights = models.resnet18(pretrained=True).conv1.weight
+                        model.conv1.weight = nn.Parameter(original_weights.mean(dim=1, keepdim=True))
+        except:
+            pass
+        
+        # Modify final layer for correct number of classes
+        in_features = model.fc.in_features
+        model.fc = nn.Linear(in_features, num_classes)
+        
+        return model
+    
+    def _train_model(self, X_train: np.ndarray, y_train: np.ndarray):
+        """Train the ResNet model"""
+        X_train_tensor = self._prepare_image_tensor(X_train)
+        y_train_tensor = torch.LongTensor(y_train)
+        
+        train_dataset = TensorDataset(X_train_tensor, y_train_tensor)
+        batch_size = min(32, len(X_train))
+        train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+        
+        criterion = nn.CrossEntropyLoss()
+        params = self.config.get('params', {})
+        learning_rate = params.get('learning_rate', 0.001)
+        epochs = params.get('epochs', 10)
+        
+        optimizer = optim.Adam(self.model.parameters(), lr=learning_rate)
+        
+        self.model.train()
+        for epoch in range(epochs):
+            running_loss = 0.0
+            for batch_X, batch_y in train_loader:
+                optimizer.zero_grad()
+                outputs = self.model(batch_X)
+                loss = criterion(outputs, batch_y)
+                loss.backward()
+                optimizer.step()
+                running_loss += loss.item()
+    
+    def _prepare_image_tensor(self, X: np.ndarray) -> torch.Tensor:
+        """Prepare image data as tensor with correct format"""
+        if not isinstance(X, np.ndarray):
+            X = np.array(X)
+        
+        if X.ndim == 2:  # Flattened data
+            if X.shape[1] == 784:  # MNIST
+                X_tensor = torch.FloatTensor(X.reshape(X.shape[0], 1, 28, 28))
+            elif X.shape[1] == 3072:  # CIFAR-10
+                X_tensor = torch.FloatTensor(X.reshape(X.shape[0], 3, 32, 32))
+            else:
+                raise ValueError(f"Cannot infer image shape from {X.shape[1]} features")
+        elif X.ndim == 3:  # Grayscale
+            X_tensor = torch.FloatTensor(X).unsqueeze(1)
+        elif X.ndim == 4:
+            if X.shape[1] in [1, 3]:  # (N, C, H, W)
+                X_tensor = torch.FloatTensor(X)
+            elif X.shape[-1] in [1, 3]:  # (N, H, W, C)
+                X_tensor = torch.FloatTensor(X).permute(0, 3, 1, 2)
+            else:
+                raise ValueError(f"Cannot interpret shape {X.shape}")
+        else:
+            raise ValueError(f"Cannot handle {X.ndim} dimensions")
+        
+        # Normalize if needed
+        if X_tensor.max() > 1.0:
+            X_tensor = X_tensor / 255.0
+        
+        return X_tensor
+    
+    def _predict(self, X: np.ndarray) -> np.ndarray:
+        """Make predictions"""
+        self.model.eval()
+        X_tensor = self._prepare_image_tensor(X)
+        
+        with torch.no_grad():
+            outputs = self.model(X_tensor)
+            _, predicted = torch.max(outputs, 1)
+        
+        return predicted.numpy()
+    
+    def predict_proba(self, X: np.ndarray) -> np.ndarray:
+        """Make probability predictions"""
+        self.model.eval()
+        X_tensor = self._prepare_image_tensor(X)
         
         with torch.no_grad():
             outputs = self.model(X_tensor)

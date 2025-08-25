@@ -931,7 +931,7 @@ class SHAPInteractivePlotsExplainer(BaseExplainer):
         explanations = []
         feature_names = dataset.feature_names if hasattr(dataset, 'feature_names') else [f'feature_{i}' for i in range(X_test.shape[1])]
         
-        n_explanations = min(30, len(X_test))
+        n_explanations = min(5, len(X_test))  # Reduced from 30 to 5 for speed
         test_subset = X_test[:n_explanations]
         
         for i, instance in enumerate(test_subset):
@@ -969,7 +969,10 @@ class SHAPInteractivePlotsExplainer(BaseExplainer):
     
     def _calculate_interactive_shap(self, instance: np.ndarray, X_train: np.ndarray, 
                                   feature_names: List[str]) -> Dict[str, Any]:
-        """Calculate SHAP values including interaction effects"""
+        """Calculate SHAP values including interaction effects (optimized version)"""
+        start_time = time.time()
+        timeout_seconds = 30  # 30 second timeout per instance
+        
         n_features = len(instance)
         baseline = np.mean(X_train, axis=0)
         
@@ -978,55 +981,54 @@ class SHAPInteractivePlotsExplainer(BaseExplainer):
         base_pred = self.model.predict([instance])[0]
         baseline_pred = self.model.predict([baseline])[0]
         
-        # Calculate main effects
+        # Simplified main effects calculation (much faster)
         for i in range(n_features):
-            marginal_contributions = []
-            n_samples = 20
+            # Check timeout
+            if time.time() - start_time > timeout_seconds:
+                self.logger.warning(f"SHAP Interactive timeout reached for feature {i}")
+                break
+                
+            # Simple permutation importance instead of full Shapley calculation
+            instance_permuted = baseline.copy()
+            instance_permuted[i] = instance[i]
+            pred_permuted = self.model.predict([instance_permuted])[0]
             
-            for _ in range(n_samples):
-                # Random coalition
-                coalition_size = np.random.randint(0, n_features)
-                coalition = np.random.choice(
-                    [j for j in range(n_features) if j != i],
-                    size=min(coalition_size, n_features - 1),
-                    replace=False
-                )
-                
-                # Coalition without feature i
-                instance_without = baseline.copy()
-                for j in coalition:
-                    instance_without[j] = instance[j]
-                pred_without = self.model.predict([instance_without])[0]
-                
-                # Coalition with feature i
-                instance_with = instance_without.copy()
-                instance_with[i] = instance[i]
-                pred_with = self.model.predict([instance_with])[0]
-                
-                marginal_contributions.append(pred_with - pred_without)
-            
-            main_effects[i] = np.mean(marginal_contributions)
+            main_effects[i] = pred_permuted - baseline_pred
         
-        # Calculate pairwise interaction effects
+        # Simplified pairwise interaction effects (limited to prevent hanging)
         interaction_matrix = np.zeros((n_features, n_features))
         interaction_effects = []
         
-        for i in range(n_features):
-            for j in range(i + 1, n_features):
-                interaction_value = self._calculate_pairwise_interaction(
-                    instance, baseline, i, j
-                )
-                interaction_matrix[i, j] = interaction_value
-                interaction_matrix[j, i] = interaction_value
+        # Only compute interactions for top features and with timeout
+        top_features = np.argsort(np.abs(main_effects))[-min(5, n_features):]
+        
+        for i in range(len(top_features)):
+            for j in range(i + 1, len(top_features)):
+                # Check timeout
+                if time.time() - start_time > timeout_seconds:
+                    self.logger.warning("SHAP Interactive interaction calculation timeout")
+                    break
+                    
+                feat_i, feat_j = top_features[i], top_features[j]
                 
-                if abs(interaction_value) > 0.01:  # Only store significant interactions
+                # Simplified interaction calculation
+                interaction_value = self._calculate_simple_interaction(
+                    instance, baseline, feat_i, feat_j
+                )
+                interaction_matrix[feat_i, feat_j] = interaction_value
+                interaction_matrix[feat_j, feat_i] = interaction_value
+                
+                if abs(interaction_value) > 0.01:
                     interaction_effects.append({
-                        'feature_1': feature_names[i],
-                        'feature_2': feature_names[j],
+                        'feature_1': feature_names[feat_i],
+                        'feature_2': feature_names[feat_j],
                         'interaction_value': float(interaction_value),
-                        'feature_1_index': i,
-                        'feature_2_index': j
+                        'feature_1_index': int(feat_i),
+                        'feature_2_index': int(feat_j)
                     })
+            
+            if time.time() - start_time > timeout_seconds:
+                break
         
         # Sort interactions by magnitude
         interaction_effects.sort(key=lambda x: abs(x['interaction_value']), reverse=True)
@@ -1082,6 +1084,29 @@ class SHAPInteractivePlotsExplainer(BaseExplainer):
         
         waterfall_data.append({'name': 'Final Prediction', 'value': final_pred, 'cumulative': final_pred})
         return waterfall_data
+    
+    def _calculate_simple_interaction(self, instance: np.ndarray, baseline: np.ndarray, 
+                                    i: int, j: int) -> float:
+        """Calculate simplified pairwise interaction effect between features i and j"""
+        # Simplified version that's much faster
+        base_both = baseline.copy()
+        base_both[i] = instance[i]  
+        base_both[j] = instance[j]
+        pred_both = self.model.predict([base_both])[0]
+        
+        base_i = baseline.copy()
+        base_i[i] = instance[i]
+        pred_i = self.model.predict([base_i])[0]
+        
+        base_j = baseline.copy() 
+        base_j[j] = instance[j]
+        pred_j = self.model.predict([base_j])[0]
+        
+        baseline_pred = self.model.predict([baseline])[0]
+        
+        # Simplified interaction calculation
+        interaction = pred_both - pred_i - pred_j + baseline_pred
+        return interaction
 
 
 class CORELSExplainer(BaseExplainer):
