@@ -51,7 +51,9 @@ class CausalSHAPExplainer(BaseExplainer):
         feature_names = dataset.feature_names if hasattr(dataset, 'feature_names') else [f'feature_{i}' for i in range(X_test.shape[1])]
         
         # Generate explanations for subset of test instances
-        n_explanations = min(50, len(X_test))
+        # Get max test samples from config (None means use full test set)
+        max_test_samples = self.config.get('experiment', {}).get('explanation', {}).get('max_test_samples', None)
+        n_explanations = len(X_test) if max_test_samples is None else min(max_test_samples, len(X_test))
         test_subset = X_test[:n_explanations]
         
         # Build causal structure (simplified - in practice this would come from domain knowledge)

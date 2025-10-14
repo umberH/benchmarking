@@ -39,7 +39,9 @@ class AttentionVisualizationExplainer(BaseExplainer):
         explanations = []
         
         # Generate explanations for a subset of test instances
-        n_explanations = min(50, len(X_test))  # Limit for performance
+        # Get max test samples from config (None means use full test set)
+        max_test_samples = self.config.get('experiment', {}).get('explanation', {}).get('max_test_samples', None)
+        n_explanations = len(X_test) if max_test_samples is None else min(max_test_samples, len(X_test))
         test_subset = X_test[:n_explanations]
         
         for i, text_instance in enumerate(test_subset):

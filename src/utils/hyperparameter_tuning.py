@@ -254,8 +254,57 @@ class HyperparameterTuner:
         
         # Perform grid search
         start_time = time.time()
-        
+
         try:
+            # Calculate total combinations
+            import itertools
+            total_combinations = 1
+            for param_values in param_grid.values():
+                total_combinations *= len(param_values)
+
+            self.logger.info(f"Total parameter combinations to test: {total_combinations}")
+            self.logger.info(f"CV folds: {self.tuning_config['cv_folds']}")
+            self.logger.info(f"Total fits: {total_combinations * self.tuning_config['cv_folds']}")
+
+            # Create custom progress tracking
+            class ProgressCallback:
+                def __init__(self, logger, total_combinations, start_time):
+                    self.logger = logger
+                    self.total_combinations = total_combinations
+                    self.start_time = start_time
+                    self.current = 0
+                    self.best_score = -float('inf')
+                    self.last_log_time = start_time
+
+                def log_progress(self, score=None):
+                    self.current += 1
+                    current_time = time.time()
+
+                    # Only log every 10% or every 30 seconds
+                    progress_pct = (self.current / self.total_combinations) * 100
+                    time_since_last_log = current_time - self.last_log_time
+
+                    should_log = (
+                        self.current % max(1, self.total_combinations // 10) == 0 or
+                        time_since_last_log > 30 or
+                        self.current == self.total_combinations
+                    )
+
+                    if should_log:
+                        elapsed = current_time - self.start_time
+                        rate = self.current / elapsed if elapsed > 0 else 0
+                        remaining = (self.total_combinations - self.current) / rate if rate > 0 else 0
+
+                        self.logger.info(f"[TUNING PROGRESS] {self.current}/{self.total_combinations} ({progress_pct:.1f}%) | "
+                                       f"Elapsed: {elapsed/60:.1f}m | ETA: {remaining/60:.1f}m | "
+                                       f"Best Score So Far: {self.best_score:.4f}")
+                        self.last_log_time = current_time
+
+                    if score is not None and score > self.best_score:
+                        self.best_score = score
+
+            progress_callback = ProgressCallback(self.logger, total_combinations, start_time)
+
             grid_search = GridSearchCV(
                 estimator=model,
                 param_grid=param_grid,
@@ -264,10 +313,11 @@ class HyperparameterTuner:
                 n_jobs=self.tuning_config['n_jobs'],
                 verbose=self.tuning_config['verbose']
             )
-            
-            # Fit the grid search
+
+            # Fit the grid search with progress tracking
+            self.logger.info("Starting hyperparameter search...")
             grid_search.fit(X_train, y_train)
-            
+
             tuning_time = time.time() - start_time
             
             # Collect results
@@ -406,8 +456,11 @@ class HyperparameterTuner:
         # Save to file
         with open(filepath, 'w') as f:
             json.dump(save_data, f, indent=2, default=str)
-        
+
         self.logger.info(f"Saved tuning result to {filepath}")
+
+        # Update summary file for caching
+        self._update_summary_file(dataset_name, model_name, result)
     
     def save_all_tuning_results(self, results: Dict[str, Any]):
         """
@@ -457,7 +510,81 @@ class HyperparameterTuner:
             json.dump(summary, f, indent=2, default=str)
         
         self.logger.info(f"Saved tuning summary to {summary_file}")
-    
+
+    def _update_summary_file(self, dataset_name: str, model_name: str, result: Dict[str, Any]):
+        """
+        Update the tuning summary file with a new result
+
+        Args:
+            dataset_name: Name of the dataset
+            model_name: Name of the model
+            result: Tuning result dictionary
+        """
+        summary_file = self.output_dir / "tuning_summary.json"
+
+        # Load existing summary or create new one
+        if summary_file.exists():
+            try:
+                with open(summary_file, 'r') as f:
+                    summary = json.load(f)
+            except Exception as e:
+                self.logger.warning(f"Failed to load existing summary, creating new one: {e}")
+                summary = {
+                    'tuning_summary': {
+                        'total_datasets': 0,
+                        'total_models': 0,
+                        'successful_tunings': 0,
+                        'failed_tunings': 0,
+                        'timestamp': datetime.now().isoformat()
+                    },
+                    'best_parameters': {},
+                    'performance_summary': {}
+                }
+        else:
+            summary = {
+                'tuning_summary': {
+                    'total_datasets': 0,
+                    'total_models': 0,
+                    'successful_tunings': 0,
+                    'failed_tunings': 0,
+                    'timestamp': datetime.now().isoformat()
+                },
+                'best_parameters': {},
+                'performance_summary': {}
+            }
+
+        # Update with new result
+        key = f"{dataset_name}_{model_name}"
+
+        # Check if this is a new entry
+        is_new = key not in summary['best_parameters']
+
+        if result['success']:
+            # Update counts if new
+            if is_new:
+                summary['tuning_summary']['successful_tunings'] += 1
+                summary['tuning_summary']['total_models'] += 1
+
+            # Store best parameters
+            summary['best_parameters'][key] = result['best_params']
+
+            # Store performance
+            summary['performance_summary'][key] = {
+                'cv_score': result['best_score'],
+                'test_accuracy': result['test_accuracy'],
+                'test_f1': result['test_f1'],
+                'test_roc_auc': result.get('test_roc_auc'),
+                'tuning_time': result['tuning_time'],
+                'timestamp': result['timestamp']
+            }
+
+        # Update timestamp
+        summary['tuning_summary']['timestamp'] = datetime.now().isoformat()
+
+        # Save updated summary
+        with open(summary_file, 'w') as f:
+            json.dump(summary, f, indent=2, default=str)
+
     def load_best_parameters(self, dataset_name: str, model_name: str) -> Optional[Dict[str, Any]]:
         """
         Load best parameters for a specific dataset-model combination

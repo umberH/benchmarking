@@ -11,86 +11,172 @@ from .base_explainer import BaseExplainer
 
 
 class OcclusionExplainer(BaseExplainer):
-    """Occlusion explainer (placeholder)"""
-    
+    """
+    Occlusion-based explainer for images
+    Generates saliency maps by occluding patches and measuring prediction changes
+    """
+
     supported_data_types = ['image']
     supported_model_types = ['cnn', 'vit']
-    
+
     def explain(self, dataset) -> dict:
         """Generate occlusion explanations for image data: occlude each patch and measure prediction change."""
         import numpy as np
         import time
         start_time = time.time()
+
         X_train, X_test, y_train, y_test = dataset.get_data()
         model = self.model
         explanations = []
-        n_explanations = min(10, len(X_test))  # Images are expensive
+
+        # Use config to determine number of explanations
+        max_test_samples = self.config.get('experiment', {}).get('explanation', {}).get('max_test_samples', None)
+        n_explanations = len(X_test) if max_test_samples is None else min(max_test_samples, len(X_test))
+        n_explanations = min(n_explanations, 50)  # Limit for computational efficiency
+
         test_subset = X_test[:n_explanations]
-        print(f"[DEBUG] OcclusionExplainer: Generating for {n_explanations} instances.")
-        
+        self.logger.info(f"OcclusionExplainer: Generating for {n_explanations} instances")
+
         for i, instance in enumerate(test_subset):
-            # Ensure instance is a numpy array
-            if not isinstance(instance, np.ndarray):
-                instance = np.array(instance)
-            
-            # Get model prediction with proper reshaping
             try:
+                # Ensure instance is a numpy array
+                if not isinstance(instance, np.ndarray):
+                    instance = np.array(instance)
+
+                # Handle flattened images - reshape to proper dimensions
                 if instance.ndim == 1:
-                    # Flattened image - try to reshape to square
-                    side_len = int(np.sqrt(len(instance)))
-                    if side_len * side_len == len(instance):
-                        instance = instance.reshape(side_len, side_len)
-                    else:
-                        # Try common image sizes
-                        if len(instance) == 784:  # 28x28
-                            instance = instance.reshape(28, 28)
-                        elif len(instance) == 3072:  # 32x32x3
-                            instance = instance.reshape(32, 32, 3)
-                        else:
-                            print(f"[DEBUG] OcclusionExplainer: Cannot reshape 1D array of length {len(instance)}")
-                            continue
-                
-                base_pred = model.predict([instance])[0]
-            except Exception as e:
-                print(f"[DEBUG] OcclusionExplainer: Error predicting instance {i}: {e}")
-                continue
-            
-            # Assume instance is 2D or 3D image (HWC)
-            if instance.ndim == 2:
-                h, w = instance.shape
-                c = 1
-            elif instance.ndim == 3:
-                h, w, c = instance.shape
-            else:
-                print(f"[DEBUG] OcclusionExplainer: Unsupported shape {instance.shape}")
-                continue
-            patch_size = max(1, h // 8)
-            importance_map = np.zeros((h, w))
-            for y in range(0, h, patch_size):
-                for x in range(0, w, patch_size):
-                    try:
-                        occluded = instance.copy()
-                        occluded[y:y+patch_size, x:x+patch_size, ...] = 0
-                        occluded_pred = model.predict([occluded])[0]
-                        importance = abs(base_pred - occluded_pred)
-                        importance_map[y:y+patch_size, x:x+patch_size] = importance
-                    except Exception as e:
-                        print(f"[DEBUG] Error in occlusion loop at ({y}, {x}): {e}")
+                    instance = self._reshape_flattened_image(instance)
+                    if instance is None:
+                        self.logger.warning(f"Cannot reshape instance {i}, skipping")
                         continue
-            explanations.append({
-                'instance_id': i,
-                'importance_map': importance_map.tolist(),
-                'prediction': float(base_pred),
-                'true_label': float(y_test[i]) if i < len(y_test) else None
-            })
+
+                # Store original shape for reshaping back
+                original_shape = instance.shape
+
+                # Get base prediction
+                base_pred = model.predict([instance])[0]
+
+                # Generate occlusion-based importance map
+                importance_map = self._generate_occlusion_map(instance, model, base_pred)
+
+                # Flatten importance map for storage
+                importance_flat = importance_map.flatten().tolist()
+
+                explanation = {
+                    'instance_id': i,
+                    'importance_map': importance_map.tolist(),  # 2D or 3D map
+                    'feature_importance': importance_flat,  # Flattened for consistency
+                    'prediction': float(base_pred),
+                    'true_label': float(y_test[i]) if i < len(y_test) else None,
+                    'image_shape': list(original_shape)
+                }
+                explanations.append(explanation)
+
+            except Exception as e:
+                self.logger.warning(f"Error processing instance {i}: {e}")
+                continue
+
         generation_time = time.time() - start_time
-        print(f"[DEBUG] OcclusionExplainer: Done. Generated {len(explanations)} explanations in {generation_time:.2f}s.")
+        self.logger.info(f"OcclusionExplainer: Generated {len(explanations)} explanations in {generation_time:.2f}s")
+
         return {
             'explanations': explanations,
             'generation_time': generation_time,
             'method': 'occlusion',
-            'info': {'n_explanations': len(explanations)}
+            'info': {
+                'n_explanations': len(explanations),
+                'method_description': 'Occlusion-based saliency map generation'
+            }
         }
+
+    def _reshape_flattened_image(self, instance: np.ndarray) -> np.ndarray:
+        """
+        Reshape flattened image to proper dimensions
+
+        Args:
+            instance: Flattened image array
+
+        Returns:
+            Reshaped image or None if cannot reshape
+        """
+        length = len(instance)
+
+        # Try square grayscale
+        side_len = int(np.sqrt(length))
+        if side_len * side_len == length:
+            return instance.reshape(side_len, side_len)
+
+        # Try common image sizes
+        if length == 784:  # 28x28 (MNIST, Fashion-MNIST)
+            return instance.reshape(28, 28)
+        elif length == 3072:  # 32x32x3 (CIFAR-10)
+            return instance.reshape(32, 32, 3)
+        elif length == 12288:  # 64x64x3
+            return instance.reshape(64, 64, 3)
+        elif length == 150528:  # 224x224x3 (ImageNet)
+            return instance.reshape(224, 224, 3)
+
+        return None
+
+    def _generate_occlusion_map(self, instance: np.ndarray, model, base_pred: float,
+                                 patch_size: int = None) -> np.ndarray:
+        """
+        Generate importance map by occluding patches
+
+        Args:
+            instance: Image instance (2D or 3D)
+            model: Model to use for predictions
+            base_pred: Baseline prediction
+            patch_size: Size of occlusion patches (auto-determined if None)
+
+        Returns:
+            Importance map same shape as instance (or 2D if instance is 3D)
+        """
+        # Determine image dimensions
+        if instance.ndim == 2:
+            h, w = instance.shape
+            c = 1
+        elif instance.ndim == 3:
+            h, w, c = instance.shape
+        else:
+            raise ValueError(f"Unsupported image shape: {instance.shape}")
+
+        # Auto-determine patch size if not provided
+        if patch_size is None:
+            patch_size = max(2, min(h, w) // 8)
+
+        # Initialize importance map
+        importance_map = np.zeros((h, w))
+
+        # Occlude patches and measure prediction change
+        for y in range(0, h, patch_size):
+            for x in range(0, w, patch_size):
+                try:
+                    # Create occluded version
+                    occluded = instance.copy()
+                    y_end = min(y + patch_size, h)
+                    x_end = min(x + patch_size, w)
+
+                    # Occlude patch (set to zero or mean)
+                    if instance.ndim == 3:
+                        occluded[y:y_end, x:x_end, :] = 0
+                    else:
+                        occluded[y:y_end, x:x_end] = 0
+
+                    # Get prediction on occluded image
+                    occluded_pred = model.predict([occluded])[0]
+
+                    # Calculate importance as prediction change
+                    importance = abs(base_pred - occluded_pred)
+
+                    # Assign importance to patch
+                    importance_map[y:y_end, x:x_end] = importance
+
+                except Exception as e:
+                    self.logger.warning(f"Error occluding patch at ({y}, {x}): {e}")
+                    continue
+
+        return importance_map
 
 
 class FeatureAblationExplainer(BaseExplainer):
@@ -107,7 +193,9 @@ class FeatureAblationExplainer(BaseExplainer):
         X_train, X_test, y_train, y_test = dataset.get_data()
         model = self.model
         explanations = []
-        n_explanations = min(50, len(X_test))
+        # Get max test samples from config (None means use full test set)
+        max_test_samples = self.config.get('experiment', {}).get('explanation', {}).get('max_test_samples', None)
+        n_explanations = len(X_test) if max_test_samples is None else min(max_test_samples, len(X_test))
         test_subset = X_test[:n_explanations]
         print(f"[DEBUG] FeatureAblationExplainer: Generating for {n_explanations} instances.")
         for i, instance in enumerate(test_subset):
@@ -159,7 +247,9 @@ class TextOcclusionExplainer(BaseExplainer):
         X_train, X_test, y_train, y_test = dataset.get_data()
         model = self.model
         explanations = []
-        n_explanations = min(50, len(X_test))
+        # Get max test samples from config (None means use full test set)
+        max_test_samples = self.config.get('experiment', {}).get('explanation', {}).get('max_test_samples', None)
+        n_explanations = len(X_test) if max_test_samples is None else min(max_test_samples, len(X_test))
         test_subset = X_test[:n_explanations]
         
         self.logger.info(f"TextOcclusionExplainer: Generating for {n_explanations} instances.")

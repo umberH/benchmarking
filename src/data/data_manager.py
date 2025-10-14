@@ -13,6 +13,7 @@ import time
 
 from .datasets import TabularDataset, ImageDataset, TextDataset
 from ..utils.data_splitting import DataSplitter
+from .openml_loader import OpenMLLoader
 
 
 class DataManager:
@@ -30,9 +31,13 @@ class DataManager:
         self.config = config
         self.logger = logging.getLogger(__name__)
         self.datasets = {}
-        
+
         # Initialize data splitter
         self.data_splitter = DataSplitter(config)
+
+        # Initialize OpenML loader
+        self.openml_loader = OpenMLLoader(cache_dir='data/openml_cache')
+        self.logger.info("OpenML loader initialized for 13 confirmed datasets")
         
         # Default data paths
         self.data_paths = {
@@ -152,7 +157,16 @@ class DataManager:
         """Load a mandatory dataset by name"""
         dataset_type = dataset_config['type']
         source = dataset_config['source']
-        
+
+        # Check if dataset is available on OpenML first
+        if self.openml_loader.is_available() and dataset_name in self.openml_loader.get_available_datasets():
+            try:
+                self.logger.info(f"Loading {dataset_name} from OpenML")
+                return self._load_from_openml(dataset_name)
+            except Exception as e:
+                self.logger.warning(f"Failed to load {dataset_name} from OpenML: {e}")
+                self.logger.info(f"Falling back to original source: {source}")
+
         # Binary tabular datasets
         if dataset_name == 'adult_income':
             return self._load_adult_income_dataset()
@@ -1036,5 +1050,78 @@ class DataManager:
         except Exception as e:
             self.logger.error(f"Could not load AG News dataset: {e}")
             raise
-    
+
+    def _load_from_openml(self, dataset_name: str) -> Any:
+        """
+        Load dataset from OpenML using the OpenML loader
+
+        Args:
+            dataset_name: Name of the dataset
+
+        Returns:
+            Dataset object (TabularDataset or ImageDataset)
+        """
+        # Get data from OpenML
+        X, y, metadata = self.openml_loader.load_by_name(dataset_name)
+
+        # Split the data
+        from sklearn.model_selection import train_test_split
+
+        # Ensure stratification is possible
+        unique_classes = np.unique(y)
+        if len(unique_classes) < 2:
+            stratify = None
+        else:
+            stratify = y
+
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.2, random_state=42, stratify=stratify
+        )
+
+        dataset_type = metadata.get('dataset_type', 'tabular')
+
+        if dataset_type == 'tabular':
+            # Create TabularDataset
+            feature_names = metadata.get('feature_names', [f'feature_{i}' for i in range(X.shape[1])])
+            return TabularDataset(
+                name=dataset_name,
+                X_train=pd.DataFrame(X_train, columns=feature_names) if feature_names else X_train,
+                X_test=pd.DataFrame(X_test, columns=feature_names) if feature_names else X_test,
+                y_train=y_train,
+                y_test=y_test,
+                feature_names=feature_names,
+                config={
+                    'source': 'openml',
+                    'openml_id': metadata.get('openml_id'),
+                    'description': metadata.get('description', f'OpenML dataset: {dataset_name}')
+                }
+            )
+        elif dataset_type == 'image':
+            # For image datasets, reshape if needed
+            # OpenML image datasets come flattened, need to reshape
+            if dataset_name == 'mnist':
+                X_train = X_train.reshape(-1, 1, 28, 28)
+                X_test = X_test.reshape(-1, 1, 28, 28)
+            elif dataset_name == 'fashion_mnist':
+                X_train = X_train.reshape(-1, 1, 28, 28)
+                X_test = X_test.reshape(-1, 1, 28, 28)
+            elif dataset_name == 'cifar10':
+                X_train = X_train.reshape(-1, 3, 32, 32)
+                X_test = X_test.reshape(-1, 3, 32, 32)
+
+            return ImageDataset(
+                name=dataset_name,
+                X_train=X_train,
+                X_test=X_test,
+                y_train=y_train,
+                y_test=y_test,
+                config={
+                    'source': 'openml',
+                    'openml_id': metadata.get('openml_id'),
+                    'description': metadata.get('description', f'OpenML image dataset: {dataset_name}')
+                }
+            )
+        else:
+            raise ValueError(f"Unsupported dataset type from OpenML: {dataset_type}")
+
  

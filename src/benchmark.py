@@ -16,6 +16,7 @@ from .evaluation.evaluator import Evaluator
 from .utils.reporting import ReportGenerator
 from .utils.data_validation import DataValidator, validate_all_datasets
 from .utils.hyperparameter_tuning import HyperparameterTuner, load_tuned_parameters
+from .utils.model_persistence import ModelPersistence
 
 
 class XAIBenchmark:
@@ -23,17 +24,22 @@ class XAIBenchmark:
     Main class for XAI benchmarking experiments
     """
     
-    def __init__(self, config: Dict[str, Any], output_dir: Path):
+    def __init__(self, config: Dict[str, Any], output_dir: Path, auto_tune: bool = False):
         """
         Initialize the benchmark
-        
+
         Args:
             config: Configuration dictionary
-            output_dir: Output directory for results
+            output_dir: Directory for saving results
+            auto_tune: If True, automatically tune hyperparameters before training
         """
         self.config = config
         self.output_dir = output_dir
         self.logger = logging.getLogger(__name__)
+        self.auto_tune_enabled = auto_tune
+
+        if auto_tune:
+            self.logger.info("Auto-tune mode ENABLED - Will tune hyperparameters before training")
         
         # Initialize components
         # Pass the full config so DataManager can access the 'data' section internally
@@ -44,11 +50,20 @@ class XAIBenchmark:
         self.report_generator = ReportGenerator(output_dir)
         self.data_validator = DataValidator(config)
         
-        # Initialize hyperparameter tuner
+        # Initialize model persistence with central storage (not per-experiment)
+        # This allows models to be reused across ALL experiments
+        central_models_dir = Path("saved_models")  # Project root
+        self.model_persistence = ModelPersistence(central_models_dir)
+        self.logger.info(f"Using central model storage: {central_models_dir.absolute()}")
+
+        # Initialize hyperparameter tuner with central storage inside saved_models
+        # This allows tuning results to be reused across ALL experiments
+        central_tuning_dir = central_models_dir / "tuning_results"
         self.hyperparameter_tuner = HyperparameterTuner(
-            config, 
-            output_dir / "tuning_results"
+            config,
+            central_tuning_dir
         )
+        self.logger.info(f"Using central tuning storage: {central_tuning_dir.absolute()}")
         
         # Results storage
         self.results = {
@@ -208,33 +223,105 @@ class XAIBenchmark:
                 if model_config is None:
                     self.logger.error(f"Model '{model_name}' not found in section '{valid_model_section}'.")
                     continue
+                # Prepare model configuration with tuned parameters if requested
+                model_config_to_use = dict(model_config)
+                if use_tuned_params:
+                    tuned_params = self.get_tuned_parameters(dataset_name, model_name)
+                    if tuned_params:
+                        self.logger.info(f"Using tuned parameters for {model_name}: {tuned_params}")
+                        model_config_to_use.update(tuned_params)
+                    else:
+                        self.logger.info(f"No tuned parameters found for {model_name} on {dataset_name}.")
+
                 # Check for saved model and prompt for reuse/retrain
-                model_file = self.results_dir / f"{dataset_name}_{model_name}.pt"
                 reuse_model = False
-                if model_file.exists():
+                loaded_model = None
+                loaded_metadata = None
+
+                if self.model_persistence.model_exists(dataset_name, model_name, model_config_to_use):
+                    model_info = self.model_persistence.get_model_info(dataset_name, model_name, model_config_to_use)
+                    self.logger.info(f"Found saved model for '{model_name}' on '{dataset_name}'")
+                    self.logger.info(f"Saved on: {model_info.get('saved_timestamp', 'Unknown')}")
+                    self.logger.info(f"Previous test accuracy: {model_info.get('performance_metrics', {}).get('test_accuracy', 'N/A')}")
+
                     reuse = input(f"Model '{model_name}' for dataset '{dataset_name}' already exists. Reuse? (y/n): ")
                     reuse_model = (reuse.strip().lower() == 'y')
-                if reuse_model:
+
+                    if reuse_model:
+                        loaded_model, loaded_metadata = self.model_persistence.load_model(
+                            dataset_name, model_name, model_config_to_use
+                        )
+                        if loaded_model is None:
+                            self.logger.warning(f"Failed to load saved model. Training from scratch...")
+                            reuse_model = False
+
+                if reuse_model and loaded_model is not None:
                     self.logger.info(f"Reusing saved model '{model_name}' for '{dataset_name}'")
-                    # TODO: Load model from file if supported
-                    model = self.model_factory.create_model(model_config, dataset, model_name)
-                    # model.load(model_file) # If implemented
+
+                    # Check if loaded_model is a BaseModel wrapper (has is_trained attribute or has vectorizer/tokenizer)
+                    if (hasattr(loaded_model, 'is_trained') and hasattr(loaded_model, 'model')) or \
+                       hasattr(loaded_model, 'vectorizer') or hasattr(loaded_model, 'tokenizer'):
+                        # This is a complete BaseModel wrapper - use it directly
+                        model = loaded_model
+                        model.dataset = dataset  # Update dataset reference
+                        model.config = model_config_to_use  # Update config
+                    else:
+                        # Create model wrapper and load the inner model
+                        model = self.model_factory.create_model(model_config_to_use, dataset, model_name)
+
+                        # Handle PyTorch state_dict loading
+                        if isinstance(loaded_model, dict) and 'model_state_dict' in loaded_model:
+                            # This is a PyTorch checkpoint - need to load state_dict
+                            # Ensure the model is created before loading state_dict
+                            if model.model is None:
+                                model.model = model._create_model()
+                            model.model.load_state_dict(loaded_model['model_state_dict'])
+                        else:
+                            # Regular inner model object (sklearn models)
+                            # Check if this is a text model that needs vectorizer
+                            model_class_name = type(model).__name__
+                            needs_vectorizer = model_class_name in ['BERTModel', 'LSTMModel', 'NaiveBayesTextModel', 'SVMTextModel', 'XGBoostTextModel']
+
+                            if needs_vectorizer:
+                                # Old saved model without vectorizer - cannot be used
+                                self.logger.error(f"Loaded model '{model_name}' is missing vectorizer (old format). Please retrain this model.")
+                                self.logger.error(f"To retrain: Delete saved_models/models/{dataset_name}_{model_name}_*.pkl and run again")
+                                raise Exception(f"Model '{model_name}' was saved in old format without vectorizer. Please delete and retrain.")
+                            else:
+                                model.model = loaded_model
+
+                    model.is_trained = True
+                    model.is_loaded_from_cache = True
+                    # Use saved performance metrics
+                    performance = loaded_metadata.get('performance_metrics', {})
+                    if hasattr(model, 'performance_metrics'):
+                        model.performance_metrics = performance
                 else:
                     self.logger.info(f"Training {model_name} on {dataset_name} (type: {dataset_type})")
-                    model_config_to_use = dict(model_config)
-                    if use_tuned_params:
-                        tuned_params = self.get_tuned_parameters(dataset_name, model_name)
-                        if tuned_params:
-                            self.logger.info(f"Using tuned parameters for {model_name}: {tuned_params}")
-                            model_config_to_use.update(tuned_params)
-                        else:
-                            self.logger.info(f"No tuned parameters found for {model_name} on {dataset_name}.")
                     model = self.model_factory.create_model(model_config_to_use, dataset, model_name)
                     model.train(dataset)
                     self.logger.info(f"Model '{model_name}' trained on '{dataset_name}'. Training time: {getattr(model, 'training_time', 'N/A')}")
                     performance = model.evaluate(dataset)
                     self.logger.info(f"Performance metrics for '{model_name}' on '{dataset_name}': {performance}")
-                    # TODO: Save model to file if supported
+
+                    # Save the trained model
+                    try:
+                        # For text models with vectorizer/tokenizer, save the complete wrapper
+                        if hasattr(model, 'vectorizer') or hasattr(model, 'tokenizer'):
+                            model_to_save = model
+                        else:
+                            model_to_save = model.model  # The actual model object
+
+                        model_id = self.model_persistence.save_model(
+                            model_to_save,
+                            dataset_name,
+                            model_name,
+                            model_config_to_use,
+                            performance
+                        )
+                        self.logger.info(f"Model saved with ID: {model_id}")
+                    except Exception as e:
+                        self.logger.warning(f"Failed to save model: {e}")
                 models[dataset_name][model_name] = model
                 self.results['model_results'][f"{dataset_name}_{model_name}"] = {
                     'training_time': getattr(model, 'training_time', None),
@@ -740,15 +827,85 @@ class XAIBenchmark:
                     if tuned_params:
                         print(f"Using tuned parameters: {tuned_params}")
                         model_config_to_use.update(tuned_params)
-                
-                # Train model
-                try:
-                    model = self.model_factory.create_model(model_config_to_use, dataset, model_config_to_use['type'])
-                    model.train(dataset)
-                    print(f"[SUCCESS] Model '{model_config['name']}' trained successfully")
-                except Exception as e:
-                    print(f"[ERROR] Failed to train model '{model_config['name']}': {e}")
-                    continue
+
+                # Check if model already exists and can be reused
+                model_name = model_config['name']
+                if self.model_persistence.model_exists(dataset_name, model_name, model_config_to_use):
+                    print(f"Found saved model for '{model_name}' on '{dataset_name}'")
+                    try:
+                        loaded_model, loaded_metadata = self.model_persistence.load_model(
+                            dataset_name, model_name, model_config_to_use
+                        )
+                        if loaded_model is not None:
+                            # Check if loaded_model is a BaseModel wrapper (has is_trained or has vectorizer/tokenizer)
+                            if (hasattr(loaded_model, 'is_trained') and hasattr(loaded_model, 'model')) or \
+                               hasattr(loaded_model, 'vectorizer') or hasattr(loaded_model, 'tokenizer'):
+                                model = loaded_model
+                                model.dataset = dataset
+                                model.config = model_config_to_use
+                            else:
+                                # Create wrapper and load inner model
+                                model = self.model_factory.create_model(model_config_to_use, dataset, model_config_to_use['type'])
+
+                                # Handle PyTorch state_dict loading
+                                if isinstance(loaded_model, dict) and 'model_state_dict' in loaded_model:
+                                    # Ensure the model is created before loading state_dict
+                                    if model.model is None:
+                                        model.model = model._create_model()
+                                    model.model.load_state_dict(loaded_model['model_state_dict'])
+                                else:
+                                    # Check if this is a text model that needs vectorizer
+                                    model_class_name = type(model).__name__
+                                    needs_vectorizer = model_class_name in ['BERTModel', 'LSTMModel', 'NaiveBayesTextModel', 'SVMTextModel', 'XGBoostTextModel']
+
+                                    if needs_vectorizer:
+                                        # Old saved model without vectorizer - cannot be used
+                                        raise Exception(f"Model '{model_name}' was saved in old format without vectorizer. Please delete and retrain.")
+                                    else:
+                                        model.model = loaded_model
+
+                            model.is_trained = True
+                            model.is_loaded_from_cache = True
+                            test_acc = loaded_metadata.get('performance_metrics', {}).get('test_accuracy', 'N/A')
+                            print(f"[SUCCESS] Loaded model '{model_name}' (Test Acc: {test_acc})")
+                        else:
+                            raise Exception("Failed to load saved model")
+                    except Exception as e:
+                        print(f"[WARNING] Failed to load saved model: {e}")
+                        print(f"Training new model instead...")
+                        # Fall through to training below
+                        model = None
+                else:
+                    model = None
+
+                # Train model if not loaded
+                if model is None:
+                    try:
+                        model = self.model_factory.create_model(model_config_to_use, dataset, model_config_to_use['type'])
+                        model.train(dataset)
+                        print(f"[SUCCESS] Model '{model_config['name']}' trained successfully")
+
+                        # Save the trained model
+                        try:
+                            # For text models with vectorizer/tokenizer, save the complete wrapper
+                            if hasattr(model, 'vectorizer') or hasattr(model, 'tokenizer'):
+                                model_to_save = model
+                            else:
+                                model_to_save = model.model
+
+                            model_id = self.model_persistence.save_model(
+                                model_to_save,
+                                dataset_name,
+                                model_name,
+                                model_config_to_use,
+                                model.evaluate(dataset) if hasattr(model, 'evaluate') else {}
+                            )
+                            print(f"[SAVED] Model saved as: {model_id}")
+                        except Exception as save_err:
+                            print(f"[WARNING] Failed to save model: {save_err}")
+                    except Exception as e:
+                        print(f"[ERROR] Failed to train model '{model_config['name']}': {e}")
+                        continue
 
                 # Find compatible explanation methods
                 explanation_candidates = []
@@ -786,7 +943,7 @@ class XAIBenchmark:
 
                 # Process each explanation method
                 for explanation_config in selected_explanations:
-                    print(f"\n  → Generating {explanation_config['name']} explanations...")
+                    print(f"\n  [GENERATE] Generating {explanation_config['name']} explanations...")
                     
                     try:
                         explainer = self.explanation_factory.create_explainer(explanation_config, model, dataset)
@@ -811,35 +968,61 @@ class XAIBenchmark:
                         selected_eval_metrics = [all_eval_metrics[i] for i in indices]
 
                     # Evaluate explanations
+                    evaluation_results = {}
                     try:
                         all_results = self.evaluator.evaluate(model, explanation_results, dataset)
-                        evaluation_results = {k: v for k, v in all_results.items() if k in selected_eval_metrics}
-                        
-                        # Display results with enhanced information
-                        print(f"\n    Evaluation results for {explanation_config['name']}:")
-                        
-                        # Show explanation info first
-                        explanation_info = explanation_results.get('info', {})
-                        if explanation_info:
-                            print(f"      {'Info':15}:")
-                            print(f"        N explanations: {explanation_info.get('n_explanations', 0)}")
-                            print(f"        Accuracy: {explanation_info.get('accuracy', 0.0):.4f}")
-                            print(f"        Class coverage: {explanation_info.get('class_coverage', 0)}/{explanation_info.get('total_classes', 0)}")
-                            if 'avg_proto_distance' in explanation_info:
-                                print(f"        Avg distance: {explanation_info['avg_proto_distance']:.4f} ± {explanation_info.get('std_proto_distance', 0.0):.4f}")
-                            elif 'avg_cf_distance' in explanation_info:
-                                print(f"        Avg CF distance: {explanation_info['avg_cf_distance']:.4f} ± {explanation_info.get('std_cf_distance', 0.0):.4f}")
-                        
-                        # Show evaluation metrics
-                        print(f"      {'Metrics':15}:")
-                        for k, v in evaluation_results.items():
-                            if isinstance(v, (int, float)):
-                                print(f"        {k:15}: {float(v):.4f}")
-                            else:
-                                print(f"        {k:15}: {v}")
+                        # Safely filter results
+                        for k, v in all_results.items():
+                            if k in selected_eval_metrics:
+                                evaluation_results[k] = v
                     except Exception as e:
                         print(f"    [ERROR] Failed to evaluate explanations: {e}")
                         evaluation_results = {}
+
+                    # Display results
+                    if evaluation_results:
+                        try:
+                            print(f"\n    Evaluation results for {explanation_config['name']}:")
+
+                            # Show explanation info first
+                            explanation_info = explanation_results.get('info', {})
+                            if explanation_info:
+                                print(f"      {'Info':15}:")
+                                print(f"        N explanations: {explanation_info.get('n_explanations', 0)}")
+
+                                # Safely handle accuracy display
+                                try:
+                                    acc_val = explanation_info.get('accuracy', 0.0)
+                                    print(f"        Accuracy: {float(acc_val):.4f}")
+                                except:
+                                    print(f"        Accuracy: N/A")
+
+                                print(f"        Class coverage: {explanation_info.get('class_coverage', 0)}/{explanation_info.get('total_classes', 0)}")
+
+                                # Safely handle distance displays
+                                if 'avg_proto_distance' in explanation_info:
+                                    try:
+                                        print(f"        Avg distance: {float(explanation_info['avg_proto_distance']):.4f} ± {float(explanation_info.get('std_proto_distance', 0.0)):.4f}")
+                                    except:
+                                        print(f"        Avg distance: {explanation_info['avg_proto_distance']}")
+                                elif 'avg_cf_distance' in explanation_info:
+                                    try:
+                                        print(f"        Avg CF distance: {float(explanation_info['avg_cf_distance']):.4f} ± {float(explanation_info.get('std_cf_distance', 0.0)):.4f}")
+                                    except:
+                                        print(f"        Avg CF distance: {explanation_info['avg_cf_distance']}")
+
+                            # Show evaluation metrics
+                            print(f"      {'Metrics':15}:")
+                            for k, v in evaluation_results.items():
+                                try:
+                                    # Try to convert to float for numeric values
+                                    val = float(v)
+                                    print(f"        {k:15}: {val:.4f}")
+                                except (TypeError, ValueError):
+                                    # If conversion fails, just print as-is
+                                    print(f"        {k:15}: {v}")
+                        except Exception as e:
+                            print(f"    [ERROR] Failed to display results: {e}")
 
                     # Save results
                     self.results.setdefault('interactive_runs', []).append({
@@ -875,6 +1058,157 @@ class XAIBenchmark:
             self.logger.info(f"Results saved to {self.summary_file}")
         except Exception as e:
             self.logger.error(f"Failed to save results: {e}")
+
+    def train_models_only(self, use_tuned_params: bool = False):
+        """
+        Train and save all models without running explanations or evaluations.
+        Perfect for preparing models before running experiments.
+
+        Args:
+            use_tuned_params: Whether to use pre-tuned parameters (if available)
+        """
+        self.logger.info("=" * 80)
+        self.logger.info("TRAIN MODELS ONLY MODE")
+        self.logger.info("=" * 80)
+        self.logger.info("This mode will:")
+        self.logger.info("  1. Train all compatible models for all datasets")
+        if self.auto_tune_enabled:
+            self.logger.info("  2. Auto-tune hyperparameters (if not already tuned)")
+        elif use_tuned_params:
+            self.logger.info("  2. Use pre-tuned hyperparameters (if available)")
+        else:
+            self.logger.info("  2. Use default hyperparameters from config")
+        self.logger.info("  3. Save all trained models to central storage")
+        self.logger.info("  4. Skip explanations and evaluations")
+        self.logger.info("")
+        self.logger.info("After completion, you can run experiments with --interactive")
+        self.logger.info("or --run-all and models will load instantly!")
+        self.logger.info("=" * 80)
+
+        mandatory_dataset_names = list(self.data_manager._get_mandatory_datasets().keys())
+        if not mandatory_dataset_names:
+            self.logger.error("No mandatory datasets available")
+            return
+
+        available_models = self.model_factory.get_available_models()
+        if not available_models:
+            self.logger.error("No models available from configuration")
+            return
+
+        trained_count = 0
+        loaded_count = 0
+        failed_count = 0
+
+        for dataset_name in mandatory_dataset_names:
+            try:
+                self.logger.info("")
+                self.logger.info(f"{'='*60}")
+                self.logger.info(f"DATASET: {dataset_name}")
+                self.logger.info(f"{'='*60}")
+
+                dataset = self.data_manager.load_dataset(dataset_name)
+                dataset_type = dataset.get_info().get('type')
+
+                # Filter models by dataset compatibility
+                compatible_models = []
+                for m in available_models:
+                    model_type_key = m.get('type')
+                    model_class = self.model_factory.model_registry.get(model_type_key)
+                    if not model_class:
+                        continue
+                    supported = getattr(model_class, 'supported_data_types', [])
+                    if not supported or (dataset_type in supported):
+                        compatible_models.append(m)
+
+                if not compatible_models:
+                    self.logger.warning(f"No compatible models for dataset '{dataset_name}' (type {dataset_type})")
+                    continue
+
+                self.logger.info(f"Compatible models: {[m.get('name') for m in compatible_models]}")
+
+                for model_config in compatible_models:
+                    try:
+                        model_name = model_config.get('name')
+                        self.logger.info(f"\n  Processing: {model_name}")
+
+                        # Prepare final model config
+                        final_model_config = model_config.copy()
+
+                        # Auto-tune if enabled
+                        if self.auto_tune_enabled:
+                            tuned_params = self._get_or_tune_hyperparameters(dataset_name, model_name, dataset)
+                            if tuned_params:
+                                final_model_config.update(tuned_params)
+                                self.logger.info(f"    [OK] Using auto-tuned parameters")
+
+                        # OR use pre-tuned params
+                        elif use_tuned_params:
+                            tuned_params = self.get_tuned_parameters(dataset_name, model_name)
+                            if tuned_params:
+                                final_model_config.update(tuned_params)
+                                self.logger.info(f"    [OK] Using pre-tuned parameters")
+
+                        # Check if model exists
+                        if self.model_persistence.model_exists(dataset_name, model_name, final_model_config):
+                            self.logger.info(f"    [LOAD] Model already exists, loading to verify...")
+                            loaded_model, loaded_metadata = self.model_persistence.load_model(
+                                dataset_name, model_name, final_model_config
+                            )
+                            if loaded_model is not None:
+                                test_acc = loaded_metadata.get('performance_metrics', {}).get('test_accuracy', 'N/A')
+                                self.logger.info(f"    [OK] Model loaded successfully (Test Acc: {test_acc})")
+                                loaded_count += 1
+                            else:
+                                raise Exception("Failed to load saved model")
+                        else:
+                            # Train new model
+                            self.logger.info(f"    [TRAIN] Training new model...")
+                            model = self.model_factory.create_model(final_model_config, dataset)
+                            model.train(dataset)
+
+                            # Evaluate and save
+                            performance = model.evaluate(dataset)
+                            self.logger.info(f"    [OK] Training complete (Test Acc: {performance.get('test_accuracy', 'N/A')})")
+
+                            # For text models with vectorizer/tokenizer, save the complete wrapper
+                            if hasattr(model, 'vectorizer') or hasattr(model, 'tokenizer'):
+                                model_to_save = model
+                            else:
+                                model_to_save = model.model
+
+                            model_id = self.model_persistence.save_model(
+                                model_to_save,
+                                dataset_name,
+                                model_name,
+                                final_model_config,
+                                performance
+                            )
+                            self.logger.info(f"    [OK] Model saved: {model_id}")
+                            trained_count += 1
+
+                    except Exception as e:
+                        self.logger.error(f"    [FAIL] Failed: {e}")
+                        failed_count += 1
+                        continue
+
+            except Exception as e:
+                self.logger.error(f"Failed to process dataset '{dataset_name}': {e}")
+                continue
+
+        # Summary
+        self.logger.info("")
+        self.logger.info("=" * 80)
+        self.logger.info("TRAINING SUMMARY")
+        self.logger.info("=" * 80)
+        self.logger.info(f"Models trained:     {trained_count}")
+        self.logger.info(f"Models loaded:      {loaded_count}")
+        self.logger.info(f"Models failed:      {failed_count}")
+        self.logger.info(f"Total processed:    {trained_count + loaded_count + failed_count}")
+        self.logger.info("")
+        self.logger.info("[OK] All models are now saved and ready to use!")
+        self.logger.info("  Run experiments with: python main.py --interactive")
+        self.logger.info("  or: python main.py --run-all")
+        self.logger.info("=" * 80)
 
     def run_all(self, use_tuned_params: bool = False):
         """Run all datasets x compatible models x compatible explanation methods with incremental saving."""
@@ -935,8 +1269,92 @@ class XAIBenchmark:
                         model_config = {**model_config, **tuned_params}
                 
                 try:
-                    model = self.model_factory.create_model(model_config, dataset)
-                    model.train(dataset)
+                    model_name = model_config.get('name')
+
+                    # Prepare final model config (may include tuned params or use-tuned-params)
+                    final_model_config = model_config.copy()
+
+                    # Auto-tune if enabled (tunes on-demand, caches results)
+                    if self.auto_tune_enabled:
+                        tuned_params = self._get_or_tune_hyperparameters(dataset_name, model_name, dataset)
+                        if tuned_params:
+                            final_model_config.update(tuned_params)
+                            self.logger.info(f"Using auto-tuned parameters for {model_name}: {tuned_params}")
+
+                    # OR use pre-tuned params if use_tuned_params flag is set
+                    elif use_tuned_params:
+                        tuned_params = self.get_tuned_parameters(dataset_name, model_name)
+                        if tuned_params:
+                            final_model_config.update(tuned_params)
+                            self.logger.info(f"Using pre-tuned parameters for {model_name}: {tuned_params}")
+
+                    # Check if model already exists and can be reused (with final config)
+                    if self.model_persistence.model_exists(dataset_name, model_name, final_model_config):
+                        self.logger.info(f"Found saved model for '{model_name}' on '{dataset_name}', loading...")
+                        loaded_model, loaded_metadata = self.model_persistence.load_model(
+                            dataset_name, model_name, final_model_config
+                        )
+                        if loaded_model is not None:
+                            # Check if loaded_model is a BaseModel wrapper (has is_trained or has vectorizer/tokenizer)
+                            if (hasattr(loaded_model, 'is_trained') and hasattr(loaded_model, 'model')) or \
+                               hasattr(loaded_model, 'vectorizer') or hasattr(loaded_model, 'tokenizer'):
+                                # Complete BaseModel wrapper - use directly
+                                model = loaded_model
+                                model.dataset = dataset
+                                model.config = final_model_config
+                            else:
+                                # Create wrapper and load inner model
+                                model = self.model_factory.create_model(final_model_config, dataset)
+
+                                # Handle PyTorch state_dict loading
+                                if isinstance(loaded_model, dict) and 'model_state_dict' in loaded_model:
+                                    # Ensure the model is created before loading state_dict
+                                    if model.model is None:
+                                        model.model = model._create_model()
+                                    model.model.load_state_dict(loaded_model['model_state_dict'])
+                                else:
+                                    # Check if this is a text model that needs vectorizer
+                                    model_class_name = type(model).__name__
+                                    needs_vectorizer = model_class_name in ['BERTModel', 'LSTMModel', 'NaiveBayesTextModel', 'SVMTextModel', 'XGBoostTextModel']
+
+                                    if needs_vectorizer:
+                                        # Old saved model without vectorizer - cannot be used
+                                        raise Exception(f"Model '{model_name}' was saved in old format without vectorizer. Please delete and retrain.")
+                                    else:
+                                        model.model = loaded_model
+
+                            model.is_trained = True
+                            model.is_loaded_from_cache = True
+                            self.logger.info(f"Loaded model '{model_name}' (Test Acc: {loaded_metadata.get('performance_metrics', {}).get('test_accuracy', 'N/A')})")
+                        else:
+                            raise Exception("Failed to load saved model")
+                    else:
+                        # Train new model with final config
+                        model = self.model_factory.create_model(final_model_config, dataset)
+                        model.train(dataset)
+
+                        # Evaluate and save the trained model
+                        performance = model.evaluate(dataset)
+                        self.logger.info(f"Model '{model_name}' trained. Test Acc: {performance.get('test_accuracy', 'N/A')}")
+
+                        try:
+                            # For text models with vectorizer/tokenizer, save the complete wrapper
+                            if hasattr(model, 'vectorizer') or hasattr(model, 'tokenizer'):
+                                model_to_save = model
+                            else:
+                                model_to_save = model.model
+
+                            model_id = self.model_persistence.save_model(
+                                model_to_save,
+                                dataset_name,
+                                model_name,
+                                final_model_config,
+                                performance
+                            )
+                            self.logger.info(f"Model saved with ID: {model_id}")
+                        except Exception as e:
+                            self.logger.warning(f"Failed to save model: {e}")
+
                 except Exception as e:
                     self.logger.error(f"Failed to train model '{model_config.get('name')}' on '{dataset_name}': {e}")
                     continue
@@ -1054,8 +1472,91 @@ class XAIBenchmark:
                         model_config = {**model_config, **tuned_params}
                 
                 try:
-                    model = self.model_factory.create_model(model_config, dataset)
-                    model.train(dataset)
+                    model_name = model_config.get('name')
+
+                    # Prepare final model config (may include tuned params or use-tuned-params)
+                    final_model_config = model_config.copy()
+
+                    # Auto-tune if enabled (tunes on-demand, caches results)
+                    if self.auto_tune_enabled:
+                        tuned_params = self._get_or_tune_hyperparameters(dataset_name, model_name, dataset)
+                        if tuned_params:
+                            final_model_config.update(tuned_params)
+                            self.logger.info(f"Using auto-tuned parameters for {model_name}: {tuned_params}")
+
+                    # OR use pre-tuned params if use_tuned_params flag is set
+                    elif use_tuned_params:
+                        tuned_params = self.get_tuned_parameters(dataset_name, model_name)
+                        if tuned_params:
+                            final_model_config.update(tuned_params)
+                            self.logger.info(f"Using pre-tuned parameters for {model_name}: {tuned_params}")
+
+                    # Check if model already exists and can be reused (with final config)
+                    if self.model_persistence.model_exists(dataset_name, model_name, final_model_config):
+                        self.logger.info(f"Found saved model for '{model_name}' on '{dataset_name}', loading...")
+                        loaded_model, loaded_metadata = self.model_persistence.load_model(
+                            dataset_name, model_name, final_model_config
+                        )
+                        if loaded_model is not None:
+                            # Check if loaded_model is a BaseModel wrapper (has is_trained or has vectorizer/tokenizer)
+                            if (hasattr(loaded_model, 'is_trained') and hasattr(loaded_model, 'model')) or \
+                               hasattr(loaded_model, 'vectorizer') or hasattr(loaded_model, 'tokenizer'):
+                                # Complete BaseModel wrapper - use directly
+                                model = loaded_model
+                                model.dataset = dataset
+                                model.config = final_model_config
+                            else:
+                                # Create wrapper and load inner model
+                                model = self.model_factory.create_model(final_model_config, dataset)
+
+                                # Handle PyTorch state_dict loading
+                                if isinstance(loaded_model, dict) and 'model_state_dict' in loaded_model:
+                                    # Ensure the model is created before loading state_dict
+                                    if model.model is None:
+                                        model.model = model._create_model()
+                                    model.model.load_state_dict(loaded_model['model_state_dict'])
+                                else:
+                                    # Check if this is a text model that needs vectorizer
+                                    model_class_name = type(model).__name__
+                                    needs_vectorizer = model_class_name in ['BERTModel', 'LSTMModel', 'NaiveBayesTextModel', 'SVMTextModel', 'XGBoostTextModel']
+
+                                    if needs_vectorizer:
+                                        # Old saved model without vectorizer - cannot be used
+                                        raise Exception(f"Model '{model_name}' was saved in old format without vectorizer. Please delete and retrain.")
+                                    else:
+                                        model.model = loaded_model
+
+                            model.is_trained = True
+                            model.is_loaded_from_cache = True
+                            self.logger.info(f"Loaded model '{model_name}' (Test Acc: {loaded_metadata.get('performance_metrics', {}).get('test_accuracy', 'N/A')})")
+                        else:
+                            raise Exception("Failed to load saved model")
+                    else:
+                        # Train new model with final config
+                        model = self.model_factory.create_model(final_model_config, dataset)
+                        model.train(dataset)
+
+                        # Evaluate and save the trained model
+                        performance = model.evaluate(dataset)
+                        self.logger.info(f"Model '{model_name}' trained. Test Acc: {performance.get('test_accuracy', 'N/A')}")
+
+                        try:
+                            # For text models with vectorizer/tokenizer, save the complete wrapper
+                            if hasattr(model, 'vectorizer') or hasattr(model, 'tokenizer'):
+                                model_to_save = model
+                            else:
+                                model_to_save = model.model
+
+                            model_id = self.model_persistence.save_model(
+                                model_to_save,
+                                dataset_name,
+                                model_name,
+                                final_model_config,
+                                performance
+                            )
+                            self.logger.info(f"Model saved with ID: {model_id}")
+                        except Exception as e:
+                            self.logger.warning(f"Failed to save model: {e}")
                     model_performance = model.evaluate(dataset)
                     
                     self.logger.info(f"Successfully trained model: {model_config.get('name')} on {dataset_name}")
@@ -1092,12 +1593,15 @@ class XAIBenchmark:
                     try:
                         explainer = self.explanation_factory.create_explainer(method_config, model, dataset)
                         explanation_results = explainer.explain(dataset)
-                        
+
                         # Generate detailed explanations for entire test set (method is pre-filtered for compatibility)
                         if hasattr(self, '_generate_detailed_test_set_explanations'):
+                            # Pass bulk explanations to avoid re-generating
+                            bulk_explanations = explanation_results.get('explanations', [])
                             detailed_explanations = self._generate_detailed_test_set_explanations(
-                                explainer, dataset, model, dataset_name, model_config.get('name'), 
-                                method_config.get('name') or method_config.get('type')
+                                explainer, dataset, model, dataset_name, model_config.get('name'),
+                                method_config.get('name') or method_config.get('type'),
+                                bulk_explanations=bulk_explanations
                             )
                         else:
                             # Fallback when method not available (caching issue)
@@ -1446,7 +1950,7 @@ class XAIBenchmark:
         
         self.logger.info(f"Comprehensive markdown report saved to {report_path}")
     
-    def _generate_detailed_test_set_explanations(self, explainer, dataset, model, dataset_name, model_name, method_name):
+    def _generate_detailed_test_set_explanations(self, explainer, dataset, model, dataset_name, model_name, method_name, bulk_explanations=None):
         """Generate detailed explanations for the entire test set and save to files."""
         try:
             # Get test data
@@ -1468,50 +1972,60 @@ class XAIBenchmark:
                 if error_count > max_errors:
                     self.logger.warning(f"Too many errors ({error_count}), stopping detailed explanation generation")
                     break
-                    
+
                 batch_end = min(i + batch_size, len(X_test))
                 batch_X = X_test[i:batch_end]
                 batch_y = y_test[i:batch_end] if hasattr(y_test, '__len__') else [y_test] * (batch_end - i)
-                
+
+                # BATCH PREDICTION - predict all instances in batch at once
+                try:
+                    if hasattr(model, 'predict_proba'):
+                        batch_predictions_proba = model.predict_proba(batch_X)
+                        batch_predictions = model.predict(batch_X)
+                    else:
+                        batch_predictions = model.predict(batch_X)
+                        batch_predictions_proba = None
+                except Exception as batch_pred_e:
+                    self.logger.warning(f"Batch prediction failed for batch {i}-{batch_end}: {batch_pred_e}")
+                    # Fallback to individual predictions
+                    batch_predictions = []
+                    batch_predictions_proba = []
+                    for instance in batch_X:
+                        try:
+                            pred = model.predict([instance])[0]
+                            batch_predictions.append(pred)
+                            if hasattr(model, 'predict_proba'):
+                                batch_predictions_proba.append(model.predict_proba([instance])[0])
+                        except:
+                            batch_predictions.append(0.0)
+                            if hasattr(model, 'predict_proba'):
+                                batch_predictions_proba.append(None)
+
+                # Process each instance with pre-computed predictions
                 for j, (instance, true_label) in enumerate(zip(batch_X, batch_y)):
                     instance_id = i + j
-                    
+
                     try:
-                        # Get model prediction with error handling
-                        try:
-                            if hasattr(model, 'predict_proba'):
-                                prediction_proba = model.predict_proba([instance])[0]
-                                prediction = model.predict([instance])[0]
-                            else:
-                                prediction = model.predict([instance])[0]
-                                prediction_proba = None
-                        except Exception as pred_e:
-                            self.logger.warning(f"Prediction failed for instance {instance_id}: {pred_e}")
-                            prediction = 0.0
+                        # Extract prediction from batch results
+                        prediction_raw = batch_predictions[j]
+                        prediction = float(prediction_raw.item()) if hasattr(prediction_raw, 'item') else float(prediction_raw)
+
+                        if batch_predictions_proba is not None:
+                            prediction_proba_raw = batch_predictions_proba[j]
+                            prediction_proba = prediction_proba_raw if not hasattr(prediction_proba_raw, 'item') else prediction_proba_raw
+                        else:
                             prediction_proba = None
-                        
-                        # Generate explanation for this instance with extra safety
-                        try:
-                            instance_explanation = self._explain_single_instance(
-                                explainer, instance, model, instance_id, prediction, true_label, prediction_proba, dataset
-                            )
-                            detailed_explanations.append(instance_explanation)
-                        except Exception as explain_error:
-                            # Final safety net for explanation errors
-                            self.logger.warning(f"Failed to generate explanation for instance {instance_id}: {explain_error}")
-                            error_explanation = {
-                                'instance_id': instance_id,
-                                'true_label': true_label,
-                                'prediction': prediction,
-                                'error': f'Explanation generation failed: {str(explain_error)}',
-                                'instance_type': str(type(instance).__name__)
-                            }
-                            detailed_explanations.append(error_explanation)
-                        
+
+                        # Generate explanation for this instance
+                        instance_explanation = self._explain_single_instance(
+                            explainer, instance, model, instance_id, prediction, true_label, prediction_proba, dataset, bulk_explanations
+                        )
+                        detailed_explanations.append(instance_explanation)
+
                         # Log progress every 100 instances
                         if instance_id % 100 == 0:
                             self.logger.info(f"Processed {instance_id + 1}/{len(X_test)} instances")
-                        
+
                     except Exception as e:
                         error_count += 1
                         self.logger.warning(f"Failed to explain instance {instance_id}: {e}")
@@ -1519,7 +2033,7 @@ class XAIBenchmark:
                         detailed_explanations.append({
                             'instance_id': instance_id,
                             'true_label': true_label,
-                            'prediction': 0.0,
+                            'prediction': prediction if 'prediction' in locals() else 0.0,
                             'error': str(e)
                         })
                         continue
@@ -1553,138 +2067,55 @@ class XAIBenchmark:
                 'total_instances': 0
             }
     
-    def _explain_single_instance(self, explainer, instance, model, instance_id, prediction, true_label, prediction_proba=None, full_dataset=None):
-        """Generate explanation for a single instance."""
+    def _explain_single_instance(self, explainer, instance, model, instance_id, prediction, true_label, prediction_proba=None, full_dataset=None, bulk_explanations=None):
+        """Generate explanation for a single instance - extract from bulk explanations if available."""
         try:
-            # Check if explainer is compatible with text data
-            if hasattr(explainer, 'supported_data_types'):
-                supported_types = getattr(explainer, 'supported_data_types', [])
-                if isinstance(instance, (str, list)) or (hasattr(instance, 'dtype') and instance.dtype.kind in ['U', 'S', 'O']):
-                    if 'text' not in supported_types and supported_types:
-                        # Skip explanation for incompatible text data
-                        return {
-                            'instance_id': instance_id,
-                            'true_label': true_label,
-                            'prediction': prediction,
-                            'error': f'Explainer does not support text data. Supported: {supported_types}',
-                            'instance_type': str(type(instance).__name__)
-                        }
-            
-            # Handle different data types
-            processed_instance = self._process_instance_for_explanation(instance)
-            
-            # Create a mini dataset for this instance
-            # IMPORTANT FIX: Include training data for methods that need it
-            if full_dataset is not None:
-                X_train_full, X_test_full, y_train_full, y_test_full = full_dataset.get_data()
-                # Use a subset of training data to avoid memory issues
-                train_subset_size = min(100, len(X_train_full))  # Use max 100 training samples
-                X_train_subset = X_train_full[:train_subset_size]
-                y_train_subset = y_train_full[:train_subset_size]
-            else:
-                X_train_subset = []
-                y_train_subset = []
-            
-            mini_dataset_data = {
-                'X_test': [processed_instance],
-                'y_test': [true_label],
-                'X_train': X_train_subset,  # Now includes training data
-                'y_train': y_train_subset
-            }
-            
-            # Create temporary dataset-like object with additional attributes
-            class TempDataset:
-                def __init__(self, original_dataset=None):
-                    self.original_dataset = original_dataset
-                    # Copy feature names if available
-                    if original_dataset and hasattr(original_dataset, 'feature_names'):
-                        self.feature_names = original_dataset.feature_names
-                    else:
-                        # Create default feature names based on instance shape
-                        if hasattr(processed_instance, '__len__') and not isinstance(processed_instance, str):
-                            self.feature_names = [f'feature_{i}' for i in range(len(processed_instance))]
-                        else:
-                            self.feature_names = ['feature_0']
-                    
-                    # Copy dataset info if available
-                    if original_dataset and hasattr(original_dataset, 'get_info'):
-                        self._info = original_dataset.get_info()
-                    else:
-                        self._info = {'type': 'tabular'}
-                
-                def get_data(self):
-                    return mini_dataset_data['X_train'], mini_dataset_data['X_test'], mini_dataset_data['y_train'], mini_dataset_data['y_test']
-                
-                def get_info(self):
-                    return self._info
-            
-            temp_dataset = TempDataset(full_dataset)
-            
-            # Generate explanation with defensive error handling
-            try:
-                explanation_result = explainer.explain(temp_dataset)
-                
-                # Validate the explanation result structure
-                if not isinstance(explanation_result, dict):
-                    raise ValueError(f"Explainer returned invalid result type: {type(explanation_result)}")
-                    
-                if 'explanations' not in explanation_result:
-                    explanation_result['explanations'] = []
-                    
-            except AttributeError as ae:
-                if 'split' in str(ae):
-                    # Specific handling for the numpy split error
-                    self.logger.warning(f"Text processing error in explainer: {ae}")
-                    explanation_result = {
-                        'explanations': [],
-                        'error': 'Text processing incompatibility with explainer',
-                        'method': 'failed_explanation'
-                    }
-                else:
-                    raise ae
-            except Exception as ee:
-                self.logger.warning(f"Explainer failed: {ee}")
-                explanation_result = {
-                    'explanations': [],
-                    'error': str(ee),
-                    'method': 'failed_explanation'
-                }
-            
-            # Extract explanation details safely
-            explanations_list = explanation_result.get('explanations', [])
-            if explanations_list and len(explanations_list) > 0:
-                feature_importance = explanations_list[0].get('feature_importance', [])
-            else:
-                feature_importance = []
-            
             # Create detailed explanation entry with safe conversions
             try:
                 # Safe conversion of prediction and true_label
-                pred_val = float(prediction) if hasattr(prediction, 'item') else float(prediction)
-                true_val = float(true_label) if hasattr(true_label, 'item') else float(true_label)
+                pred_val = float(prediction.item()) if hasattr(prediction, 'item') else float(prediction)
+                true_val = float(true_label.item()) if hasattr(true_label, 'item') else float(true_label)
                 correct_pred = abs(pred_val - true_val) < 0.5
             except (ValueError, TypeError):
                 pred_val = prediction
                 true_val = true_label
                 correct_pred = False
-            
+
+            # Convert prediction_proba if needed
+            if prediction_proba is not None:
+                if hasattr(prediction_proba, 'tolist'):
+                    proba_list = prediction_proba.tolist()
+                elif hasattr(prediction_proba, '__iter__'):
+                    proba_list = list(prediction_proba)
+                else:
+                    proba_list = None
+            else:
+                proba_list = None
+
+            # Extract feature importance from bulk explanations if available
+            feature_importance = []
+            if bulk_explanations and instance_id < len(bulk_explanations):
+                bulk_exp = bulk_explanations[instance_id]
+                feature_importance = bulk_exp.get('feature_importance', [])
+                # Convert numpy arrays to lists
+                if hasattr(feature_importance, 'tolist'):
+                    feature_importance = feature_importance.tolist()
+
             explanation_entry = {
                 'instance_id': instance_id,
                 'true_label': true_val,
                 'prediction': pred_val,
-                'prediction_proba': prediction_proba.tolist() if prediction_proba is not None else None,
+                'prediction_proba': proba_list,
                 'correct_prediction': correct_pred,
                 'feature_importance': feature_importance,
-                'top_features': self._get_top_features(feature_importance, top_k=5),
-                'explanation_confidence': explanation_result.get('confidence', 1.0),
-                'explanation_metadata': explanation_result.get('metadata', {}),
+                'top_features': self._get_top_features(feature_importance, top_k=5) if feature_importance else [],
+                'explanation_confidence': 1.0,
+                'explanation_metadata': {},
                 'instance_type': str(type(instance).__name__)
             }
-            
-            # Log successful creation of explanation entry
-            self.logger.debug(f"Successfully created explanation entry for instance {instance_id}")
+
             return explanation_entry
-            
+
         except Exception as e:
             self.logger.error(f"Error explaining instance {instance_id}: {e}")
             # Include more detailed error information
@@ -2025,6 +2456,54 @@ class XAIBenchmark:
         
         return markdown_file
     
+    def _get_or_tune_hyperparameters(self, dataset_name: str, model_name: str, dataset) -> Dict[str, Any]:
+        """
+        Get tuned hyperparameters for a model, running tuning if not already done
+
+        Args:
+            dataset_name: Name of the dataset
+            model_name: Name of the model
+            dataset: Dataset object
+
+        Returns:
+            Dict of tuned hyperparameters, or empty dict if tuning fails/not applicable
+        """
+        # Check for existing tuned parameters
+        tuned_params = self.hyperparameter_tuner.load_best_parameters(dataset_name, model_name)
+
+        if tuned_params is not None:
+            self.logger.info(f"[AUTO-TUNE] Found cached tuned parameters for {model_name} on {dataset_name}")
+            return tuned_params
+
+        # Run hyperparameter tuning
+        self.logger.info(f"[AUTO-TUNE] No cached parameters found. Running hyperparameter tuning for {model_name} on {dataset_name}")
+        self.logger.info(f"[AUTO-TUNE] This may take a while (typically 10-60 minutes per model)...")
+
+        try:
+            tuning_result = self.hyperparameter_tuner.tune_model(model_name, dataset, dataset_name)
+
+            if tuning_result['success']:
+                tuned_params = tuning_result['best_params']
+                self.logger.info(f"[AUTO-TUNE] [OK] Tuning completed successfully!")
+                self.logger.info(f"[AUTO-TUNE]   Best CV Score: {tuning_result['best_score']:.4f}")
+                self.logger.info(f"[AUTO-TUNE]   Test Accuracy: {tuning_result['test_accuracy']:.4f}")
+                self.logger.info(f"[AUTO-TUNE]   Tuning Time: {tuning_result['tuning_time']:.1f}s")
+                self.logger.info(f"[AUTO-TUNE]   Best Parameters: {tuned_params}")
+
+                # Save the tuning result
+                self.hyperparameter_tuner.save_tuning_result(dataset_name, model_name, tuning_result)
+
+                return tuned_params
+            else:
+                self.logger.warning(f"[AUTO-TUNE] [FAIL] Tuning failed: {tuning_result['error']}")
+                self.logger.warning(f"[AUTO-TUNE] Falling back to default parameters")
+                return {}
+
+        except Exception as e:
+            self.logger.error(f"[AUTO-TUNE] [FAIL] Exception during tuning: {e}")
+            self.logger.warning(f"[AUTO-TUNE] Falling back to default parameters")
+            return {}
+
     def _save_iteration_result(self, iteration_key: str, result_data: Dict[str, Any]):
         """
         Save individual iteration result to a separate folder structure
@@ -2065,10 +2544,7 @@ class XAIBenchmark:
                 'timestamp': datetime.now().isoformat(),
                 'iteration_key': iteration_key,
                 'filename': filename,
-                'folder_path': str(iteration_folder)
-            },
-            'experiment_info': {
-                'config': self.config,
+                'folder_path': str(iteration_folder),
                 'benchmark_timestamp': self.results['experiment_info']['timestamp']
             },
             'result_data': result_data

@@ -36,11 +36,15 @@ def parse_args():
     # Hyperparameter tuning options
     parser.add_argument("--tune-hyperparameters", action="store_true",
                        help="Run hyperparameter tuning for all models and datasets")
+    parser.add_argument("--auto-tune", action="store_true",
+                       help="Automatically tune hyperparameters before training each model (if not already tuned)")
     parser.add_argument("--use-tuned-params", action="store_true",
                        help="Use tuned hyperparameters in benchmark runs")
+    parser.add_argument("--train-models-only", action="store_true",
+                       help="Only train and save models (optionally with tuning), skip explanations and evaluations")
     
     # Tuning-specific options
-    parser.add_argument("--tuning-output-dir", type=str, default="tuning_results",
+    parser.add_argument("--tuning-output-dir", type=str, default="saved_models/tuning_results",
                        help="Output directory for tuning results")
     parser.add_argument("--cv-folds", type=int, default=5,
                        help="Number of cross-validation folds for tuning")
@@ -58,10 +62,36 @@ def parse_args():
 def main():
     """Main function"""
     args = parse_args()
-    
-    # Setup logging
-    setup_logging(getattr(logging, args.log_level))
+
+    # Create log file for ALL run modes (not just interactive)
+    from datetime import datetime
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    log_dir = Path("logs")
+    log_dir.mkdir(exist_ok=True)
+
+    # Determine log filename based on run mode
+    if args.train_models_only:
+        log_filename = f"train_models_{timestamp}.log"
+    elif args.interactive:
+        log_filename = f"interactive_{timestamp}.log"
+    elif args.comprehensive:
+        log_filename = f"comprehensive_{timestamp}.log"
+    elif args.run_all:
+        log_filename = f"run_all_{timestamp}.log"
+    elif args.tune_hyperparameters:
+        log_filename = f"tuning_{timestamp}.log"
+    else:
+        log_filename = f"pipeline_{timestamp}.log"
+
+    log_file = str(log_dir / log_filename)
+
+    # Setup logging with file output for ALL modes
+    setup_logging(getattr(logging, args.log_level), log_file=log_file)
     logger = logging.getLogger(__name__)
+
+    # Always inform user about log location
+    logger.info(f"Log file: {log_file}")
+    print(f"[LOG] Output being saved to: {log_file}")
     
     try:
         # Load and validate configuration
@@ -85,7 +115,7 @@ def main():
         logger.info(f"✅ Results will be saved to: {output_dir}")
         
         # Initialize benchmark
-        benchmark = XAIBenchmark(config, output_dir)
+        benchmark = XAIBenchmark(config, output_dir, auto_tune=args.auto_tune)
         
         # Run hyperparameter tuning if requested
         if args.tune_hyperparameters:
@@ -127,7 +157,10 @@ def main():
             return
         
         # Run benchmark modes
-        if args.comprehensive:
+        if args.train_models_only:
+            logger.info("Running TRAIN MODELS ONLY mode")
+            benchmark.train_models_only(use_tuned_params=args.use_tuned_params)
+        elif args.comprehensive:
             logger.info("Running comprehensive benchmarking with markdown report generation")
             benchmark.run_comprehensive(use_tuned_params=args.use_tuned_params)
         elif args.run_all:

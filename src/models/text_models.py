@@ -216,7 +216,12 @@ class RoBERTaModel(BaseModel):
             
             return np.array(predictions)
         except Exception as e:
+            import traceback
             print(f"Transformer prediction failed: {e}")
+            print(f"Traceback: {traceback.format_exc()}")
+            print(f"Model type: {type(self.model)}")
+            print(f"Has tokenizer: {hasattr(self, 'tokenizer')}")
+            print(f"Has use_transformers: {hasattr(self, 'use_transformers')}")
             return np.zeros(len(X))
     
     def predict_proba(self, X: List[str]) -> np.ndarray:
@@ -255,7 +260,12 @@ class RoBERTaModel(BaseModel):
             
             return np.array(probabilities)
         except Exception as e:
+            import traceback
             print(f"Transformer probability prediction failed: {e}")
+            print(f"Traceback: {traceback.format_exc()}")
+            print(f"Model type: {type(self.model)}")
+            print(f"Has tokenizer: {hasattr(self, 'tokenizer')}")
+            print(f"Has use_transformers: {hasattr(self, 'use_transformers')}")
             dataset_info = self.dataset.get_info()
             num_classes = dataset_info['n_classes']
             return np.full((len(X), num_classes), 1.0/num_classes)
@@ -341,9 +351,9 @@ class SVMTextModel(BaseModel):
 
 class XGBoostTextModel(BaseModel):
     """XGBoost model for text classification"""
-    
+
     supported_data_types = ['text']
-    
+
     def _create_model(self) -> xgb.XGBClassifier:
         """Create XGBoost model"""
         self.tfidf_vectorizer = TfidfVectorizer(
@@ -353,20 +363,20 @@ class XGBoostTextModel(BaseModel):
             min_df=2,
             max_df=0.9
         )
-        
+
         params = self.config.get('params', {})
         n_estimators = params.get('n_estimators', 100)
         max_depth = params.get('max_depth', 6)
         learning_rate = params.get('learning_rate', 0.1)
-        
+
         dataset_info = self.dataset.get_info()
         num_classes = dataset_info['n_classes']
-        
+
         if num_classes == 2:
             objective = 'binary:logistic'
         else:
             objective = 'multi:softprob'
-        
+
         return xgb.XGBClassifier(
             n_estimators=n_estimators,
             max_depth=max_depth,
@@ -375,18 +385,37 @@ class XGBoostTextModel(BaseModel):
             random_state=42,
             verbosity=0
         )
-    
+
     def _train_model(self, X_train: List[str], y_train: np.ndarray):
         """Train the XGBoost model"""
         X_train_vectorized = self.tfidf_vectorizer.fit_transform(X_train)
         self.model.fit(X_train_vectorized, y_train)
-    
+
     def _predict(self, X: List[str]) -> np.ndarray:
         """Make predictions"""
         X_vectorized = self.tfidf_vectorizer.transform(X)
         return self.model.predict(X_vectorized)
-    
+
     def predict_proba(self, X: List[str]) -> np.ndarray:
         """Make probability predictions"""
         X_vectorized = self.tfidf_vectorizer.transform(X)
         return self.model.predict_proba(X_vectorized)
+
+    def __getstate__(self):
+        """Custom pickle serialization to ensure tfidf_vectorizer is saved"""
+        state = self.__dict__.copy()
+        return state
+
+    def __setstate__(self, state):
+        """Custom pickle deserialization to ensure tfidf_vectorizer is restored"""
+        self.__dict__.update(state)
+        # Ensure tfidf_vectorizer exists
+        if not hasattr(self, 'tfidf_vectorizer') or self.tfidf_vectorizer is None:
+            self.logger.warning("tfidf_vectorizer not found in saved model, reinitializing")
+            self.tfidf_vectorizer = TfidfVectorizer(
+                max_features=5000,
+                stop_words='english',
+                ngram_range=(1, 2),
+                min_df=2,
+                max_df=0.9
+            )

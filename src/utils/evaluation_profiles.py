@@ -226,8 +226,8 @@ class EvaluationProfileManager:
             higher_is_better=True
         )
         
-        metrics['advanced_compactness'] = MetricInfo(
-            name='advanced_compactness',
+        metrics['advanced_stability'] = MetricInfo(
+            name='advanced_stability',
             category=MetricCategory.COMPREHENSIBILITY,
             description='Compactness Axiom: explanations should be sparse and focused on important features',
             applicable_to={'feature_attribution', 'perturbation_based'},
@@ -388,23 +388,23 @@ class EvaluationProfileManager:
             'causal_shap': ['time_complexity', 'faithfulness', 'monotonicity', 'completeness',
                            'stability', 'consistency', 'sparsity', 'simplicity',
                            'advanced_identity', 'advanced_separability', 'advanced_non_sensitivity',
-                           'advanced_compactness', 'advanced_correctness', 'advanced_entropy',
+                           'advanced_stability', 'advanced_correctness', 'advanced_entropy',
                            'advanced_gini_coefficient', 'advanced_kl_divergence'],
             'shapley_flow': ['time_complexity', 'faithfulness', 'monotonicity', 'stability', 'consistency',
                            'sparsity', 'simplicity', 'advanced_identity', 'advanced_separability',
-                           'advanced_non_sensitivity', 'advanced_compactness', 'advanced_correctness',
+                           'advanced_non_sensitivity', 'advanced_stability', 'advanced_correctness',
                            'advanced_entropy', 'advanced_gini_coefficient', 'advanced_kl_divergence'],
             'bayesian_rule_list': ['time_complexity', 'faithfulness', 'stability', 'consistency',
-                                 'advanced_identity', 'advanced_correctness', 'advanced_compactness'],
+                                 'advanced_identity', 'advanced_correctness', 'advanced_stability'],
             'influence_functions': ['time_complexity', 'faithfulness', 'stability', 'consistency',
                                   'advanced_identity', 'advanced_non_sensitivity', 'advanced_correctness'],
             'shap_interactive': ['time_complexity', 'faithfulness', 'monotonicity', 'completeness',
                                'stability', 'consistency', 'sparsity', 'simplicity',
                                'advanced_identity', 'advanced_separability', 'advanced_non_sensitivity',
-                               'advanced_compactness', 'advanced_correctness', 'advanced_entropy',
+                               'advanced_stability', 'advanced_correctness', 'advanced_entropy',
                                'advanced_gini_coefficient', 'advanced_kl_divergence'],
             'corels': ['time_complexity', 'faithfulness', 'stability', 'consistency',
-                     'advanced_identity', 'advanced_correctness', 'advanced_compactness']
+                     'advanced_identity', 'advanced_correctness', 'advanced_stability']
         }
         
         # Check for text-specific variant first if data type is text

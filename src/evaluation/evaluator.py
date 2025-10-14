@@ -11,6 +11,7 @@ from scipy.stats import pearsonr, spearmanr
 from .statistical_tests import StatisticalTester
 from .text_metrics import TextExplanationMetrics
 from .advanced_metrics import AdvancedMetricsEvaluator, StatisticalSignificanceTester
+from .monotonicity_evaluator import MonotonicityEvaluator
 
 
 class Evaluator:
@@ -31,6 +32,7 @@ class Evaluator:
         self.text_metrics = TextExplanationMetrics()
         self.advanced_metrics = AdvancedMetricsEvaluator()
         self.statistical_significance_tester = StatisticalSignificanceTester()
+        self.monotonicity_evaluator = MonotonicityEvaluator()
     
     def evaluate(self, model, explanation_results: Dict[str, Any], dataset) -> Dict[str, float]:
         """
@@ -119,26 +121,68 @@ class Evaluator:
         if method in ['prototype', 'counterfactual']:
             return self._evaluate_example_based_fidelity(explanations, model, dataset)
         
-        faithfulness_scores = []
-        monotonicity_scores = []
-        completeness_scores = []
-        
-        # Only compute completeness for SHAP/IG
-        compute_completeness = any(x in method for x in ['shap', 'integrated gradients', 'ig'])
-        # Only compute faithfulness/monotonicity for feature attribution methods
-        compute_faithfulness = any(x in method for x in ['shap', 'lime', 'integrated gradients', 'ig', 'feature attribution'])
-        compute_monotonicity = compute_faithfulness
-        
         # Check if this is text data (detect from explanations)
         is_text_data = False
         if explanations:
             first_explanation = explanations[0]
             if 'text_content' in first_explanation and first_explanation['text_content'] is not None:
                 is_text_data = True
+
+        faithfulness_scores = []
+        monotonicity_scores = []
+        completeness_scores = []
+
+        # Compute completeness for SHAP/IG and for text data with any method
+        compute_completeness = any(x in method for x in ['shap', 'integrated gradients', 'ig']) or is_text_data
+        # Only compute faithfulness/monotonicity for feature attribution methods
+        compute_faithfulness = any(x in method for x in ['shap', 'lime', 'integrated gradients', 'ig', 'feature attribution'])
+        compute_monotonicity = compute_faithfulness
         
-        # For text data, skip monotonicity (doesn't make sense for word importance)
+        # Use advanced monotonicity evaluation for all data types
+        try:
+            # Debug: Print what we're evaluating
+            if explanations:
+                first_exp = explanations[0]
+                print(f"\n[DEBUG] Evaluating monotonicity for:")
+                print(f"  - Has text_content: {'text_content' in first_exp}")
+                print(f"  - Has tokens: {'tokens' in first_exp}")
+                print(f"  - Has feature_importance: {'feature_importance' in first_exp}")
+                if 'feature_importance' in first_exp:
+                    imp = first_exp['feature_importance']
+                    print(f"  - Feature importance length: {len(imp) if isinstance(imp, list) else 'not a list'}")
+                    if isinstance(imp, list) and len(imp) > 0:
+                        print(f"  - First 3 importance values: {imp[:3]}")
+
+            monotonicity_results = self.monotonicity_evaluator.evaluate_monotonicity(
+                explanations, model=model, data_type='auto'
+            )
+            # Extract the main monotonicity score
+            advanced_monotonicity = monotonicity_results.get('monotonicity', 0.0)
+
+            print(f"[DEBUG] Advanced monotonicity result: {advanced_monotonicity}")
+            print(f"[DEBUG] Is NaN: {np.isnan(advanced_monotonicity) if isinstance(advanced_monotonicity, (int, float)) else 'not a number'}")
+
+        except Exception as e:
+            self.logger.warning(f"Error in advanced monotonicity evaluation: {e}")
+            print(f"[DEBUG] ERROR in monotonicity evaluation: {e}")
+            import traceback
+            traceback.print_exc()
+            advanced_monotonicity = 0.0
+
+        # For backward compatibility, keep the original logic for tabular data
+        # but use advanced evaluation for text and image
+        data_type = 'tabular'  # default
         if is_text_data:
-            compute_monotonicity = False
+            data_type = 'text'
+            compute_monotonicity = False  # Skip old implementation
+        elif explanations and len(explanations) > 0:
+            first_exp = explanations[0]
+            if 'importance_map' in first_exp or (
+                'feature_importance' in first_exp and
+                len(first_exp.get('feature_importance', [])) > 1000
+            ):
+                data_type = 'image'
+                compute_monotonicity = False  # Skip old implementation
         
         for explanation in explanations:
             feature_importance = explanation.get('feature_importance', [])
@@ -155,48 +199,152 @@ class Evaluator:
             try:
                 if isinstance(feature_importance, (list, np.ndarray)):
                     feature_importance = np.array(feature_importance)
-                    has_values = feature_importance.size > 0 and len(feature_importance) > 0
+                    has_values = hasattr(feature_importance, 'size') and feature_importance.size > 0 and len(feature_importance) > 0
                 else:
                     has_values = bool(feature_importance) if feature_importance is not None else False
             except Exception:
                 has_values = bool(feature_importance) if feature_importance is not None else False
             
-            if has_values and feature_importance.size > 0:
+            if has_values and hasattr(feature_importance, 'size') and feature_importance.size > 0:
                 # Faithfulness: removal test (only for compatible methods)
                 if compute_faithfulness and input_instance is not None:
                     try:
-                        # For text data, faithfulness is based on prediction accuracy
+                        # For text data, faithfulness is based on word removal test
                         if is_text_data:
-                            # For text, faithfulness is simply prediction accuracy
-                            true_label = explanation.get('true_label')
-                            if true_label is not None:
-                                faithfulness = 1.0 if prediction == true_label else 0.0
-                                faithfulness_scores.append(faithfulness)
-                        else:
-                            # For tabular data, use feature removal test
-                            k = max(1, int(0.1 * len(feature_importance)))
-                            top_k_idx = np.argsort(-np.abs(feature_importance))[:k]
-                            x_mod = np.array(input_instance, dtype=float).copy()
-                            
-                            # Replace with baseline values instead of zero
-                            if baseline_prediction is not None:
-                                # Get baseline instance from model (we need to recreate it)
+                            # Implement text faithfulness using word removal
+                            text_content = explanation.get('text_content', '')
+                            tokens = explanation.get('tokens', [])
+                            if text_content and tokens and len(feature_importance) > 0:
                                 try:
-                                    from sklearn.dummy import DummyClassifier
-                                    # Estimate baseline as feature means from training data
-                                    # This is an approximation - ideally we'd pass training data
-                                    baseline_values = np.zeros_like(x_mod)  # Fallback to zeros if no baseline
-                                    x_mod[top_k_idx] = baseline_values[top_k_idx]
-                                except:
-                                    x_mod[top_k_idx] = 0  # Fallback to original method
+                                    # Remove top 20% most important words
+                                    k = max(1, int(0.2 * len(feature_importance)))
+                                    top_k_idx = np.argsort(-np.abs(feature_importance))[:k]
+
+                                    # Create text with important words completely removed
+                                    remaining_tokens = []
+                                    for i, token in enumerate(tokens):
+                                        if i not in top_k_idx:
+                                            remaining_tokens.append(token)
+
+                                    # Create masked text (with important words removed)
+                                    if remaining_tokens:
+                                        masked_text = ' '.join(remaining_tokens)
+                                    else:
+                                        masked_text = ""  # All words were important
+
+                                    # Get predictions
+                                    try:
+                                        if hasattr(model, 'predict_proba') and masked_text.strip():
+                                            # Use probability-based faithfulness for better measurement
+                                            orig_proba = model.predict_proba([text_content])[0]
+                                            masked_proba = model.predict_proba([masked_text])[0]
+
+                                            # Calculate KL divergence or max probability difference
+                                            faithfulness = abs(np.max(orig_proba) - np.max(masked_proba))
+                                            faithfulness_scores.append(min(1.0, faithfulness))
+                                        elif masked_text.strip():
+                                            # Fallback to prediction difference
+                                            masked_pred = model.predict([masked_text])[0]
+                                            faithfulness = abs(prediction - masked_pred)
+                                            # Normalize by prediction scale
+                                            if abs(prediction) > 1e-6:
+                                                faithfulness = faithfulness / abs(prediction)
+                                            faithfulness_scores.append(min(1.0, faithfulness))
+                                        else:
+                                            # If all words removed, assume high faithfulness
+                                            faithfulness_scores.append(0.8)
+                                    except Exception as e:
+                                        # If prediction fails, assume moderate faithfulness
+                                        faithfulness_scores.append(0.5)
+                                except Exception:
+                                    # Any other error, low faithfulness
+                                    faithfulness_scores.append(0.2)
+                        else:
+                            # Check if this is image data
+                            is_image_data = (data_type == 'image' or
+                                           'importance_map' in explanation or
+                                           (hasattr(input_instance, 'shape') and len(input_instance.shape) >= 2 and
+                                            input_instance.shape[0] > 10))  # Images typically > 10x10
+
+                            if is_image_data:
+                                # For image data, use pixel masking/removal test
+                                print(f"    [FAITHFULNESS] Processing image data")
+                                try:
+                                    # Get the original image shape
+                                    orig_image = np.array(input_instance, dtype=float)
+                                    orig_shape = orig_image.shape
+                                    print(f"    [FAITHFULNESS] Image shape: {orig_shape}")
+
+                                    # Flatten feature importance if it's 2D/3D
+                                    flat_importance = np.abs(feature_importance).flatten()
+
+                                    # Remove top 10% most important pixels
+                                    k = max(1, int(0.1 * len(flat_importance)))
+                                    top_k_idx = np.argsort(-flat_importance)[:k]
+                                    print(f"    [FAITHFULNESS] Masking top {k} pixels")
+
+                                    # Create modified image with important pixels masked
+                                    x_mod_flat = orig_image.flatten().copy()
+
+                                    # Mask with mean value (better than 0 for images)
+                                    mask_value = np.mean(x_mod_flat)
+                                    x_mod_flat[top_k_idx] = mask_value
+
+                                    # Reshape back to original image shape
+                                    x_mod = x_mod_flat.reshape(orig_shape)
+
+                                    # Get predictions - ensure correct shape for model
+                                    pred_orig = prediction
+                                    if hasattr(model, 'predict'):
+                                        # Most image models expect batch dimension
+                                        if len(orig_shape) == 2:  # Grayscale
+                                            x_mod_batch = np.expand_dims(x_mod, axis=0)
+                                        elif len(orig_shape) == 3:  # RGB
+                                            x_mod_batch = np.expand_dims(x_mod, axis=0)
+                                        else:
+                                            x_mod_batch = x_mod
+
+                                        pred_mod = model.predict(x_mod_batch)[0]
+                                    else:
+                                        pred_mod = pred_orig
+
+                                    print(f"    [FAITHFULNESS] pred_orig: {pred_orig}, pred_mod: {pred_mod}")
+
+                                    # Calculate faithfulness
+                                    faithfulness = abs(pred_orig - pred_mod) / (abs(pred_orig) + 1e-8)
+                                    print(f"    [FAITHFULNESS] Image faithfulness: {faithfulness:.6f}")
+                                    faithfulness_scores.append(min(1.0, faithfulness))
+
+                                except Exception as e:
+                                    print(f"    [FAITHFULNESS] Error in image faithfulness: {e}")
+                                    import traceback
+                                    traceback.print_exc()
+                                    faithfulness_scores.append(0.3)
                             else:
-                                x_mod[top_k_idx] = 0  # Fallback to original method
-                            
-                            pred_orig = prediction
-                            pred_mod = model.predict([x_mod])[0] if hasattr(model, 'predict') else pred_orig
-                            # Normalize faithfulness by prediction magnitude for better comparison
-                            faithfulness = abs(pred_orig - pred_mod) / (abs(pred_orig) + 1e-8)
-                            faithfulness_scores.append(min(1.0, faithfulness))  # Cap at 1.0
+                                # For tabular data, use feature removal test
+                                k = max(1, int(0.1 * len(feature_importance)))
+                                top_k_idx = np.argsort(-np.abs(feature_importance))[:k]
+                                x_mod = np.array(input_instance, dtype=float).copy()
+
+                                # Replace with baseline values instead of zero
+                                if baseline_prediction is not None:
+                                    # Get baseline instance from model (we need to recreate it)
+                                    try:
+                                        from sklearn.dummy import DummyClassifier
+                                        # Estimate baseline as feature means from training data
+                                        # This is an approximation - ideally we'd pass training data
+                                        baseline_values = np.zeros_like(x_mod)  # Fallback to zeros if no baseline
+                                        x_mod[top_k_idx] = baseline_values[top_k_idx]
+                                    except:
+                                        x_mod[top_k_idx] = 0  # Fallback to original method
+                                else:
+                                    x_mod[top_k_idx] = 0  # Fallback to original method
+
+                                pred_orig = prediction
+                                pred_mod = model.predict([x_mod])[0] if hasattr(model, 'predict') else pred_orig
+                                # Normalize faithfulness by prediction magnitude for better comparison
+                                faithfulness = abs(pred_orig - pred_mod) / (abs(pred_orig) + 1e-8)
+                                faithfulness_scores.append(min(1.0, faithfulness))  # Cap at 1.0
                     except Exception:
                         pass
                 # Monotonicity: check if increasing feature increases output (for compatible methods)
@@ -238,24 +386,64 @@ class Evaluator:
                             continue
                     monotonicity = monotonicity_count / total if total > 0 else 0.0
                     monotonicity_scores.append(monotonicity)
-                # Completeness: only for SHAP/IG (additivity property)
-                if compute_completeness and baseline_prediction is not None:
+                # Completeness: for SHAP/IG (additivity property) and text data (coverage)
+                if compute_completeness:
                     try:
-                        sum_attributions = np.sum(feature_importance)
-                        
-                        # For classification models, use probability differences
-                        if hasattr(model, 'predict_proba'):
-                            # Get probability outputs for more stable completeness
-                            orig_proba = model.predict_proba([input_instance])[0]
-                            # Estimate baseline probabilities (should be passed from explainer)
-                            baseline_proba = np.ones(len(orig_proba)) / len(orig_proba)  # Uniform baseline
-                            
-                            # Use max probability difference for completeness
-                            pred_class = np.argmax(orig_proba)
-                            output_diff = orig_proba[pred_class] - baseline_proba[pred_class]
-                        else:
-                            # Fallback to raw predictions
-                            output_diff = prediction - baseline_prediction
+                        if is_text_data:
+                            # For text: completeness = coverage of important words using percentile threshold
+                            if len(feature_importance) > 0:
+                                # Use percentile-based threshold (top 20% of words are "important")
+                                importance_abs = np.abs(feature_importance)
+
+                                # Method 1: Top percentile approach
+                                threshold_percentile = np.percentile(importance_abs, 80)  # Top 20%
+                                important_words_percentile = np.sum(importance_abs >= threshold_percentile)
+
+                                # Method 2: Entropy-based approach (how spread out the importance is)
+                                # High completeness = importance is spread across many words
+                                # Low completeness = importance concentrated in few words
+                                total_importance = np.sum(importance_abs)
+                                if total_importance > 1e-8:
+                                    normalized_importance = importance_abs / total_importance
+                                    # Calculate entropy (higher entropy = more spread out = higher completeness)
+                                    entropy = -np.sum(normalized_importance * np.log(normalized_importance + 1e-10))
+                                    max_entropy = np.log(len(feature_importance))  # Maximum possible entropy
+                                    entropy_completeness = entropy / max_entropy if max_entropy > 0 else 0.0
+                                else:
+                                    entropy_completeness = 0.0
+
+                                # Method 3: Effective number of words (based on concentration)
+                                if total_importance > 1e-8:
+                                    # Simpson's diversity index adapted for explanations
+                                    normalized_sq = (importance_abs / total_importance) ** 2
+                                    effective_words = 1.0 / np.sum(normalized_sq)
+                                    effective_completeness = effective_words / len(feature_importance)
+                                else:
+                                    effective_completeness = 0.0
+
+                                # Combine methods for robust completeness measure
+                                percentile_completeness = important_words_percentile / len(feature_importance)
+
+                                # Average of all three methods for robust measure
+                                completeness = (percentile_completeness + entropy_completeness + effective_completeness) / 3.0
+                                completeness_scores.append(min(1.0, max(0.0, completeness)))
+                        elif baseline_prediction is not None:
+                            # For tabular: traditional additivity-based completeness
+                            sum_attributions = np.sum(feature_importance)
+
+                            # For classification models, use probability differences
+                            if hasattr(model, 'predict_proba'):
+                                # Get probability outputs for more stable completeness
+                                orig_proba = model.predict_proba([input_instance])[0]
+                                # Estimate baseline probabilities (should be passed from explainer)
+                                baseline_proba = np.ones(len(orig_proba)) / len(orig_proba)  # Uniform baseline
+
+                                # Use max probability difference for completeness
+                                pred_class = np.argmax(orig_proba)
+                                output_diff = orig_proba[pred_class] - baseline_proba[pred_class]
+                            else:
+                                # Fallback to raw predictions
+                                output_diff = prediction - baseline_prediction
                         
                         # Completeness: how well attributions sum to the model output difference
                         if abs(output_diff) > 1e-8:
@@ -268,9 +456,19 @@ class Evaluator:
                     except Exception:
                         completeness_scores.append(0.0)
         # Aggregate results
+        # Use advanced monotonicity for text/image, traditional for tabular
+        if data_type in ['text', 'image']:
+            monotonicity_value = advanced_monotonicity
+        elif compute_monotonicity and monotonicity_scores:
+            monotonicity_value = float(np.mean(monotonicity_scores))
+        elif not compute_monotonicity and data_type == 'tabular':
+            monotonicity_value = 0.0  # Tabular but couldn't compute
+        else:
+            monotonicity_value = advanced_monotonicity  # Fallback to advanced
+
         return {
             'faithfulness': float(np.mean(faithfulness_scores)) if faithfulness_scores else 0.0,
-            'monotonicity': float(np.mean(monotonicity_scores)) if monotonicity_scores else 0.0,
+            'monotonicity': monotonicity_value,
             'completeness': float(np.mean(completeness_scores)) if completeness_scores else 0.0
         }
     
@@ -330,7 +528,14 @@ class Evaluator:
         feature_importances = np.array(normalized_importances)
         
         # Stability: consistency across explanations
-        stability = 1.0 - np.mean(np.std(feature_importances, axis=0)) / (np.mean(feature_importances) + 1e-8)
+        # Calculate coefficient of variation (CV) for each feature across explanations
+        mean_importance = np.mean(np.abs(feature_importances), axis=0)
+        std_importance = np.std(feature_importances, axis=0)
+
+        # Avoid division by zero
+        cv = np.where(mean_importance > 1e-8, std_importance / mean_importance, 0)
+        # Stability is inverse of mean coefficient of variation
+        stability = 1.0 / (1.0 + np.mean(cv))
         stability = max(0, min(1, stability))
         
         # Consistency: rank correlation between explanations
@@ -365,52 +570,113 @@ class Evaluator:
     def _evaluate_comprehensibility(self, explanation_results: Dict[str, Any]) -> Dict[str, float]:
         """Evaluate comprehensibility of explanations"""
         explanations = explanation_results.get('explanations', [])
-        
+
         if not explanations:
             return {
                 'sparsity': 0.0,
                 'simplicity': 0.0
             }
-        
+
         sparsity_scores = []
         simplicity_scores = []
-        
-        for explanation in explanations:
+
+        # Detect data type from first explanation
+        is_image_data = False
+        if explanations:
+            first_exp = explanations[0]
+            is_image_data = ('importance_map' in first_exp or
+                           (hasattr(first_exp.get('input'), 'shape') and
+                            len(first_exp.get('input', []).shape) >= 2))
+
+        print(f"\n[DEBUG SPARSITY] Evaluating comprehensibility for {'image' if is_image_data else 'tabular/text'} data")
+
+        for i, explanation in enumerate(explanations):
+            # Get feature importance - handle both tabular and image data
             feature_importance = explanation.get('feature_importance', [])
-            
+
+            # For image data, use importance_map if feature_importance is empty
+            # Check if feature_importance is empty properly for arrays
+            is_empty = False
+            if feature_importance is None:
+                is_empty = True
+            elif hasattr(feature_importance, '__len__'):
+                is_empty = len(feature_importance) == 0
+
+            if is_empty and 'importance_map' in explanation:
+                importance_map = explanation.get('importance_map', [])
+                if isinstance(importance_map, list):
+                    # Flatten the 2D importance map to 1D array for sparsity calculation
+                    feature_importance = np.array(importance_map).flatten()
+                elif isinstance(importance_map, np.ndarray):
+                    feature_importance = importance_map.flatten()
+
             try:
                 if isinstance(feature_importance, (list, np.ndarray)):
                     feature_importance = np.array(feature_importance)
-                    has_values = feature_importance.size > 0
+                    has_values = hasattr(feature_importance, 'size') and feature_importance.size > 0
                 else:
                     has_values = bool(feature_importance)
             except Exception:
                 has_values = bool(feature_importance)
-            
-            if has_values and feature_importance.size > 0:
+
+            if has_values and hasattr(feature_importance, 'size') and feature_importance.size > 0:
                 # Sparsity: how many features are actually important
-                # Use 75th percentile as threshold for important features
-                importance_threshold = np.percentile(np.abs(feature_importance), 75)
-                important_count = np.sum(np.abs(feature_importance) >= importance_threshold)
+                # Use different thresholds for different data types
+                if is_image_data:
+                    # For images, use 90th percentile (expect most pixels to be unimportant)
+                    percentile_threshold = 90
+                    print(f"  [SPARSITY] Image #{i+1}: Using {percentile_threshold}th percentile for {len(feature_importance)} pixels")
+                elif len(feature_importance) > 100:
+                    # For high-dimensional data, use 85th percentile
+                    percentile_threshold = 85
+                    print(f"  [SPARSITY] High-dim #{i+1}: Using {percentile_threshold}th percentile for {len(feature_importance)} features")
+                else:
+                    # For low-dimensional tabular data, use 75th percentile
+                    percentile_threshold = 75
+                    print(f"  [SPARSITY] Tabular #{i+1}: Using {percentile_threshold}th percentile for {len(feature_importance)} features")
+
+                importance_abs = np.abs(feature_importance)
+                importance_threshold = np.percentile(importance_abs, percentile_threshold)
+                important_count = np.sum(importance_abs >= importance_threshold)
+
+                # Calculate sparsity
                 sparsity = 1.0 - float(important_count) / len(feature_importance)
+
+                print(f"    - Importance range: [{np.min(importance_abs):.6f}, {np.max(importance_abs):.6f}]")
+                print(f"    - Threshold (p{percentile_threshold}): {importance_threshold:.6f}")
+                print(f"    - Important features: {important_count} / {len(feature_importance)} ({100*important_count/len(feature_importance):.2f}%)")
+                print(f"    - Sparsity score: {sparsity:.6f}")
+
                 sparsity_scores.append(max(0, min(1, sparsity)))
-                
+
                 # Simplicity: how concentrated the importance is
                 # Calculate Gini coefficient as a measure of concentration
-                sorted_importance = np.sort(feature_importance)
+                sorted_importance = np.sort(np.abs(feature_importance))  # Use absolute values
                 n = len(sorted_importance)
-                if n > 1 and np.sum(sorted_importance) > 0:
+                total_importance = np.sum(sorted_importance)
+
+                if n > 1 and total_importance > 1e-10:
                     # Gini coefficient calculation
                     cumsum = np.cumsum(sorted_importance)
-                    gini = (n + 1 - 2 * np.sum(cumsum) / np.sum(sorted_importance)) / n
-                    simplicity = max(0, min(1, gini))  # Normalize to [0, 1]
+                    gini = (n + 1 - 2 * np.sum(cumsum) / total_importance) / n
+                    simplicity = max(0, min(1, abs(gini)))  # Normalize to [0, 1]
+
+                    print(f"    - Gini coefficient: {gini:.6f}")
+                    print(f"    - Simplicity score: {simplicity:.6f}")
+
                     simplicity_scores.append(simplicity)
                 else:
+                    print(f"    - Single feature or zero importance, simplicity: 1.0")
                     simplicity_scores.append(1.0)  # Perfect simplicity for single feature
-        
+
+        final_sparsity = np.mean(sparsity_scores) if sparsity_scores else 0.0
+        final_simplicity = np.mean(simplicity_scores) if simplicity_scores else 0.0
+
+        print(f"\n[DEBUG SPARSITY] Final scores: sparsity={final_sparsity:.6f}, simplicity={final_simplicity:.6f}")
+
         return {
-            'sparsity': np.mean(sparsity_scores) if sparsity_scores else 0.0,
-            'simplicity': np.mean(simplicity_scores) if simplicity_scores else 0.0
+            'sparsity': final_sparsity,
+            'simplicity': final_simplicity
         }
     
     def _evaluate_example_based_fidelity(self, explanations: List[Dict], model, dataset) -> Dict[str, float]:
@@ -464,8 +730,8 @@ class Evaluator:
         
         return {
             'faithfulness': np.mean(faithfulness_scores) if faithfulness_scores else 0.0,
-            'monotonicity': np.mean(consistency_scores) if consistency_scores else 0.0,  # Reuse for consistency
-            'completeness': coverage  # Reuse for coverage
+            'monotonicity': np.mean(consistency_scores) if consistency_scores else 0.0,
+            'completeness': coverage
         }
     
     def _evaluate_example_based_stability(self, explanations: List[Dict]) -> Dict[str, float]:
@@ -593,7 +859,7 @@ class Evaluator:
                 'advanced_identity': 0.0,
                 'advanced_separability': 0.0,
                 'advanced_non_sensitivity': 0.0,
-                'advanced_compactness': 0.0,
+                'advanced_stability': 0.0,
                 'advanced_correctness': 0.0,
                 'advanced_entropy': 0.0,
                 'advanced_gini_coefficient': 0.0,

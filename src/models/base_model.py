@@ -8,6 +8,7 @@ from abc import ABC, abstractmethod
 from typing import Dict, Any, Optional
 import numpy as np
 from sklearn.metrics import accuracy_score, classification_report
+from pathlib import Path
 
 
 class BaseModel(ABC):
@@ -18,7 +19,7 @@ class BaseModel(ABC):
     def __init__(self, config: Dict[str, Any], dataset):
         """
         Initialize base model
-        
+
         Args:
             config: Model configuration
             dataset: Dataset instance
@@ -29,6 +30,7 @@ class BaseModel(ABC):
         self.model = None
         self.training_time = 0.0
         self.is_trained = False
+        self.is_loaded_from_cache = False
     
     @abstractmethod
     def _create_model(self) -> Any:
