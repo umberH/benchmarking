@@ -158,14 +158,21 @@ class DataManager:
         dataset_type = dataset_config['type']
         source = dataset_config['source']
 
-        # Check if dataset is available on OpenML first
-        if self.openml_loader.is_available() and dataset_name in self.openml_loader.get_available_datasets():
+        # Skip OpenML for large image datasets that have native loaders (to avoid OOM errors)
+        large_image_datasets = {'cifar10', 'fashion_mnist', 'mnist'}
+
+        # Check if dataset is available on OpenML first (but skip large images)
+        if (self.openml_loader.is_available() and
+            dataset_name in self.openml_loader.get_available_datasets() and
+            dataset_name not in large_image_datasets):
             try:
                 self.logger.info(f"Loading {dataset_name} from OpenML")
                 return self._load_from_openml(dataset_name)
             except Exception as e:
                 self.logger.warning(f"Failed to load {dataset_name} from OpenML: {e}")
                 self.logger.info(f"Falling back to original source: {source}")
+        elif dataset_name in large_image_datasets and self.openml_loader.is_available():
+            self.logger.info(f"Skipping OpenML for {dataset_name} (using native loader to avoid memory issues)")
 
         # Binary tabular datasets
         if dataset_name == 'adult_income':

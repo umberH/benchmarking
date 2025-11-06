@@ -25,9 +25,9 @@ class ExplanationFactory:
     def __init__(self, config: Dict[str, Any]):
         """
         Initialize explanation factory
-        
+
         Args:
-            config: Configuration dictionary for explanations
+            config: Full configuration dictionary (needs full config to access experiment settings)
         """
         self.config = config
         self.logger = logging.getLogger(__name__)
@@ -66,7 +66,10 @@ class ExplanationFactory:
     
     def get_available_methods(self) -> List[Dict[str, Any]]:
         """Get list of available explanation method configurations"""
-        methods = self.config.get('methods')
+        # Get explanations section from full config
+        explanations_config = self.config.get('explanations', {})
+
+        methods = explanations_config.get('methods')
         if methods:
             return methods
 
@@ -79,7 +82,7 @@ class ExplanationFactory:
             'perturbation',
         )
         for category in categories:
-            for item in self.config.get(category, []) or []:
+            for item in explanations_config.get(category, []) or []:
                 name = item.get('name')
                 if not name:
                     continue
@@ -123,7 +126,7 @@ class ExplanationFactory:
     def create_explainer(self, explanation_config: Dict[str, Any], model, dataset) -> BaseExplainer:
         """
         Create an explainer instance
-        
+
         Args:
             explanation_config: Explanation method configuration
             model: Trained model instance
@@ -136,7 +139,8 @@ class ExplanationFactory:
             raise ValueError(f"Unknown explanation method name: {method_name}")
         self.logger.info(f"Creating explainer: {method_name}")
         explainer_class = self.explainer_registry[method_name]
-        explainer = explainer_class(explanation_config, model, dataset)
+        # Pass full config instead of just explanation_config so explainer can access experiment settings
+        explainer = explainer_class(self.config, model, dataset)
         return explainer
     
     def get_method_info(self, method_name: str) -> Dict[str, Any]:

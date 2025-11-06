@@ -114,12 +114,20 @@ class PrototypeExplainer(BaseExplainer):
                     pdist = float(proto_distance)
             else:
                 pdist = None
+            # Calculate feature importance as absolute difference from prototype
+            if proto_instance is not None:
+                feature_importance = np.abs(instance - proto_instance).tolist()
+            else:
+                # If no prototype found, use zeros
+                feature_importance = np.zeros_like(instance).tolist()
+
             explanations.append({
                 'instance_id': original_idx,
                 'original': instance.tolist() if hasattr(instance, 'tolist') else list(instance),
                 'prediction': int(pred),
                 'prototype': proto_instance.tolist() if proto_instance is not None and hasattr(proto_instance, 'tolist') else (list(proto_instance) if proto_instance is not None else None),
                 'proto_distance': pdist,
+                'feature_importance': feature_importance,
                 'true_label': int(y_test[original_idx]) if original_idx < len(y_test) else None,
                 'confidence': model.predict_proba(instance.reshape(1, *instance.shape))[0].max() if hasattr(model, 'predict_proba') else None
             })
@@ -275,6 +283,22 @@ class CounterfactualExplainer(BaseExplainer):
                 cf_instance = X_train[opposite_idx[min_idx]] if is_text else X_train[opposite_idx][min_idx]
                 cf_distance = dists[min_idx]
 
+            # Calculate feature importance as absolute difference from counterfactual
+            if cf_instance is not None:
+                if is_text:
+                    # For text, use zeros (text has separate handling in evaluator)
+                    feature_importance = []
+                else:
+                    # For tabular/image data
+                    cf_vec = X_train_vec[opposite_idx][min_idx] if 'min_idx' in locals() else cf_instance
+                    feature_importance = np.abs(instance_vec - cf_vec).tolist()
+            else:
+                # If no counterfactual found, use zeros
+                if is_text:
+                    feature_importance = []
+                else:
+                    feature_importance = np.zeros_like(instance_vec).tolist()
+
             # Store the original format (text string or array)
             explanations.append({
                 'instance_id': original_idx,
@@ -282,6 +306,7 @@ class CounterfactualExplainer(BaseExplainer):
                 'prediction': int(pred),
                 'counterfactual': cf_instance if is_text else (cf_instance.tolist() if cf_instance is not None and hasattr(cf_instance, 'tolist') else (list(cf_instance) if cf_instance is not None else None)),
                 'cf_distance': float(cf_distance) if cf_distance is not None else None,
+                'feature_importance': feature_importance,
                 'true_label': int(y_test[original_idx]) if original_idx < len(y_test) else None,
                 'confidence': model.predict_proba([instance])[0].max() if is_text and hasattr(model, 'predict_proba') else (model.predict_proba(instance.reshape(1, *instance.shape))[0].max() if hasattr(model, 'predict_proba') else None)
             })

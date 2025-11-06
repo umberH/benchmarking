@@ -32,10 +32,13 @@ class OcclusionExplainer(BaseExplainer):
         # Use config to determine number of explanations
         max_test_samples = self.config.get('experiment', {}).get('explanation', {}).get('max_test_samples', None)
         n_explanations = len(X_test) if max_test_samples is None else min(max_test_samples, len(X_test))
-        n_explanations = min(n_explanations, 50)  # Limit for computational efficiency
+        # Limit for computational efficiency (occlusion is expensive)
+        # BUT ensure we generate for all requested instances to avoid empty feature_importance
+        max_occlusion_limit = 200  # Reasonable limit to prevent hanging
+        n_explanations = min(n_explanations, max_occlusion_limit)
 
         test_subset = X_test[:n_explanations]
-        self.logger.info(f"OcclusionExplainer: Generating for {n_explanations} instances")
+        self.logger.info(f"OcclusionExplainer: Generating for {n_explanations} instances (limited to {max_occlusion_limit} for efficiency)")
 
         for i, instance in enumerate(test_subset):
             try:
@@ -143,10 +146,20 @@ class OcclusionExplainer(BaseExplainer):
 
         # Auto-determine patch size if not provided
         if patch_size is None:
-            patch_size = max(2, min(h, w) // 8)
+            # Use larger patches for efficiency (fewer iterations)
+            patch_size = max(4, min(h, w) // 7)  # Slightly larger patches
 
         # Initialize importance map
         importance_map = np.zeros((h, w))
+
+        # Calculate total iterations to avoid hanging on large images
+        total_iterations = ((h + patch_size - 1) // patch_size) * ((w + patch_size - 1) // patch_size)
+        max_iterations = 100  # Safety limit to prevent hanging
+
+        if total_iterations > max_iterations:
+            # Increase patch size to reduce iterations
+            patch_size = max(patch_size, int(np.sqrt(h * w / max_iterations)))
+            self.logger.warning(f"Image too large ({h}x{w}), increasing patch size to {patch_size} to limit iterations")
 
         # Occlude patches and measure prediction change
         for y in range(0, h, patch_size):

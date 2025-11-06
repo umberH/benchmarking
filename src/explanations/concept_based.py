@@ -32,11 +32,13 @@ class TCAVExplainer(BaseExplainer):
         # Use config to determine number of explanations
         max_test_samples = self.config.get('experiment', {}).get('explanation', {}).get('max_test_samples', None)
         n_explanations = len(X_test) if max_test_samples is None else min(max_test_samples, len(X_test))
-        n_explanations = min(n_explanations, 50)  # Limit for computational efficiency
+        # Limit for computational efficiency to prevent hanging
+        max_tcav_limit = 200
+        n_explanations = min(n_explanations, max_tcav_limit)
 
         test_subset = X_test[:n_explanations]
 
-        self.logger.info(f"TCAV: Generating explanations for {n_explanations} instances")
+        self.logger.info(f"TCAV: Generating explanations for {n_explanations} instances (limited to {max_tcav_limit} for efficiency)")
 
         # Generate concept vectors by clustering training data
         concept_vectors = self._generate_concept_vectors(X_train, y_train)
@@ -61,10 +63,22 @@ class TCAVExplainer(BaseExplainer):
                 # Create concept names
                 concept_names = [f"concept_{j}" for j in range(len(concept_vectors))]
 
+                # Calculate feature importance as weighted sum of concept contributions
+                # Each concept vector's contribution weighted by its TCAV score
+                feature_importance = np.zeros_like(instance_flat)
+                for j, (score, concept_vec) in enumerate(zip(tcav_scores, concept_vectors)):
+                    # Weight each concept vector by its TCAV score
+                    feature_importance += abs(score) * np.abs(concept_vec)
+
+                # Normalize to avoid extremely large values
+                if np.max(feature_importance) > 0:
+                    feature_importance = feature_importance / np.max(feature_importance)
+
                 explanation = {
                     'instance_id': i,
                     'tcav_scores': tcav_scores.tolist(),
                     'concept_names': concept_names,
+                    'feature_importance': feature_importance.tolist(),
                     'prediction': float(prediction),
                     'true_label': float(y_test[i]) if i < len(y_test) else None,
                     'n_concepts': len(concept_vectors)
@@ -173,11 +187,13 @@ class ConceptBottleneckExplainer(BaseExplainer):
         # Use config to determine number of explanations
         max_test_samples = self.config.get('experiment', {}).get('explanation', {}).get('max_test_samples', None)
         n_explanations = len(X_test) if max_test_samples is None else min(max_test_samples, len(X_test))
-        n_explanations = min(n_explanations, 50)  # Limit for computational efficiency
+        # Limit for computational efficiency to prevent hanging
+        max_cb_limit = 200
+        n_explanations = min(n_explanations, max_cb_limit)
 
         test_subset = X_test[:n_explanations]
 
-        self.logger.info(f"ConceptBottleneck: Generating explanations for {n_explanations} instances")
+        self.logger.info(f"ConceptBottleneck: Generating explanations for {n_explanations} instances (limited to {max_cb_limit} for efficiency)")
 
         # Learn concept representations
         concept_model, concept_names = self._learn_concept_bottleneck(X_train, y_train)
@@ -205,10 +221,36 @@ class ConceptBottleneckExplainer(BaseExplainer):
                 # Get model prediction
                 prediction = self.model.predict([instance])[0]
 
+                # Calculate feature importance from concept model coefficients
+                # Use the logistic regression coefficients weighted by concept activations
+                if hasattr(concept_model, 'coef_'):
+                    # Get coefficients for the predicted class
+                    pred_class_idx = int(prediction) if prediction < len(concept_model.classes_) else 0
+                    if concept_model.coef_.ndim > 1:
+                        class_coef = concept_model.coef_[pred_class_idx]
+                    else:
+                        class_coef = concept_model.coef_
+
+                    # Map back to original feature space
+                    if hasattr(self, 'pca') and self.pca is not None:
+                        # Transform PCA components back to original space
+                        feature_importance_full = np.dot(class_coef, self.pca.components_)
+                    else:
+                        feature_importance_full = class_coef
+
+                    # Take absolute values and normalize
+                    feature_importance = np.abs(feature_importance_full)
+                    if np.max(feature_importance) > 0:
+                        feature_importance = feature_importance / np.max(feature_importance)
+                else:
+                    # Fallback: use concept activations as proxy
+                    feature_importance = concept_activations
+
                 explanation = {
                     'instance_id': i,
                     'concept_activations': concept_activations.tolist(),
                     'concept_names': concept_names,
+                    'feature_importance': feature_importance.tolist() if isinstance(feature_importance, np.ndarray) else list(feature_importance),
                     'prediction': float(prediction),
                     'true_label': float(y_test[i]) if i < len(y_test) else None,
                     'n_concepts': len(concept_names)

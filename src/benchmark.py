@@ -45,7 +45,8 @@ class XAIBenchmark:
         # Pass the full config so DataManager can access the 'data' section internally
         self.data_manager = DataManager(config)
         self.model_factory = ModelFactory(config.get('models', {}))
-        self.explanation_factory = ExplanationFactory(config.get('explanations', {}))
+        # Pass full config to ExplanationFactory so it can access experiment.explanation.max_test_samples
+        self.explanation_factory = ExplanationFactory(config)
         self.evaluator = Evaluator(config.get('evaluation', {}))
         self.report_generator = ReportGenerator(output_dir)
         self.data_validator = DataValidator(config)
@@ -1955,17 +1956,29 @@ class XAIBenchmark:
         try:
             # Get test data
             X_train, X_test, y_train, y_test = dataset.get_data()
-            
+
+            # Limit test samples based on config
+            max_test_samples = self.config.get('experiment', {}).get('explanation', {}).get('max_test_samples', None)
+            if max_test_samples is not None and len(X_test) > max_test_samples:
+                self.logger.info(f"Limiting test set from {len(X_test)} to {max_test_samples} samples (as per config)")
+                # Handle both list and array types
+                if isinstance(X_test, list):
+                    X_test = X_test[:max_test_samples]
+                    y_test = y_test[:max_test_samples]
+                else:
+                    X_test = X_test[:max_test_samples]
+                    y_test = y_test[:max_test_samples]
+
             # Create directory for detailed explanations
             detailed_dir = self.output_dir / "detailed_explanations" / dataset_name / model_name
             detailed_dir.mkdir(parents=True, exist_ok=True)
-            
+
             # Generate explanations for each test instance
             detailed_explanations = []
             batch_size = min(20, len(X_test))  # Smaller batch size to reduce memory issues
             error_count = 0
             max_errors = min(10, len(X_test) // 10)  # Stop if too many errors
-            
+
             self.logger.info(f"Generating detailed explanations for {len(X_test)} test instances (batch size: {batch_size})")
             
             for i in range(0, len(X_test), batch_size):
@@ -2852,11 +2865,22 @@ class XAIBenchmark:
             try:
                 # Get test data
                 X_train, X_test, y_train, y_test = dataset.get_data()
-                
+
+                # Limit test samples based on config
+                max_test_samples = self.config.get('experiment', {}).get('explanation', {}).get('max_test_samples', None)
+                if max_test_samples is not None and len(X_test) > max_test_samples:
+                    self.logger.info(f"Limiting test set from {len(X_test)} to {max_test_samples} samples (as per config)")
+                    if isinstance(X_test, list):
+                        X_test = X_test[:max_test_samples]
+                        y_test = y_test[:max_test_samples]
+                    else:
+                        X_test = X_test[:max_test_samples]
+                        y_test = y_test[:max_test_samples]
+
                 # Create directory for detailed explanations
                 detailed_dir = self.output_dir / "detailed_explanations" / dataset_name / model_name
                 detailed_dir.mkdir(parents=True, exist_ok=True)
-                
+
                 # Generate simplified explanations to avoid data type errors
                 self.logger.info(f"Generating simplified explanation summary for {len(X_test)} test instances")
                 

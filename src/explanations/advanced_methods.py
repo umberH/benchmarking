@@ -27,34 +27,34 @@ class CausalSHAPExplainer(BaseExplainer):
     def explain(self, dataset) -> Dict[str, Any]:
         """Generate causal SHAP explanations considering feature dependencies"""
         start_time = time.time()
-        
+
         # Get data
         X_train, X_test, y_train, y_test = dataset.get_data()
-        
+
         # Check for text data compatibility
         if isinstance(X_test, list):  # Skip if not tabular
             self.logger.warning("CausalSHAP only supports tabular data")
             return self._empty_result()
-        
+
         # Additional check for string/text data in arrays
         if hasattr(X_test, 'dtype') and X_test.dtype.kind in ['U', 'S', 'O']:
             self.logger.warning("CausalSHAP does not support text/string data")
             return self._empty_result()
-        
+
         # Check dataset info for text type
         dataset_info = getattr(dataset, 'get_info', lambda: {})()
         if dataset_info.get('type') == 'text':
             self.logger.warning("CausalSHAP does not support text datasets")
             return self._empty_result()
-        
+
+        # Limit test samples based on config
+        X_test, y_test = self._limit_test_samples(X_test, y_test)
+
         explanations = []
         feature_names = dataset.feature_names if hasattr(dataset, 'feature_names') else [f'feature_{i}' for i in range(X_test.shape[1])]
-        
-        # Generate explanations for subset of test instances
-        # Get max test samples from config (None means use full test set)
-        max_test_samples = self.config.get('experiment', {}).get('explanation', {}).get('max_test_samples', None)
-        n_explanations = len(X_test) if max_test_samples is None else min(max_test_samples, len(X_test))
-        test_subset = X_test[:n_explanations]
+
+        # Use all limited test samples
+        test_subset = X_test
         
         # Build causal structure (simplified - in practice this would come from domain knowledge)
         causal_graph = self._infer_causal_structure(X_train, feature_names)
@@ -191,36 +191,40 @@ class ShapleyFlowExplainer(BaseExplainer):
     def explain(self, dataset) -> Dict[str, Any]:
         """Generate Shapley Flow explanations tracking value propagation"""
         start_time = time.time()
-        
+
         X_train, X_test, y_train, y_test = dataset.get_data()
-        
+
         # Check for text data compatibility
         if isinstance(X_test, list):
             self.logger.warning("ShapleyFlow does not support text data")
             return self._empty_result()
-        
+
         # Additional check for string/text data in arrays
         if hasattr(X_test, 'dtype') and X_test.dtype.kind in ['U', 'S', 'O']:
             self.logger.warning("ShapleyFlow does not support text/string data")
             return self._empty_result()
-        
+
         # Check dataset info for text type
         dataset_info = getattr(dataset, 'get_info', lambda: {})()
         if dataset_info.get('type') == 'text':
             self.logger.warning("ShapleyFlow does not support text datasets")
             return self._empty_result()
-        
+
         # Check if any element in test data appears to be text
         if hasattr(X_test, 'shape') and len(X_test) > 0:
             sample = X_test[0] if len(X_test.shape) > 1 else X_test
             if hasattr(sample, 'dtype') and sample.dtype.kind in ['U', 'S', 'O']:
                 self.logger.warning("ShapleyFlow detected text data in test set")
                 return self._empty_result()
-        
+
+        # Limit test samples based on config
+        X_test, y_test = self._limit_test_samples(X_test, y_test)
+
         explanations = []
         feature_names = dataset.feature_names if hasattr(dataset, 'feature_names') else [f'feature_{i}' for i in range(X_test.shape[1])]
-        
-        n_explanations = min(30, len(X_test))  # Computationally expensive
+
+        # Further limit for computationally expensive method
+        n_explanations = min(30, len(X_test))
         test_subset = X_test[:n_explanations]
         
         for i, instance in enumerate(test_subset):
@@ -314,7 +318,7 @@ class ShapleyFlowExplainer(BaseExplainer):
         baseline_pred = self.model.predict([baseline])[0]
         
         # Calculate feature importance using integrated gradients approximation
-        n_steps = 10
+        n_steps = 100
         for i in range(n_features):
             gradient_sum = 0
             for step in range(1, n_steps + 1):
@@ -392,31 +396,35 @@ class BayesianRuleListExplainer(BaseExplainer):
     def explain(self, dataset) -> Dict[str, Any]:
         """Generate Bayesian Rule List explanations"""
         start_time = time.time()
-        
+
         X_train, X_test, y_train, y_test = dataset.get_data()
-        
+
         # Check for text data compatibility
         if isinstance(X_test, list):
             self.logger.warning("BayesianRuleList only supports tabular data")
             return self._empty_result()
-        
+
         # Additional check for string/text data in arrays
         if hasattr(X_test, 'dtype') and X_test.dtype.kind in ['U', 'S', 'O']:
             self.logger.warning("BayesianRuleList does not support text/string data")
             return self._empty_result()
-        
+
         # Check dataset info for text type
         dataset_info = getattr(dataset, 'get_info', lambda: {})()
         if dataset_info.get('type') == 'text':
             self.logger.warning("BayesianRuleList does not support text datasets")
             return self._empty_result()
-        
+
+        # Limit test samples based on config
+        X_test, y_test = self._limit_test_samples(X_test, y_test)
+
         # Generate rule list from training data and model
         rule_list = self._generate_rule_list(X_train, y_train)
-        
+
         explanations = []
         feature_names = dataset.feature_names if hasattr(dataset, 'feature_names') else [f'feature_{i}' for i in range(X_test.shape[1])]
-        
+
+        # Further limit for computationally expensive method
         n_explanations = min(100, len(X_test))
         test_subset = X_test[:n_explanations]
         
@@ -692,15 +700,19 @@ class InfluenceFunctionExplainer(BaseExplainer):
     def explain(self, dataset) -> Dict[str, Any]:
         """Generate influence function explanations"""
         start_time = time.time()
-        
+
         X_train, X_test, y_train, y_test = dataset.get_data()
-        
+
+        # Limit test samples based on config
+        X_test, y_test = self._limit_test_samples(X_test, y_test)
+
         explanations = []
         feature_names = None
         if not isinstance(X_test, list):
             feature_names = dataset.feature_names if hasattr(dataset, 'feature_names') else [f'feature_{i}' for i in range(X_test.shape[1])]
-        
-        n_explanations = min(20, len(X_test))  # Very computationally expensive
+
+        # Further limit for very computationally expensive method
+        n_explanations = min(20, len(X_test))
         test_subset = X_test[:n_explanations] if not isinstance(X_test, list) else X_test[:n_explanations]
         
         for i, test_instance in enumerate(test_subset):
@@ -911,29 +923,33 @@ class SHAPInteractivePlotsExplainer(BaseExplainer):
     def explain(self, dataset) -> Dict[str, Any]:
         """Generate SHAP explanations with interaction effects"""
         start_time = time.time()
-        
+
         X_train, X_test, y_train, y_test = dataset.get_data()
-        
+
         # Check for text data compatibility
         if isinstance(X_test, list):
             self.logger.warning("SHAP Interactive Plots only support tabular data")
             return self._empty_result()
-        
+
         # Additional check for string/text data in arrays
         if hasattr(X_test, 'dtype') and X_test.dtype.kind in ['U', 'S', 'O']:
             self.logger.warning("SHAP Interactive Plots does not support text/string data")
             return self._empty_result()
-        
+
         # Check dataset info for text type
         dataset_info = getattr(dataset, 'get_info', lambda: {})()
         if dataset_info.get('type') == 'text':
             self.logger.warning("SHAP Interactive Plots does not support text datasets")
             return self._empty_result()
-        
+
+        # Limit test samples based on config
+        X_test, y_test = self._limit_test_samples(X_test, y_test)
+
         explanations = []
         feature_names = dataset.feature_names if hasattr(dataset, 'feature_names') else [f'feature_{i}' for i in range(X_test.shape[1])]
-        
-        n_explanations = min(5, len(X_test))  # Reduced from 30 to 5 for speed
+
+        # Further limit for very computationally expensive method
+        n_explanations = min(5, len(X_test))
         test_subset = X_test[:n_explanations]
         
         for i, instance in enumerate(test_subset):
@@ -1123,38 +1139,42 @@ class CORELSExplainer(BaseExplainer):
     def explain(self, dataset) -> Dict[str, Any]:
         """Generate CORELS optimal rule list explanations"""
         start_time = time.time()
-        
+
         X_train, X_test, y_train, y_test = dataset.get_data()
-        
+
         # Check for text data compatibility
         if isinstance(X_test, list):
             self.logger.warning("CORELS only supports tabular data")
             return self._empty_result()
-        
+
         # Additional check for string/text data in arrays
         if hasattr(X_test, 'dtype') and X_test.dtype.kind in ['U', 'S', 'O']:
             self.logger.warning("CORELS does not support text/string data")
             return self._empty_result()
-        
+
         # Check dataset info for text type
         dataset_info = getattr(dataset, 'get_info', lambda: {})()
         if dataset_info.get('type') == 'text':
             self.logger.warning("CORELS does not support text datasets")
             return self._empty_result()
-        
+
         # Check if any element in test data appears to be text
         if hasattr(X_test, 'shape') and len(X_test) > 0:
             sample = X_test[0] if len(X_test.shape) > 1 else X_test
             if hasattr(sample, 'dtype') and sample.dtype.kind in ['U', 'S', 'O']:
                 self.logger.warning("CORELS detected text data in test set")
                 return self._empty_result()
-        
+
+        # Limit test samples based on config
+        X_test, y_test = self._limit_test_samples(X_test, y_test)
+
         # Generate optimal rule list
         optimal_rules = self._generate_optimal_rule_list(X_train, y_train)
-        
+
         explanations = []
         feature_names = dataset.feature_names if hasattr(dataset, 'feature_names') else [f'feature_{i}' for i in range(X_test.shape[1])]
-        
+
+        # Further limit for computationally expensive method
         n_explanations = min(100, len(X_test))
         test_subset = X_test[:n_explanations]
         

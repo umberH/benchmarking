@@ -111,7 +111,25 @@ class BaseModel(ABC):
             # Get predictions
             train_predictions = self.predict(X_train)
             test_predictions = self.predict(X_test)
-            
+
+            # Ensure predictions are integer class labels, not probabilities
+            # Check if predictions are continuous (probabilities) and convert to class labels
+            if train_predictions.dtype.kind == 'f':  # Float type
+                if np.all((train_predictions >= 0) & (train_predictions <= 1)):
+                    # Binary classification probabilities - convert to 0/1
+                    train_predictions = (train_predictions > 0.5).astype(int)
+                else:
+                    # Round to nearest integer
+                    train_predictions = np.round(train_predictions).astype(int)
+
+            if test_predictions.dtype.kind == 'f':  # Float type
+                if np.all((test_predictions >= 0) & (test_predictions <= 1)):
+                    # Binary classification probabilities - convert to 0/1
+                    test_predictions = (test_predictions > 0.5).astype(int)
+                else:
+                    # Round to nearest integer
+                    test_predictions = np.round(test_predictions).astype(int)
+
             # Basic accuracy metrics
             train_accuracy = accuracy_score(y_train, train_predictions)
             test_accuracy = accuracy_score(y_test, test_predictions)

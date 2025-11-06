@@ -22,7 +22,7 @@ def main():
     parser = argparse.ArgumentParser(description="Run hyperparameter tuning for XAI benchmarking")
     parser.add_argument("--config", type=str, default="configs/default_config.yaml",
                        help="Configuration file path")
-    parser.add_argument("--output-dir", type=str, default="tuning_results",
+    parser.add_argument("--output-dir", type=str, default="saved_models/tuning_results",
                        help="Output directory for tuning results")
     parser.add_argument("--datasets", type=str, nargs="+",
                        help="Specific datasets to tune (default: all mandatory)")

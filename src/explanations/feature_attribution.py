@@ -25,6 +25,9 @@ class SHAPExplainer(BaseExplainer):
         # Get test data
         X_train, X_test, y_train, y_test = dataset.get_data()
 
+        # Limit test samples based on config
+        X_test, y_test = self._limit_test_samples(X_test, y_test)
+
         # Handle different data types
         if isinstance(X_test, list):
             # Text data - use text-specific SHAP implementation
@@ -40,10 +43,8 @@ class SHAPExplainer(BaseExplainer):
 
         feature_names = dataset.feature_names if hasattr(dataset, 'feature_names') else [f'feature_{i}' for i in range(X_test.shape[1])]
 
-        # Get max test samples from config
-        max_test_samples = self.config.get('experiment', {}).get('explanation', {}).get('max_test_samples', None)
-        n_explanations = len(X_test) if max_test_samples is None else min(max_test_samples, len(X_test))
-        test_subset = X_test[:n_explanations]
+        # X_test is already limited by _limit_test_samples() above
+        test_subset = X_test
 
         # Use TreeSHAP for tree-based models (fast and exact)
         is_tree = self._is_tree_model()
@@ -383,10 +384,12 @@ class SHAPExplainer(BaseExplainer):
         test_subset = X_test[:n_explanations]
         
         for i, text_instance in enumerate(test_subset):
+            print(f"[SHAP Text] Processing instance {i+1}/{n_explanations}")
             # Calculate word-level Shapley values for text
             word_importance, feature_names = self._calculate_text_shapley_values(
                 text_instance, X_train, y_train
             )
+            print(f"[SHAP Text] Completed instance {i+1}/{n_explanations}")
             
             # Get model prediction
             prediction = self.model.predict([text_instance])[0]
@@ -500,43 +503,54 @@ class SHAPExplainer(BaseExplainer):
         # Get full text prediction
         full_prediction = self.model.predict([text_instance])[0]
         
-        # Calculate Shapley values using marginal contributions
-        shapley_values = np.zeros(n_words)
-        
-        # For computational efficiency, use a sampling-based approach
-        n_samples = min(100, 2 ** min(n_words, 10))  # Limit sampling
-        
-        for word_idx in range(n_words):
-            marginal_contributions = []
-            
-            for _ in range(min(20, n_samples)):  # Sample coalitions
-                # Generate random coalition (subset of other words)
-                coalition_size = np.random.randint(0, n_words)
-                coalition = np.random.choice(
-                    [idx for idx in range(n_words) if idx != word_idx],
-                    size=min(coalition_size, n_words - 1),
-                    replace=False
-                )
-                
-                # Coalition without current word
-                coalition_without = list(coalition)
-                text_without = ' '.join([words[idx] for idx in coalition_without])
-                if not text_without.strip():
-                    pred_without = baseline_prediction
-                else:
-                    pred_without = self.model.predict([text_without])[0]
-                
-                # Coalition with current word
-                coalition_with = list(coalition) + [word_idx]
-                text_with = ' '.join([words[idx] for idx in sorted(coalition_with)])
-                pred_with = self.model.predict([text_with])[0]
-                
-                # Marginal contribution
-                marginal_contribution = pred_with - pred_without
-                marginal_contributions.append(marginal_contribution)
-            
-            # Average marginal contribution is the Shapley value
-            shapley_values[word_idx] = np.mean(marginal_contributions)
+        # Calculate Shapley values using KernelSHAP (efficient for text)
+        # KernelSHAP: Use weighted linear regression on sampled coalitions
+        # Reduce samples for long text to maintain reasonable runtime
+        if n_words > 100:
+            n_samples = 50  # Minimal samples for very long text
+        elif n_words > 50:
+            n_samples = 75  # Moderate samples for long text
+        else:
+            n_samples = 100  # Full samples for short text
+
+        print(f"[DEBUG KernelSHAP] n_words={n_words}, n_samples={n_samples}")
+
+        # Storage for regression
+        coalition_matrix = np.zeros((n_samples, n_words))
+        predictions = np.zeros(n_samples)
+        weights = np.zeros(n_samples)
+
+        for sample_idx in range(n_samples):
+            # Sample coalition with uniform probability
+            coalition_mask = np.random.randint(0, 2, n_words).astype(bool)
+            coalition_size = np.sum(coalition_mask)
+
+            # Build text from coalition
+            coalition_words = [words[idx] for idx in range(n_words) if coalition_mask[idx]]
+            if len(coalition_words) == 0:
+                pred = baseline_prediction
+            else:
+                text_sample = ' '.join(coalition_words)
+                pred = self.model.predict([text_sample])[0]
+
+            # Store for regression
+            coalition_matrix[sample_idx] = coalition_mask.astype(float)
+            predictions[sample_idx] = pred
+
+            # KernelSHAP weight: inversely proportional to coalition size variance
+            # Weight based on binomial coefficient (SHAP kernel weight)
+            if coalition_size == 0 or coalition_size == n_words:
+                weights[sample_idx] = 1000  # High weight for boundary cases
+            else:
+                # Simplified kernel weight (avoids factorial overflow)
+                weights[sample_idx] = (n_words - 1) / (coalition_size * (n_words - coalition_size))
+
+        # Weighted linear regression to get Shapley values
+        # Add small regularization for numerical stability
+        from sklearn.linear_model import Ridge
+        ridge = Ridge(alpha=0.01, fit_intercept=True)
+        ridge.fit(coalition_matrix, predictions - baseline_prediction, sample_weight=weights)
+        shapley_values = ridge.coef_
         
         # Ensure Shapley values sum to the difference from baseline (efficiency property)
         total_effect = full_prediction - baseline_prediction
@@ -562,10 +576,13 @@ class LIMEExplainer(BaseExplainer):
     def explain(self, dataset) -> Dict[str, Any]:
         """Generate LIME explanations"""
         start_time = time.time()
-        
+
         # Get test data
         X_train, X_test, y_train, y_test = dataset.get_data()
-        
+
+        # Limit test samples based on config
+        X_test, y_test = self._limit_test_samples(X_test, y_test)
+
         # Handle different data types
         if isinstance(X_test, list):
             # Text data - use configurable word-based features
@@ -844,6 +861,10 @@ class IntegratedGradientsExplainer(BaseExplainer):
         import time
         start_time = time.time()
         X_train, X_test, y_train, y_test = dataset.get_data()
+
+        # Limit test samples based on config
+        X_test, y_test = self._limit_test_samples(X_test, y_test)
+
         model = self.model
         # Check for scikit-learn MLP or non-differentiable model
         sklearn_mlp = False

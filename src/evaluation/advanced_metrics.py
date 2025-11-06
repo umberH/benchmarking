@@ -472,7 +472,11 @@ class AdvancedMetricsEvaluator:
                 continue
             
             importance_array = np.array(feature_importance)
-            
+
+            # Skip if contains NaN or inf
+            if np.any(np.isnan(importance_array)) or np.any(np.isinf(importance_array)):
+                continue
+
             # Calculate coefficient of variation (std/mean) as separability measure
             if np.mean(np.abs(importance_array)) > 1e-8:
                 cv = np.std(importance_array) / np.mean(np.abs(importance_array))
@@ -709,6 +713,11 @@ class AdvancedMetricsEvaluator:
             
             # Explanation informativeness: higher variance in importance = more informative
             importance_array = np.array(feature_importance)
+
+            # Skip if contains NaN or inf
+            if np.any(np.isnan(importance_array)) or np.any(np.isinf(importance_array)):
+                continue
+
             if len(importance_array) > 1:
                 importance_variance = np.var(importance_array)
                 max_possible_variance = np.var([1.0] + [0.0] * (len(importance_array) - 1))  # Max possible

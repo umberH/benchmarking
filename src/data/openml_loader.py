@@ -83,14 +83,20 @@ class OpenMLLoader:
         try:
             self.logger.info(f"Loading OpenML dataset {dataset_id} ({dataset_name or 'unnamed'}) via sklearn")
 
-            # Download from OpenML using sklearn
-            data = sklearn_fetch_openml(
-                data_id=dataset_id,
-                as_frame=True,
-                parser='auto',
-                cache=True,
-                data_home=str(self.cache_dir)
-            )
+            # Download from OpenML using sklearn with memory-efficient settings
+            # Use parser='liac-arff' for large datasets to avoid pandas memory issues
+            try:
+                data = sklearn_fetch_openml(
+                    data_id=dataset_id,
+                    as_frame=True,
+                    parser='liac-arff',  # More memory efficient than 'auto' for large datasets
+                    cache=True,
+                    data_home=str(self.cache_dir)
+                )
+            except (MemoryError, Exception) as e:
+                # If liac-arff fails, raise the error for fallback handling
+                self.logger.error(f"Memory error or parser error loading dataset {dataset_id}: {e}")
+                raise MemoryError(f"Dataset {dataset_id} too large to load in memory") from e
 
             X = data.data
             y = data.target

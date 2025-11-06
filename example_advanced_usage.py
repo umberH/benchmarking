@@ -96,7 +96,7 @@ def show_advanced_metrics():
         'advanced_identity',         # Identity axiom
         'advanced_separability',     # Separability axiom  
         'advanced_non_sensitivity',  # Non-sensitivity axiom
-        'advanced_compactness'       # Compactness axiom
+        'advanced_stability'       # Compactness axiom
     ]
     
     info_metrics = [
