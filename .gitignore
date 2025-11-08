@@ -179,3 +179,37 @@ tmp/
 
 # streamlit
 .streamlit
+
+# Data and datasets
+data/
+!data/.gitkeep
+
+# Trained models
+saved_models/models/
+saved_models/metadata/
+
+# Logs
+logs/
+
+# Test files
+test/
+test_*.py
+quick_test_*.py
+
+# Generated output files
+detailed_explanations/
+*.txt
+!requirements*.txt
+
+# Generated tables and visualizations
+*.tex
+*.png
+*.jpg
+*.jpeg
+!docs/**/*.png
+!assets/**/*.png
+
+# Generated CSV results
+full_metrics_*.csv
+
+test_*.py
